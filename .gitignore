@@ -1,5 +1,7 @@
 # Backend
 be/.venv
+be/.env
 be/scripts/__pycache__
+
 
 #Frontend
