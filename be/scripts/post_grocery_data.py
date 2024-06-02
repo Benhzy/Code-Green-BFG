@@ -1,7 +1,9 @@
+# scripts/upsert_user_groceries.py
+
 import psycopg2
 from psycopg2 import sql
 
-def upsert_data_with_single_id(document_id, items):
+def upsert_user_groceries(user_id, items):
     # Database connection parameters
     conn_params = {
         "dbname": "postgres",
@@ -11,8 +13,8 @@ def upsert_data_with_single_id(document_id, items):
         "port": "5432"
     }
     
-    # Ensure document_id is a string
-    document_id = str(document_id)
+    # Ensure user_id is a string
+    user_id = str(user_id)
 
     # Upsert query for each item
     upsert_query = """
@@ -20,8 +22,8 @@ def upsert_data_with_single_id(document_id, items):
     VALUES (%s, %s, %s, %s, %s, %s)
     ON CONFLICT (user_id, item, purchase_date)
     DO UPDATE SET
-        user_id = EXCLUDED.user_id,
         quantity = EXCLUDED.quantity,
+        category = EXCLUDED.category,
         expiry_date = EXCLUDED.expiry_date;
     """
 
@@ -33,7 +35,7 @@ def upsert_data_with_single_id(document_id, items):
         # Upsert each item
         for item in items:
             cursor.execute(upsert_query, (
-                document_id,
+                user_id,
                 item['item'],
                 item['quantity'],
                 item['category'],
@@ -48,15 +50,28 @@ def upsert_data_with_single_id(document_id, items):
         cursor.close()
         conn.close()
         
-        return str(document_id), 201
+        return str(user_id), 201
     except Exception as e:
         return {"error": f"An error occurred: {e}"}, 500
 
 # Example usage
-# document_id = "1"
-# items = [
-#     {"item": "apple", "quantity": "42", "category": "fruit", "purchase_date": "2024-06-05", "expiry_date": "2024-06-12"}
-# ]
-
-# result = upsert_data_with_single_id(document_id, items)
-# print(result)
+if __name__ == '__main__':
+    user_id = "1"
+    items = [
+        {
+            "item": "apple", 
+            "quantity": "42", 
+            "category": "fruit", 
+            "purchase_date": "2024-06-05", 
+            "expiry_date": "2024-06-12"
+        },
+        {
+            "item": "banana", 
+            "quantity": "30", 
+            "category": "fruit", 
+            "purchase_date": "2024-06-06", 
+            "expiry_date": "2024-06-15"
+        }
+    ]
+    result, status_code = upsert_user_groceries(user_id, items)
+    print(result, status_code)
