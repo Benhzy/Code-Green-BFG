@@ -1,4 +1,4 @@
-# scripts/post_grocery_data_script.py
+# scripts/receipt_scanner.py
 
 from post_grocery_data import upsert_data_with_single_id
 
