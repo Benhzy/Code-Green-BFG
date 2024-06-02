@@ -1,0 +1,7 @@
+# Main
+.venv
+
+# Backend
+be/scripts/__pycache__
+
+#Frontend
