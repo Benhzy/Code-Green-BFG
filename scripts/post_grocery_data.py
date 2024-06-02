@@ -7,7 +7,7 @@ def upsert_data_with_single_id(document_id, items):
         "dbname": "postgres",
         "user": "postgres",
         "password": "00edward00",
-        "host": "192.168.56.1",
+        "host": "localhost",
         "port": "5432"
     }
     
@@ -17,8 +17,8 @@ def upsert_data_with_single_id(document_id, items):
     # Upsert query for each item
     upsert_query = """
     INSERT INTO public.groceries (user_id, item, quantity, category, purchase_date, expiry_date)
-    VALUES (%s, %s, %s, %s, %s, %s)
-    ON CONFLICT (user_id, item, purchase_date)
+    VALUES (%s, %s, %s, %s, %s)
+    ON CONFLICT (item, purchase_date)
     DO UPDATE SET
         user_id = EXCLUDED.user_id,
         quantity = EXCLUDED.quantity,
@@ -55,7 +55,7 @@ def upsert_data_with_single_id(document_id, items):
 # Example usage
 document_id = "1"
 items = [
-    {"item": "apple", "quantity": 42, "category": "fruit", "purchase_date": "2024-06-05", "expiry_date": "2024-06-12"}
+    {"item": "apple", "quantity": 50000, "category": "fruit", "purchase_date": "2024-06-03", "expiry_date": "2024-06-11"}
 ]
 
 result = upsert_data_with_single_id(document_id, items)
