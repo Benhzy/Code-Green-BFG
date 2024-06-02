@@ -7,7 +7,7 @@ def upsert_data_with_single_id(document_id, items):
         "dbname": "postgres",
         "user": "postgres",
         "password": "00edward00",
-        "host": "192.168.56.1",
+        "host": "localhost",
         "port": "5432"
     }
     
@@ -53,10 +53,10 @@ def upsert_data_with_single_id(document_id, items):
         return {"error": f"An error occurred: {e}"}, 500
 
 # Example usage
-document_id = "1"
-items = [
-    {"item": "apple", "quantity": 42, "category": "fruit", "purchase_date": "2024-06-05", "expiry_date": "2024-06-12"}
-]
+# document_id = "1"
+# items = [
+#     {"item": "apple", "quantity": "42", "category": "fruit", "purchase_date": "2024-06-05", "expiry_date": "2024-06-12"}
+# ]
 
-result = upsert_data_with_single_id(document_id, items)
-print(result)
+# result = upsert_data_with_single_id(document_id, items)
+# print(result)

@@ -7,7 +7,7 @@ def get_grocery_data_by_user_id(user_id):
         "dbname": "postgres",
         "user": "postgres",
         "password": "00edward00",
-        "host": "192.168.56.1",
+        "host": "localhost",
         "port": "5432"
     }
     
@@ -40,7 +40,7 @@ def get_grocery_data_by_user_id(user_id):
     except Exception as e:
         return {"error": f"An error occurred: {e}"}, 500
 
-# Example usage
-user_id = "1"
-result, status_code = get_grocery_data_by_user_id(user_id)
-print(result)
+# # Example usage
+# user_id = "1"
+# result, status_code = get_grocery_data_by_user_id(user_id)
+# print(result)
