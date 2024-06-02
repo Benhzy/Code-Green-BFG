@@ -1,7 +1,5 @@
-# Main
-.venv
-
 # Backend
+be/.venv
 be/scripts/__pycache__
 
 #Frontend
