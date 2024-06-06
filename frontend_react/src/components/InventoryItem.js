@@ -1,7 +1,7 @@
 // components/InventoryItem.js
 import React from 'react';
 
-const InventoryItem = ({ item, quantity, category, purchase_date, expiry_date, onDecrement, onDelete, id }) => {
+const InventoryItem = ({ id, item, category, quantity, purchase_date, expiry_date, onDecrement, onDelete }) => {
     return (
         <div className="inventory-item">
             <h3>{item}</h3>

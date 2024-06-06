@@ -81,19 +81,21 @@ function App() {
                 <button onClick={() => handleFilterChange('fruit')}>🍎 Fruits 🍎</button>
                 <button onClick={() => handleFilterChange('bread')}>🍞 Breads 🍞</button>
             </div>
-            {filteredItems.map(item => (
-                <InventoryItem
-                    key={item.item}
-                    id={item.item}
-                    item={item.item}
-                    category={item.category}
-                    quantity={item.quantity}
-                    purchase_date={item.purchase_date}
-                    expiry_date={item.expiry_date}
-                    onDecrement={onDecrement}
-                    onDelete={onDelete}
-                />
-            ))}
+            <div className="inventory-grid">
+                {filteredItems.map(item => (
+                    <InventoryItem
+                        key={item.item}
+                        id={item.item}
+                        item={item.item}
+                        category={item.category}
+                        quantity={item.quantity}
+                        purchase_date={item.purchase_date}
+                        expiry_date={item.expiry_date}
+                        onDecrement={onDecrement}
+                        onDelete={onDelete}
+                    />
+                ))}
+            </div>
         </div>
     );
 }
