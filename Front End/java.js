@@ -1,32 +1,43 @@
-// Search box in top toolbar
 document.addEventListener('DOMContentLoaded', function () {
+    setupSearch();
+    setupModalOptions();
+    setupItemRemoval();
+});
+
+function setupSearch() {
     const searchButton = document.getElementById('search-button');
     const searchInput = document.getElementById('search-input');
-
-    searchButton.addEventListener('click', function () {
-        const searchTerm = searchInput.value;
-        // Handle search functionality here
-        alert('Searching for: ' + searchTerm);
-    });
-});
-
-// To load more editing options for the modal box
-document.addEventListener("DOMContentLoaded", function () {
-    // Add event listener to the "More Options" button
-    const moreOptionsButton = document.querySelector(".more-options-button");
-    moreOptionsButton.addEventListener("click", function () {
-        // Replace the contents of the modal container with the new div
-        replaceContent();
-    });
-
-    // Function to replace the contents of the modal container
-    function replaceContent() {
-        // Get the modal container
-        const modalContainer = document.querySelector(".modal-container-initial");
-        // Get the new content div
-        const newContentDiv = document.getElementById("modal-container-more");
-
-        // Replace the contents of the modal container with the new div
-        modalContainer.innerHTML = newContentDiv.innerHTML;
+    if (searchButton && searchInput) {
+        searchButton.addEventListener('click', function () {
+            const searchTerm = searchInput.value;
+            alert('Searching for: ' + searchTerm);
+        });
     }
-});
+}
+
+function setupModalOptions() {
+    const moreOptionsButton = document.querySelector(".more-options-button");
+    if (moreOptionsButton) {
+        moreOptionsButton.addEventListener("click", function () {
+            const modalContainer = document.querySelector(".modal-container-initial");
+            const newContentDiv = document.getElementById("modal-container-more");
+            if (modalContainer && newContentDiv) {
+                modalContainer.innerHTML = newContentDiv.innerHTML;
+            }
+        });
+    }
+}
+
+function setupItemRemoval() {
+    document.body.addEventListener('click', function (event) {
+        console.log("Clicked element:", event.target);  // Debug which element was clicked
+        if (event.target.classList.contains('thrown-button') || event.target.classList.contains('eaten-button')) {
+            const inventoryItem = event.target.closest('.inventory-items-container');
+            console.log("Inventory item to remove:", inventoryItem);  // Debug the selection
+            if (inventoryItem) {
+                inventoryItem.remove();
+                alert('Item has been removed from inventory');
+            }
+        }
+    });
+}

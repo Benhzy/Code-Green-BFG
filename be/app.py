@@ -2,9 +2,11 @@ from flask import Flask, request, jsonify
 from scripts.post_grocery_data import upsert_user_groceries
 from scripts.get_grocery_data import get_grocery_data_by_user_id
 from scripts.post_user_recipe  import upsert_user_recipes
-from scripts.get_user_recipes import get_user_recipes_by_user_id
+from scripts.db_connection import get_user_recipes_by_user_id
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/add_grocery', methods=['POST'])
 def add_grocery():

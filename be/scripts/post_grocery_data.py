@@ -54,24 +54,24 @@ def upsert_user_groceries(user_id, items):
     except Exception as e:
         return {"error": f"An error occurred: {e}"}, 500
 
-# Example usage
-if __name__ == '__main__':
-    user_id = "1"
-    items = [
-        {
-            "item": "apple", 
-            "quantity": "42", 
-            "category": "fruit", 
-            "purchase_date": "2024-06-05", 
-            "expiry_date": "2024-06-12"
-        },
-        {
-            "item": "banana", 
-            "quantity": "30", 
-            "category": "fruit", 
-            "purchase_date": "2024-06-06", 
-            "expiry_date": "2024-06-15"
-        }
-    ]
-    result, status_code = upsert_user_groceries(user_id, items)
-    print(result, status_code)
+# # Example usage
+# if __name__ == '__main__':
+#     user_id = "1"
+#     items = [
+#         {
+#             "item": "apple", 
+#             "quantity": "42", 
+#             "category": "fruit", 
+#             "purchase_date": "2024-06-05", 
+#             "expiry_date": "2024-06-12"
+#         },
+#         {
+#             "item": "banana", 
+#             "quantity": "30", 
+#             "category": "fruit", 
+#             "purchase_date": "2024-06-06", 
+#             "expiry_date": "2024-06-15"
+#         }
+#     ]
+#     result, status_code = upsert_user_groceries(user_id, items)
+#     print(result, status_code)
