@@ -62,26 +62,30 @@ def fetch_ingredients_near_expiry(user_id):
         if datetime.strptime(date_str, "%Y-%m-%d") <= cutoff_date:
             near_expiry_ingredients.extend(items)
     
-    return near_expiry_ingredients
+    return ",".join(near_expiry_ingredients)
 
-def generate_recipe_suggestions(ingredients, user_recipes):
+def generate_recipe_suggestions(ingredients, user_recipes, cuisine = "Singaporean"):
     # Prepare the prompt for GPT based on near expiry ingredients and user's recipes
     ingredients_list = ', '.join([item[0] for item in ingredients])
     recipes_list = ', '.join([recipe[0] for recipe in user_recipes])
 
     extra_prompt = ""
     if recipes_list != []:
-        extra_prompt = f"Base your recipe on these recipes: {recipes_list}"
+        extra_prompt = f"Base your recipe on the cuisines from these recipes if possible: {recipes_list}"
 
     prompt = f"""
-    Create a recipe using the following ingredients close to expiry: {ingredients_list}.
+    Create a {cuisine} food recipe using the following ingredients close to expiry: {ingredients_list}.
+
+    Make sure the recipe is an authentic {cuisine} recipe.
+
+    You do not need to use all the ingredients, if a ingredient does not being in the recipe, omit it.
 
     Give your output in the following format!
 
     Recipe Name: The name of the dish.
     Description: A short description of the dish.
+    Ingredients: Each ingredient listed in a tuple format ('ingredient name', 'quantity'). IMPORTANT! all quantities need to be provided in the metric system! (e.g., - Chicken: 200g, - Olive Oil: 5ml).
     Detailed Steps: A list of steps involved in making the dish, each step described in string format and including specific details such as cooking time, temperature, and techniques.
-    Ingredients: Each ingredient listed in a tuple format ('ingredient name', 'quantity'), with all quantities provided in the metric system.
     Time Required: Total time needed to prepare and cook the dish.
     Difficulty: Difficulty level of the recipe (e.g., Easy, Medium, Hard).
     
@@ -100,7 +104,7 @@ def generate_recipe_suggestions(ingredients, user_recipes):
             }
         ],
         temperature=0.2,
-        max_tokens=15,
+        max_tokens=700,
         top_p=0.2,
         frequency_penalty=0,
         presence_penalty=0
@@ -110,16 +114,61 @@ def generate_recipe_suggestions(ingredients, user_recipes):
 
     return text
 
-def recommend_recipes(user_id):
+def extract_recipe(recipe_data):
+    lines = recipe_data.strip().split('\n')
+
+    recipe_dict = {}
+
+    in_ingredients = False
+    in_steps = False
+    ingredients = []
+    steps = []
+
+    for line in lines:
+        line = line.strip()
+        if line.startswith('Recipe Name:'):
+            recipe_dict['name'] = line.split(': ')[1].strip()
+        elif line.startswith('Ingredients:'):
+            in_ingredients = True
+            in_steps = False
+        elif line.startswith('Detailed Steps:'):
+            in_ingredients = False
+            in_steps = True
+        elif line.startswith('Time Required:'):
+            recipe_dict['time_req'] = line.split(': ')[1].strip()
+        elif line.startswith('Difficulty:'):
+            recipe_dict['difficulty'] = line.split(': ')[1].strip()
+        elif in_ingredients and '-' in line:
+            # Extract ingredient
+            ingredient_data = line.split('-', 1)[1].strip()
+            if ':' in ingredient_data:
+                ingredient, quantity = ingredient_data.split(':', 1)
+                ingredients.append((ingredient.strip(), quantity.strip()))
+            else:
+                ingredients.append((ingredient_data, ''))  # In case there's no quantity specified
+        elif in_steps and line and line[0].isdigit():
+            # Extract steps 
+            steps.append(line.split('.', 1)[1].strip())
+    
+    recipe_dict['ingredients'] = ingredients
+    recipe_dict['steps'] = steps
+    
+    return recipe_dict
+
+def recommend_recipes(user_id, cuisine):
     # Retrieve ingredients near their expiry date
     near_expiry_ingredients = fetch_ingredients_near_expiry(user_id)
-    
+
     # Retrieve user's stored recipes
     user_recipes = analyze_user_recipes(user_id)
-    
+
     # Generate recipe suggestions
     if near_expiry_ingredients:
-        return generate_recipe_suggestions(near_expiry_ingredients, user_recipes)
+        raw_recipe = generate_recipe_suggestions(near_expiry_ingredients, user_recipes, cuisine)
+        return extract_recipe(raw_recipe)
     else:
-        return "No ingredients are close to expiry, or no ingredients data available."
+        return "No ingredients are close to expiry."
 
+# near_expiry_ingredients = "Chicken, Pork, Celery, Eggplant, Strawberries"
+# user_recipes = []
+# print(recommend_recipes(1, "Chinese"))
