@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import InventoryItem from './components/InventoryItem';
+import Clock from './components/Clock';
 import './App.css';
 
 function App() {
@@ -24,22 +25,45 @@ function App() {
         };
 
         fetchInventoryItems();
-    }, [userId]); // Dependency array now includes userId
+    }, [userId]);
 
     const handleFilterChange = (category) => {
         setFilter(category);
     };
 
+    const updateServer = async (updatedItems) => {
+        try {
+            const response = await fetch('http://localhost:5000/add_grocery', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: userId,
+                    items: updatedItems,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update items on the server');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
     const onDecrement = (id, amount) => {
-        setInventoryItems(currentItems =>
-            currentItems.map(item =>
-                item.id === id ? { ...item, quantity: Math.max(item.quantity - amount, 0) } : item
-            )
+        const updatedItems = inventoryItems.map(item =>
+            item.item === id ? { ...item, quantity: Math.max(item.quantity - amount, 0) } : item
         );
+        setInventoryItems(updatedItems);
+        updateServer(updatedItems);
     };
 
     const onDelete = (id) => {
-        setInventoryItems(currentItems => currentItems.filter(item => item.id !== id));
+        const updatedItems = inventoryItems.filter(item => item.item !== id);
+        setInventoryItems(updatedItems);
+        updateServer(updatedItems);
     };
 
     const filteredItems = inventoryItems.filter(item => {
@@ -48,18 +72,24 @@ function App() {
 
     return (
         <div className="main-container">
+            <Clock />
             <div className="filter-bar">
                 <button onClick={() => handleFilterChange('All')}>🛒 All 🛒</button>
-                <button onClick={() => handleFilterChange('Vegetables')}>🍅 Vegetables 🍅</button>
-                <button onClick={() => handleFilterChange('Meat')}>🍖 Meat 🍖</button>
-                <button onClick={() => handleFilterChange('Dairy')}>🥛 Dairy 🥛</button>
-                <button onClick={() => handleFilterChange('Fruits')}>🍎 Fruits 🍎</button>
-                <button onClick={() => handleFilterChange('Breads')}>🍞 Breads 🍞</button>
+                <button onClick={() => handleFilterChange('vegetable')}>🍅 Vegetables 🍅</button>
+                <button onClick={() => handleFilterChange('meat')}>🍖 Meat 🍖</button>
+                <button onClick={() => handleFilterChange('dairy')}>🥛 Dairy 🥛</button>
+                <button onClick={() => handleFilterChange('fruit')}>🍎 Fruits 🍎</button>
+                <button onClick={() => handleFilterChange('bread')}>🍞 Breads 🍞</button>
             </div>
             {filteredItems.map(item => (
                 <InventoryItem
-                    key={item.id}
-                    {...item}
+                    key={item.item}
+                    id={item.item}
+                    item={item.item}
+                    category={item.category}
+                    quantity={item.quantity}
+                    purchase_date={item.purchase_date}
+                    expiry_date={item.expiry_date}
                     onDecrement={onDecrement}
                     onDelete={onDelete}
                 />
