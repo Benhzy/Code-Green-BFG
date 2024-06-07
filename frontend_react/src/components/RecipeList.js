@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import './RecipeList.css';
 
 function RecipeList({ userId }) {
     const [recipes, setRecipes] = useState([]);
