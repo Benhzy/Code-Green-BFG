@@ -1,20 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import InventoryItem from './components/InventoryItem';
 import Clock from './components/Clock';
-import { Fab, Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField } from '@mui/material';
-import { Add as AddIcon, PhotoCamera as PhotoCameraIcon, AddShoppingCart as AddShoppingCartIcon } from '@mui/icons-material';
 import './App.css';
 
 function App() {
     const [filter, setFilter] = useState('All');
     const [inventoryItems, setInventoryItems] = useState([]);
-    const [isFabOpen, setFabOpen] = useState(false);
-    const [isFormOpen, setFormOpen] = useState(false);
-    const [isUploadOpen, setUploadOpen] = useState(false);
-    const [newItem, setNewItem] = useState({ item: '', quantity: '', category: '' });
-
     const userId = 1; // Replace with the actual user ID
 
+    // Fetch inventory items from an API
     useEffect(() => {
         const fetchInventoryItems = async () => {
             try {
@@ -66,44 +60,30 @@ function App() {
         updateServer(updatedItems);
     };
 
-    const onDelete = (id) => {
-        const updatedItems = inventoryItems.filter(item => item.item !== id);
-        setInventoryItems(updatedItems);
-        updateServer(updatedItems);
-    };
+    const onDelete = async (id, purchase_date, expiry_date) => {
+        try {
+            const response = await fetch(`http://localhost:5000/delete_grocery`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: userId,
+                    item: id,
+                    purchase_date: purchase_date,
+                    expiry_date: expiry_date
+                })
+            });
 
-    const handleFabClick = () => {
-        setFabOpen(!isFabOpen);
-    };
+            if (!response.ok) {
+                throw new Error('Failed to delete item from the server');
+            }
 
-    const handleFormOpen = () => {
-        setFormOpen(true);
-        setFabOpen(false);
-    };
-
-    const handleUploadOpen = () => {
-        setUploadOpen(true);
-        setFabOpen(false);
-    };
-
-    const handleFormClose = () => {
-        setFormOpen(false);
-    };
-
-    const handleUploadClose = () => {
-        setUploadOpen(false);
-    };
-
-    const handleNewItemChange = (e) => {
-        setNewItem({ ...newItem, [e.target.name]: e.target.value });
-    };
-
-    const handleAddNewItem = () => {
-        const updatedItems = [...inventoryItems, newItem];
-        setInventoryItems(updatedItems);
-        updateServer(updatedItems);
-        setNewItem({ item: '', quantity: '', category: '' });
-        handleFormClose();
+            const updatedItems = inventoryItems.filter(item => !(item.item === id && item.purchase_date === purchase_date && item.expiry_date === expiry_date));
+            setInventoryItems(updatedItems);
+        } catch (error) {
+            console.error('Error:', error);
+        }
     };
 
     const filteredItems = inventoryItems.filter(item => {
@@ -124,7 +104,7 @@ function App() {
             <div className="inventory-grid">
                 {filteredItems.map(item => (
                     <InventoryItem
-                        key={item.item}
+                        key={item.item + item.purchase_date}
                         id={item.item}
                         item={item.item}
                         category={item.category}
@@ -132,81 +112,10 @@ function App() {
                         purchase_date={item.purchase_date}
                         expiry_date={item.expiry_date}
                         onDecrement={onDecrement}
-                        onDelete={onDelete}
+                        onDelete={() => onDelete(item.item, item.purchase_date, item.expiry_date)}
                     />
                 ))}
             </div>
-
-            {/* Floating Action Button */}
-            <Fab color="primary" aria-label="add" onClick={handleFabClick} style={{ position: 'fixed', bottom: 16, right: 16 }}>
-                <AddIcon />
-            </Fab>
-
-            {/* Expanded Buttons */}
-            {isFabOpen && (
-                <>
-                    <Fab color="secondary" aria-label="add-grocery" onClick={handleFormOpen} style={{ position: 'fixed', bottom: 86, right: 16 }}>
-                        <AddShoppingCartIcon />
-                    </Fab>
-                    <Fab color="secondary" aria-label="upload-photo" onClick={handleUploadOpen} style={{ position: 'fixed', bottom: 156, right: 16 }}>
-                        <PhotoCameraIcon />
-                    </Fab>
-                </>
-            )}
-
-            {/* Form Dialog */}
-            <Dialog open={isFormOpen} onClose={handleFormClose}>
-                <DialogTitle>Add Grocery</DialogTitle>
-                <DialogContent>
-                    <TextField
-                        autoFocus
-                        margin="dense"
-                        label="Grocery Item"
-                        type="text"
-                        fullWidth
-                        name="item"
-                        value={newItem.item}
-                        onChange={handleNewItemChange}
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Quantity"
-                        type="number"
-                        fullWidth
-                        name="quantity"
-                        value={newItem.quantity}
-                        onChange={handleNewItemChange}
-                    />
-                    <TextField
-                        margin="dense"
-                        label="Category"
-                        type="text"
-                        fullWidth
-                        name="category"
-                        value={newItem.category}
-                        onChange={handleNewItemChange}
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleFormClose}>Cancel</Button>
-                    <Button onClick={handleAddNewItem}>Add</Button>
-                </DialogActions>
-            </Dialog>
-
-            {/* Upload Dialog */}
-            <Dialog open={isUploadOpen} onClose={handleUploadClose}>
-                <DialogTitle>Upload Photo</DialogTitle>
-                <DialogContent>
-                    <Button variant="contained" component="label">
-                        Upload File
-                        <input type="file" hidden />
-                    </Button>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleUploadClose}>Cancel</Button>
-                    <Button onClick={handleUploadClose}>Upload</Button>
-                </DialogActions>
-            </Dialog>
         </div>
     );
 }
