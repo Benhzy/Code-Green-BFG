@@ -2,6 +2,7 @@
 be/.venv
 be/.env
 be/scripts/__pycache__
+be/scripts/.env
 
 
 #Frontend
