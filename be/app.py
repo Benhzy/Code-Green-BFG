@@ -1,9 +1,9 @@
 from flask import Flask, request, jsonify
-from scripts.post_grocery_data import upsert_user_groceries
-from scripts.get_grocery_data import get_grocery_data_by_user_id
-from scripts.post_user_recipe  import upsert_user_recipes
-from scripts.get_user_recipes import get_user_recipes_by_user_id
-from scripts.db_connection import DB_Connector
+from flask_cors import CORS
+from scripts.db_connection import get_user_recipes_by_user_id
+from scripts.db_connection import upsert_user_groceries
+from scripts.db_connection import get_grocery_data_by_user_id
+from scripts.db_connection import upsert_user_recipes
 
 app = Flask(__name__)
 CORS(app)
@@ -17,7 +17,7 @@ def add_grocery():
     if not user_id or not items:
         return jsonify({"error": "user_id and items are required"}), 400
     
-    result, status_code = DB_Connector.upsert_user_groceries(user_id, items)
+    result, status_code = upsert_user_groceries(user_id, items)
     
     if status_code != 201:
         return jsonify(result), status_code
@@ -26,8 +26,7 @@ def add_grocery():
 
 @app.route('/grocery/<user_id>', methods=['GET'])
 def get_grocery(user_id):
-    return jsonify(DB_Connector.get_grocery_data_by_user_id(user_id))
-
+    return jsonify(get_grocery_data_by_user_id(user_id))
 
 @app.route('/add_recipe', methods=['POST'])
 def add_recipe():
@@ -43,7 +42,7 @@ def add_recipe():
         if isinstance(recipe['ingredients'], list):
             recipe['ingredients'] = ', '.join(recipe['ingredients'])
     
-    result, status_code = DB_Connector.upsert_user_recipes(user_id, recipes)
+    result, status_code = upsert_user_recipes(user_id, recipes)
     
     if status_code != 201:
         return jsonify(result), status_code
@@ -52,8 +51,7 @@ def add_recipe():
 
 @app.route('/recipe/<user_id>', methods=['GET'])
 def get_recipe(user_id):
-    return jsonify(DB_Connector.get_user_recipes_by_user_id(user_id))
-
+    return jsonify(get_user_recipes_by_user_id(user_id))
 
 if __name__ == '__main__':
     app.run(debug=True)

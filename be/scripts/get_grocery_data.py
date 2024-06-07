@@ -1,3 +1,4 @@
+# get_grocery_data.py
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
@@ -36,7 +37,7 @@ def get_grocery_data_by_user_id(user_id):
         cursor.close()
         conn.close()
         
-        return groceries, 200
+        return groceries
     except Exception as e:
         return {"error": f"An error occurred: {e}"}, 500
 
