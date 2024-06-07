@@ -7,15 +7,12 @@ function RecipeList({ userId }) {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
 
-    useEffect(() => {
-        fetchRecipes();
-    }, [userId]);
-
-    const fetchRecipes = async () => {
+    // Abstracted fetch function
+    const fetchRecipes = async (url) => {
         setIsLoading(true);
         setError('');
         try {
-            const response = await fetch(`http://localhost:5000/recipe/${userId}`);
+            const response = await fetch(url);
             const data = await response.json();
             if (response.ok) {
                 setRecipes(data);
@@ -24,26 +21,21 @@ function RecipeList({ userId }) {
             }
         } catch (error) {
             setError('Error fetching recipes: ' + error.message);
+        } finally {
+            setIsLoading(false);
         }
-        setIsLoading(false);
     };
 
+    useEffect(() => {
+        // Fetch initial recipe list
+        fetchRecipes(`http://localhost:5000/recipe/${userId}`);
+    }, [userId]);
+
     const fetchRecommendedRecipes = async (cuisine = 'Singaporean') => {
-        setIsLoading(true);
-        setError('');
-        try {
-            const url = `http://localhost:5000/recommend_recipe/${userId}?cuisine=${cuisine}`;
-            const response = await fetch(url);
-            const data = await response.json();
-            if (response.ok) {
-                setRecipes(data); // Assuming the response structure is suitable for setting directly to recipes
-            } else {
-                throw new Error('Failed to fetch recommended recipes');
-            }
-        } catch (error) {
-            setError('Error fetching recommended recipes: ' + error.message);
-        }
-        setIsLoading(false);
+        // Fetch recommended recipes, then refresh the list from the database
+        await fetchRecipes(`http://localhost:5000/recommend_recipe/${userId}?cuisine=${cuisine}`);
+        // Optionally, re-fetch the complete list if needed or just update the list with new recommendations
+        fetchRecipes(`http://localhost:5000/recipe/${userId}`);
     };
 
     return (

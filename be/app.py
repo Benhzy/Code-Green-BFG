@@ -78,8 +78,7 @@ def recommend_recipe(user_id):
     # Assuming the cuisine type can also be passed as a query parameter
     cuisine = request.args.get('cuisine', 'Singaporean')
     try:
-        recipe_suggestion = recommend_recipes(user_id, cuisine)
-        return jsonify([recipe_suggestion]), 200
+        return recommend_recipes(user_id, cuisine)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
