@@ -6,6 +6,8 @@ from scripts.db_connection import get_grocery_data_by_user_id
 from scripts.db_connection import upsert_user_recipes
 from scripts.db_connection import delete_user_grocery
 
+from scripts.recipe_recommender import recommend_recipes
+
 app = Flask(__name__)
 CORS(app)
 
@@ -70,6 +72,16 @@ def delete_grocery():
         return jsonify(result), status_code
     
     return jsonify({"message": "Item deleted successfully"}), 200
+
+@app.route('/recommend_recipe/<user_id>', methods=['GET'])
+def recommend_recipe(user_id):
+    # Assuming the cuisine type can also be passed as a query parameter
+    cuisine = request.args.get('cuisine', 'Singaporean')
+    try:
+        recipe_suggestion = recommend_recipes(user_id, cuisine)
+        return jsonify([recipe_suggestion]), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -2,18 +2,13 @@
 import os
 from openai import OpenAI
 from datetime import datetime, timedelta
-from db_connection import DB_Connector
+from scripts.db_connection import get_grocery_data_by_user_id, get_user_recipes_by_user_id
 
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
 def analyze_user_data(user_id):
     # Fetch data from the database
-    dbconn  = DB_Connector(user_id)
-    data, status_code = dbconn.get_grocery_data_by_user_id()
-    
-    if status_code != 200:
-        print(f"Error fetching data: {data['error']}")
-        return
+    data = get_grocery_data_by_user_id(user_id)
     
     # Create the dictionary with dates as keys and list of (item, quantity) tuples as values
     date_dict = {}
@@ -31,12 +26,8 @@ def analyze_user_data(user_id):
 
 def analyze_user_recipes(user_id):
     # Fetch user recipes from the database
-    dbconn  = DB_Connector(user_id)
-    data, status_code = dbconn.get_user_recipes_by_user_id()
-    
-    if status_code != 200:
-        print(f"Error fetching data: {data['error']}")
-        return
+    data = get_user_recipes_by_user_id(user_id)
+    print(data)
     
     # Create a list of tuples with (recipe_name, description)
     recipes_list = [(recipe['recipe_name'], recipe['description']) for recipe in data]
@@ -59,7 +50,7 @@ def fetch_ingredients_near_expiry(user_id):
     # Check for items within 3 days of expiry
     cutoff_date = datetime.now() + timedelta(days=3)
     for date_str, items in groceries.items():
-        if datetime.strptime(date_str, "%Y-%m-%d") <= cutoff_date:
+        if datetime.strptime(str(date_str), "%Y-%m-%d") <= cutoff_date:
             near_expiry_ingredients.extend(items)
     
     return ",".join(near_expiry_ingredients)
@@ -127,7 +118,7 @@ def extract_recipe(recipe_data):
     for line in lines:
         line = line.strip()
         if line.startswith('Recipe Name:'):
-            recipe_dict['name'] = line.split(': ')[1].strip()
+            recipe_dict['recipe_name'] = line.split(': ')[1].strip()
         elif line.startswith('Ingredients:'):
             in_ingredients = True
             in_steps = False
@@ -135,7 +126,7 @@ def extract_recipe(recipe_data):
             in_ingredients = False
             in_steps = True
         elif line.startswith('Time Required:'):
-            recipe_dict['time_req'] = line.split(': ')[1].strip()
+            recipe_dict['time_required'] = line.split(': ')[1].strip()
         elif line.startswith('Difficulty:'):
             recipe_dict['difficulty'] = line.split(': ')[1].strip()
         elif in_ingredients and '-' in line:
@@ -151,7 +142,7 @@ def extract_recipe(recipe_data):
             steps.append(line.split('.', 1)[1].strip())
     
     recipe_dict['ingredients'] = ingredients
-    recipe_dict['steps'] = steps
+    recipe_dict['instructions'] = steps
     
     return recipe_dict
 
