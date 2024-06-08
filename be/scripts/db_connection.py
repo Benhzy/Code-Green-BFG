@@ -8,13 +8,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def get_user_recipes_by_user_id(user_id):
-    conn_params = {
-        "dbname": os.getenv("DB_DEFAULT"),
-        "user": os.getenv("DB_USER"),
-        "password": os.getenv("DB_PASSWORD"),
-        "host": os.getenv("DB_HOST"),
-        "port": os.getenv("DB_PORT")
-    }
     
     user_id = str(user_id)
     select_query = """
@@ -24,7 +17,7 @@ def get_user_recipes_by_user_id(user_id):
     """
 
     try:
-        conn = psycopg2.connect(**conn_params)
+        conn = psycopg2.connect(os.environ['DATABASE_URL'])
         cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute(select_query, (user_id,))
         recipes = cursor.fetchall()
@@ -51,7 +44,7 @@ def get_grocery_data_by_user_id(user_id):
     """
 
     try:
-        conn = psycopg2.connect(**conn_params)
+        conn = psycopg2.connect(os.environ['DATABASE_URL'])
         cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute(select_query, (user_id,))
         groceries = cursor.fetchall()
@@ -84,7 +77,7 @@ def upsert_user_recipes(user_id, recipes):
     """
 
     try:
-        conn = psycopg2.connect(**conn_params)
+        conn = psycopg2.connect(os.environ['DATABASE_URL'])
         cursor = conn.cursor()
         for recipe in recipes:
             cursor.execute(upsert_query, (
@@ -124,7 +117,7 @@ def upsert_user_groceries(user_id, items):
     """
 
     try:
-        conn = psycopg2.connect(**conn_params)
+        conn = psycopg2.connect(os.environ['DATABASE_URL'])
         cursor = conn.cursor()
         for item in items:
             cursor.execute(upsert_query, (
@@ -151,7 +144,7 @@ def delete_user_grocery(user_id, item, expiry_date, purchase_date):
             "host": os.getenv("DB_HOST"),
             "port": os.getenv("DB_PORT")
         }
-        conn = psycopg2.connect(**conn_params)
+        conn = psycopg2.connect(os.environ['DATABASE_URL'])
         cursor = conn.cursor()
         cursor.execute(
             sql.SQL("DELETE FROM public.groceries WHERE user_id = %s AND item = %s AND expiry_date = %s AND purchase_date = %s"),

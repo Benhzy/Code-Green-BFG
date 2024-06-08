@@ -2,7 +2,7 @@
 import os
 from openai import OpenAI
 from datetime import datetime, timedelta
-from scripts.db_connection import get_grocery_data_by_user_id, get_user_recipes_by_user_id, upsert_user_recipes
+from db_connection import get_grocery_data_by_user_id, get_user_recipes_by_user_id, upsert_user_recipes
 from dotenv import load_dotenv
 load_dotenv("/be/scripts/.env")
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
@@ -160,9 +160,9 @@ def jsonify_recipe(recipe_data, user_id):
     }
 
 def recommend_recipes(user_id, cuisine):
-    near_expiry_ingredients = fetch_ingredients_near_expiry(user_id)
-    user_recipes = analyze_user_recipes(user_id)
-
+    # near_expiry_ingredients = fetch_ingredients_near_expiry(user_id)
+    # user_recipes = analyze_user_recipes(user_id)
+    near_expiry_ingredients = "Chicken, Pork, Celery, Eggplant, Strawberries"
     if near_expiry_ingredients:
         raw_recipe = generate_recipe_suggestions(near_expiry_ingredients, user_recipes, cuisine)
         recipe_dict = extract_recipe(raw_recipe)
@@ -172,6 +172,6 @@ def recommend_recipes(user_id, cuisine):
         return "No ingredients are close to expiry."
 
 
-# near_expiry_ingredients = "Chicken, Pork, Celery, Eggplant, Strawberries"
-# user_recipes = []
-# print(recommend_recipes(1, "Chinese"))
+near_expiry_ingredients = "Chicken, Pork, Celery, Eggplant, Strawberries"
+user_recipes = []
+print(recommend_recipes(1, "Chinese"))
