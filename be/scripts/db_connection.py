@@ -7,6 +7,11 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
+"""
+run the following CLI command:
+mkdir -p $env:appdata\postgresql\; Invoke-WebRequest -Uri https://cockroachlabs.cloud/clusters/e3885e05-0fa9-450e-b512-2523fa52fcb6/cert -OutFile $env:appdata\postgresql\root.crt
+"""
+
 def get_user_recipes_by_user_id(user_id):
     
     user_id = str(user_id)
@@ -28,14 +33,6 @@ def get_user_recipes_by_user_id(user_id):
         return {"error": f"An error occurred: {e}"}, 500
 
 def get_grocery_data_by_user_id(user_id):
-    conn_params = {
-        "dbname": os.getenv("DB_DEFAULT"),
-        "user": os.getenv("DB_USER"),
-        "password": os.getenv("DB_PASSWORD"),
-        "host": os.getenv("DB_HOST"),
-        "port": os.getenv("DB_PORT")
-    }
-    
     user_id = str(user_id)
     select_query = """
     SELECT user_id, item, quantity, category, purchase_date, expiry_date
@@ -55,14 +52,6 @@ def get_grocery_data_by_user_id(user_id):
         return {"error": f"An error occurred: {e}"}, 500
 
 def upsert_user_recipes(user_id, recipes):
-    conn_params = {
-        "dbname": os.getenv("DB_DEFAULT"),
-        "user": os.getenv("DB_USER"),
-        "password": os.getenv("DB_PASSWORD"),
-        "host": os.getenv("DB_HOST"),
-        "port": os.getenv("DB_PORT")
-    }
-    
     user_id = str(user_id)
     upsert_query = """
     INSERT INTO public.user_recipes (user_id, recipe_name, ingredients, instructions, difficulty, time_required, description)

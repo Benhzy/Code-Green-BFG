@@ -160,14 +160,14 @@ def jsonify_recipe(recipe_data, user_id):
     }
 
 def recommend_recipes(user_id, cuisine):
-    # near_expiry_ingredients = fetch_ingredients_near_expiry(user_id)
-    # user_recipes = analyze_user_recipes(user_id)
-    near_expiry_ingredients = "Chicken, Pork, Celery, Eggplant, Strawberries"
+    near_expiry_ingredients = fetch_ingredients_near_expiry(user_id)
+    user_recipes = analyze_user_recipes(user_id)
     if near_expiry_ingredients:
         raw_recipe = generate_recipe_suggestions(near_expiry_ingredients, user_recipes, cuisine)
         recipe_dict = extract_recipe(raw_recipe)
         recipe_json = jsonify_recipe(recipe_dict, user_id)  # Make sure this returns the correct structure
-        upsert_user_recipes(user_id, [recipe_json])  # Ensure this is a list of dictionaries
+        response = upsert_user_recipes(user_id, [recipe_json])  # Ensure this is a list of dictionaries
+        print(response)
     else:
         return "No ingredients are close to expiry."
 
