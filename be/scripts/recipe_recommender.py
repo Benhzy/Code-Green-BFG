@@ -3,7 +3,8 @@ import os
 from openai import OpenAI
 from datetime import datetime, timedelta
 from scripts.db_connection import get_grocery_data_by_user_id, get_user_recipes_by_user_id, upsert_user_recipes
-
+from dotenv import load_dotenv
+load_dotenv("/be/scripts/.env")
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
 def analyze_user_data(user_id):
@@ -21,7 +22,6 @@ def analyze_user_data(user_id):
     
     # Sort the dictionary by date keys
     sorted_date_dict = {k: date_dict[k] for k in sorted(date_dict)}
-    
     return sorted_date_dict
 
 def analyze_user_recipes(user_id):
@@ -47,14 +47,16 @@ def fetch_ingredients_near_expiry(user_id):
     near_expiry_ingredients = []
 
     # Check for items within 3 days of expiry
-    cutoff_date = datetime.now() + timedelta(days=3)
+    cutoff_date = datetime.now() + timedelta(days=10) 
     for date_str, items in groceries.items():
         if datetime.strptime(str(date_str), "%Y-%m-%d") <= cutoff_date:
             near_expiry_ingredients.extend(items)
-    
-    return ",".join(near_expiry_ingredients)
+    processed_near_expiry_ingredients = []
+    for ele in near_expiry_ingredients:
+        processed_near_expiry_ingredients.append(ele[0])
+    return ",".join(processed_near_expiry_ingredients)
 
-def generate_recipe_suggestions(ingredients, user_recipes, cuisine = "Singaporean"):
+def generate_recipe_suggestions(ingredients, user_recipes, cuisine = "Singaporean"): # where ingredients is a string of comma-separated ingredients
     # Prepare the prompt for GPT based on near expiry ingredients and user's recipes
     ingredients_list = ', '.join([item[0] for item in ingredients])
     recipes_list = ', '.join([recipe[0] for recipe in user_recipes])
@@ -93,7 +95,7 @@ def generate_recipe_suggestions(ingredients, user_recipes, cuisine = "Singaporea
             "content": prompt
             }
         ],
-        temperature=0.2,
+        temperature=0.5,
         max_tokens=700,
         top_p=0.2,
         frequency_penalty=0,
@@ -101,10 +103,9 @@ def generate_recipe_suggestions(ingredients, user_recipes, cuisine = "Singaporea
     )
     choices = response.choices[0]
     text = choices.message.content
-
     return text
 
-def extract_recipe(recipe_data):
+def extract_recipe(recipe_data): # where raw recipe data is the output from the GPT model
     lines = recipe_data.strip().split('\n')
 
     recipe_dict = {}
@@ -126,6 +127,8 @@ def extract_recipe(recipe_data):
             in_steps = True
         elif line.startswith('Time Required:'):
             recipe_dict['time_required'] = line.split(': ')[1].strip()
+        elif line.startswith('Description:'):
+            recipe_dict['description'] = line.split(': ')[1].strip()
         elif line.startswith('Difficulty:'):
             recipe_dict['difficulty'] = line.split(': ')[1].strip()
         elif in_ingredients and '-' in line:
@@ -133,33 +136,41 @@ def extract_recipe(recipe_data):
             ingredient_data = line.split('-', 1)[1].strip()
             if ':' in ingredient_data:
                 ingredient, quantity = ingredient_data.split(':', 1)
-                ingredients.append(ingredient.strip())
+                ingredients.append((ingredient.strip(), quantity.strip()))
             else:
-                ingredients.append((ingredient_data, ''))  # In case there's no quantity specified
+                ingredients.append(ingredient_data)  # In case there's no quantity specified
         elif in_steps and line and line[0].isdigit():
             # Extract steps 
             steps.append(line.split('.', 1)[1].strip())
     
-    recipe_dict['ingredients'] = ingredients
-    recipe_dict['instructions'] = steps
-    
+    recipe_dict['ingredients'] = str(ingredients)
+    recipe_dict['instructions'] = str(steps)
     return recipe_dict
 
-def recommend_recipes(user_id, cuisine):
-    # Retrieve ingredients near their expiry date
-    near_expiry_ingredients = fetch_ingredients_near_expiry(user_id)
+def jsonify_recipe(recipe_data, user_id):
+    # Assuming recipe_data is a dictionary with correct keys
+    return {
+        "user_id": str(user_id),
+        "recipe_name": recipe_data['recipe_name'],
+        "ingredients": recipe_data['ingredients'],
+        "instructions": recipe_data['instructions'],
+        "difficulty": recipe_data['difficulty'],
+        "time_required": recipe_data['time_required'],
+        "description": recipe_data.get('description', '')
+    }
 
-    # Retrieve user's stored recipes
+def recommend_recipes(user_id, cuisine):
+    near_expiry_ingredients = fetch_ingredients_near_expiry(user_id)
     user_recipes = analyze_user_recipes(user_id)
 
-    # Generate recipe suggestions
     if near_expiry_ingredients:
         raw_recipe = generate_recipe_suggestions(near_expiry_ingredients, user_recipes, cuisine)
-        recipe = extract_recipe(raw_recipe)
-        recipe['user_id'] = user_id
-        upsert_user_recipes(user_id, [recipe])
+        recipe_dict = extract_recipe(raw_recipe)
+        recipe_json = jsonify_recipe(recipe_dict, user_id)  # Make sure this returns the correct structure
+        upsert_user_recipes(user_id, [recipe_json])  # Ensure this is a list of dictionaries
     else:
         return "No ingredients are close to expiry."
+
 
 # near_expiry_ingredients = "Chicken, Pork, Celery, Eggplant, Strawberries"
 # user_recipes = []
