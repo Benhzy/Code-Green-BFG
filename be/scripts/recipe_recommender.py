@@ -2,7 +2,7 @@
 import os
 from openai import OpenAI
 from datetime import datetime, timedelta
-from db_connection import get_grocery_data_by_user_id, get_user_recipes_by_user_id, upsert_user_recipes
+from scripts.db_connection import get_grocery_data_by_user_id, get_user_recipes_by_user_id, upsert_user_recipes
 from dotenv import load_dotenv
 load_dotenv("/be/scripts/.env")
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
@@ -95,7 +95,7 @@ def generate_recipe_suggestions(ingredients, user_recipes, cuisine = "Singaporea
             "content": prompt
             }
         ],
-        temperature=0.5,
+        temperature=2,
         max_tokens=700,
         top_p=0.2,
         frequency_penalty=0,
@@ -159,6 +159,7 @@ def jsonify_recipe(recipe_data, user_id):
         "description": recipe_data.get('description', '')
     }
 
+
 def recommend_recipes(user_id, cuisine):
     near_expiry_ingredients = fetch_ingredients_near_expiry(user_id)
     user_recipes = analyze_user_recipes(user_id)
@@ -166,12 +167,12 @@ def recommend_recipes(user_id, cuisine):
         raw_recipe = generate_recipe_suggestions(near_expiry_ingredients, user_recipes, cuisine)
         recipe_dict = extract_recipe(raw_recipe)
         recipe_json = jsonify_recipe(recipe_dict, user_id)  # Make sure this returns the correct structure
-        response = upsert_user_recipes(user_id, [recipe_json])  # Ensure this is a list of dictionaries
-        print(response)
+        response = upsert_user_recipes([recipe_json])  # Ensure this is a list of dictionaries
+        return response
     else:
         return "No ingredients are close to expiry."
 
 
-near_expiry_ingredients = "Chicken, Pork, Celery, Eggplant, Strawberries"
-user_recipes = []
-print(recommend_recipes(1, "Chinese"))
+# near_expiry_ingredients = "Fish, Potato, Carrot, Onion, Garlic, Ginger, Soy Sauce, Oyster Sauce, Cornstarch, Sugar, Salt, Pepper, Oil"
+# user_recipes = []
+# print(recommend_recipes(123456, "Chinese"))

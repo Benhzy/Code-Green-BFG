@@ -1,22 +1,13 @@
-# scripts/post_user_recipes.py
-
+import json
 import psycopg2
-from psycopg2 import sql
+import os
 
-def upsert_user_recipes(user_id, recipes):
-    # Database connection parameters
-    conn_params = {
-        "dbname": "postgres",
-        "user": "postgres",
-        "password": "00edward00",
-        "host": "localhost",
-        "port": "5432"
-    }
-    
-    # Ensure user_id is a string
-    user_id = str(user_id)
+# Load environment variables
+from dotenv import load_dotenv
+load_dotenv()
 
-    # Upsert query for each recipe
+# Function to upsert recipes into the database
+def upsert_user_recipes(recipes):
     upsert_query = """
     INSERT INTO public.user_recipes (user_id, recipe_name, ingredients, instructions, difficulty, time_required, description)
     VALUES (%s, %s, %s, %s, %s, %s, %s)
@@ -30,50 +21,52 @@ def upsert_user_recipes(user_id, recipes):
     """
 
     try:
-        # Establish a database connection
-        conn = psycopg2.connect(**conn_params)
+        conn = psycopg2.connect(os.environ['DATABASE_URL'])
         cursor = conn.cursor()
-        
-        # Upsert each recipe
         for recipe in recipes:
             cursor.execute(upsert_query, (
-                user_id,
+                recipe['user_id'],
                 recipe['recipe_name'],
-                recipe['ingredients'],
-                recipe['instructions'],
+                str(recipe['ingredients']), 
+                str(recipe['instructions']), 
                 recipe['difficulty'],
                 recipe['time_required'],
                 recipe['description']
             ))
-        
-        # Commit the transaction
         conn.commit()
-        
-        # Close the cursor and connection
         cursor.close()
         conn.close()
-        
-        return str(user_id), 201
+        return "Upsert successful", 201
     except Exception as e:
         return {"error": f"An error occurred: {e}"}, 500
 
-# # Example usage: 
-# res, status_code = upsert_user_recipes("1", [
-#     {
-#         "recipe_name": "Apple Pie", 
-#         "ingredients": "5 apples, 100g sugar, 200g flour, 50g butter", 
-#         "instructions": "Mix and bake at 350 degrees for 45 minutes",
-#         "difficulty": "Easy",
-#         "time_required": "1 hour",
-#         "description": "A classic apple pie recipe"
-#     },
-#     {
-#         "recipe_name": "Banana Bread", 
-#         "ingredients": "2 bananas, 50g sugar, 100g flour, 50g butter, 5 eggs", 
-#         "instructions": "Mix and bake at 350 degrees for 60 minutes",
-#         "difficulty": "Medium",
-#         "time_required": "1.5 hours",
-#         "description": "A delicious banana bread recipe"
-#     }
-# ])
-# print(res, status_code)
+# Sample data to test the upsert function
+# sample_data = [
+#   {
+#     "user_id": "10001",
+#     "recipe_name": "Kung Pao Chicken",
+#     "ingredients": [
+#       ("Chicken", "300g"),
+#       ("Celery", "150g"),
+#       ("Soy Sauce", "30ml"),
+#       ("Garlic", "2 cloves, minced"),
+#       ("Ginger", "1 tsp, minced"),
+#       ("Dried Red Chilies", "3 pieces"),
+#       ("Green Onions", "2 stalks, chopped")
+#     ],
+#     "instructions": [
+#       "Heat oil in a pan.",
+#       "Fry the garlic, ginger, and chilies until fragrant.",
+#       "Add chicken and stir-fry until browned.",
+#       "Mix soy sauce, vinegar, and sugar with cornstarch and water to make a sauce.",
+#       "Pour over chicken, add peanuts and vegetables, and cook until sauce thickens."
+#     ],
+#     "difficulty": "Medium",
+#     "time_required": "45 minutes",
+#     "description": "A spicy, flavorful dish that combines tender chicken with crunchy peanuts and a fiery sauce."
+#   }
+# ]
+
+# # Call the upsert function with the sample data
+# result, status_code = upsert_user_recipes(sample_data)
+# print(result)
