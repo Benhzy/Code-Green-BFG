@@ -6,6 +6,7 @@ import BottomMenuBar from './components/BottomMenuBar';
 import RecipeList from './components/RecipeList';
 import './App.css';
 
+// Testing line for changes
 // Dummy components for Groceries and Add
 const Groceries = ({ inventoryItems, onDecrement, onDelete, filter, handleFilterChange }) => (
     <>
