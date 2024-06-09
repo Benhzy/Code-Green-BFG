@@ -1,0 +1,39 @@
+/* BottomMenuBar.css */
+.bottom-menu-bar {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    background-color: #333;
+    padding: 10px 0;
+    z-index: 1000;
+}
+
+.menu-button {
+    color: white;
+    text-decoration: none;
+    font-size: 1.5em;
+    padding: 10px;
+    flex: 1;
+    text-align: center;
+}
+
+.menu-button:hover {
+    background-color: #575757;
+    color: white; 
+}
+
+.menu-button:active {
+    background-color: #444;
+    color: white; 
+}
+
+.menu-button:visited {
+    color: white; 
+}
+
+.menu-button:focus {
+    color: white; 
+    outline: none; 
+}
