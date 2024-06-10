@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import InventoryItem from './components/InventoryItem';
 import Clock from './components/Clock';
 import BottomMenuBar from './components/BottomMenuBar';
@@ -196,6 +196,7 @@ function App() {
             <div className="main-container">
                 <div className="content">
                     <Routes>
+                        <Route path="/" element={<Navigate to="/groceries" />} />
                         <Route path="/recipes" element={<RecipeList userId={userId} />} />
                         <Route path="/groceries" element={<Groceries inventoryItems={filteredItems} onDecrement={onDecrement} onDelete={onDelete} filter={filter} handleFilterChange={handleFilterChange} />} />
                         <Route path="/add" element={<AddItem />} />
