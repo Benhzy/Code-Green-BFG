@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'; // Import BrowserRouter
 import InventoryItem from './components/InventoryItem';
 import Clock from './components/Clock';
+import Sidebar from './components/Sidebar';
+import RecipeList from './components/RecipeList';
 import './App.css';
 
 function App() {
@@ -91,32 +94,40 @@ function App() {
     });
 
     return (
-        <div className="main-container">
-            <Clock />
-            <div className="filter-bar">
-                <button onClick={() => handleFilterChange('All')}>🛒 All 🛒</button>
-                <button onClick={() => handleFilterChange('vegetable')}>🍅 Vegetables 🍅</button>
-                <button onClick={() => handleFilterChange('meat')}>🍖 Meat 🍖</button>
-                <button onClick={() => handleFilterChange('dairy')}>🥛 Dairy 🥛</button>
-                <button onClick={() => handleFilterChange('fruit')}>🍎 Fruits 🍎</button>
-                <button onClick={() => handleFilterChange('bread')}>🍞 Breads 🍞</button>
+        <Router>
+            <div className="main-container">
+                <Sidebar /> 
+                <div className="content">
+                    <Routes>
+                        <Route path="/recipes" element={<RecipeList userId={1} />} />
+                    </Routes>
+                    <Clock />
+                    <div className="filter-bar">
+                    <button onClick={() => handleFilterChange('All')}>🛒 All 🛒</button>
+                    <button onClick={() => handleFilterChange('vegetable')}>🍅 Vegetables 🍅</button>
+                    <button onClick={() => handleFilterChange('meat')}>🍖 Meat 🍖</button>
+                    <button onClick={() => handleFilterChange('dairy')}>🥛 Dairy 🥛</button>
+                    <button onClick={() => handleFilterChange('fruit')}>🍎 Fruits 🍎</button>
+                    <button onClick={() => handleFilterChange('bread')}>🍞 Breads 🍞</button>
+                    </div>
+                    <div className="inventory-grid">
+                        {filteredItems.map(item => (
+                            <InventoryItem
+                                key={item.item + item.purchase_date}
+                                id={item.item}
+                                item={item.item}
+                                category={item.category}
+                                quantity={item.quantity}
+                                purchase_date={item.purchase_date}
+                                expiry_date={item.expiry_date}
+                                onDecrement={onDecrement}
+                                onDelete={() => onDelete(item.item, item.purchase_date, item.expiry_date)}
+                            />
+                        ))}
+                    </div>
+                </div>
             </div>
-            <div className="inventory-grid">
-                {filteredItems.map(item => (
-                    <InventoryItem
-                        key={item.item + item.purchase_date}
-                        id={item.item}
-                        item={item.item}
-                        category={item.category}
-                        quantity={item.quantity}
-                        purchase_date={item.purchase_date}
-                        expiry_date={item.expiry_date}
-                        onDecrement={onDecrement}
-                        onDelete={() => onDelete(item.item, item.purchase_date, item.expiry_date)}
-                    />
-                ))}
-            </div>
-        </div>
+        </Router>
     );
 }
 
