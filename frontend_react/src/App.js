@@ -6,7 +6,6 @@ import BottomMenuBar from './components/BottomMenuBar';
 import RecipeList from './components/RecipeList';
 import './App.css';
 
-// Dummy components for Groceries and Add
 const Groceries = ({ inventoryItems, onDecrement, onDelete, filter, handleFilterChange }) => (
     <>
         <Clock />
@@ -39,32 +38,30 @@ const Groceries = ({ inventoryItems, onDecrement, onDelete, filter, handleFilter
 const AddItem = () => (
     <div>
         <h2>Add a new item</h2>
-        {/* Form to add new item goes here */}
     </div>
 );
 
 function App() {
     const [filter, setFilter] = useState('All');
     const [inventoryItems, setInventoryItems] = useState([]);
-    const userId = 123456; // Replace with the actual user ID
+    const userId = 5; // Replace with the actual user ID
 
-    // Fetch inventory items from an API
-    useEffect(() => {
-        const fetchInventoryItems = async () => {
-            try {
-                const response = await fetch(`http://localhost:5000/grocery/${userId}`);
-                const data = await response.json();
-                if (response.ok) {
-                    console.log("Fetched inventory items:", data); // Debugging statement
-                    setInventoryItems(data);
-                } else {
-                    throw new Error('Failed to fetch items');
-                }
-            } catch (error) {
-                console.error('Error fetching inventory items:', error);
+    const fetchInventoryItems = async () => {
+        try {
+            const response = await fetch(`http://localhost:5000/grocery/${userId}`);
+            const data = await response.json();
+            if (response.ok) {
+                console.log("Fetched inventory items:", data); // Debugging statement
+                setInventoryItems(data);
+            } else {
+                throw new Error('Failed to fetch items');
             }
-        };
+        } catch (error) {
+            console.error('Error fetching inventory items:', error);
+        }
+    };
 
+    useEffect(() => {
         fetchInventoryItems();
     }, [userId]);
 
@@ -205,7 +202,7 @@ function App() {
                         {/* Add more routes as needed */}
                     </Routes>
                 </div>
-                <BottomMenuBar />
+                <BottomMenuBar fetchInventoryItems={fetchInventoryItems} />
             </div>
         </Router>
     );
