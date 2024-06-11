@@ -1,0 +1,93 @@
+/* Importing the Roboto font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+.add-item-form-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #FFFFFF; /* White background for a clean look */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    padding: 20px;
+    z-index: 1000;
+    width: 400px; /* Adjust width as needed */
+    font-family: 'Roboto', sans-serif; /* Modern font */
+}
+
+.add-item-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.add-item-form h2 {
+    margin-bottom: 20px;
+    color: #4A4A4A; /* Dark earthy tone for text */
+    font-size: 24px; /* Larger font for heading */
+    text-align: center; /* Centered heading */
+    font-weight: 500; /* Medium weight for the heading */
+}
+
+.add-item-form label {
+    margin-bottom: 10px;
+    color: #4A4A4A; /* Dark earthy tone for text */
+    font-weight: 400; /* Normal weight for labels */
+}
+
+.add-item-form input,
+.add-item-form select {
+    padding: 10px; /* Increased padding for modern look */
+    margin-top: 5px;
+    margin-bottom: 15px;
+    margin-left: 20px;
+    border: 1px solid #D9CBAA; /* Light earthy tone for border */
+    border-radius: 5px;
+    font-size: 16px; /* Modern font size */
+    color: #4A4A4A; /* Dark earthy tone for text */
+    font-family: 'Roboto', sans-serif; /* Ensure font applies here too */
+}
+
+.add-item-form input:focus,
+.add-item-form select:focus {
+    border-color: #A68A64; /* Focus border color */
+    outline: none; /* Remove default outline */
+}
+
+.button-group {
+    display: flex;
+    justify-content: space-between; /* Space between buttons */
+}
+
+.submit-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #4A4A4A; /* Dark earthy tone for button */
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 16px;
+    font-family: 'Roboto', sans-serif; /* Ensure font applies here too */
+    font-weight: 500; /* Medium weight for buttons */
+}
+
+.submit-button:hover {
+    background-color: #333333; /* Slightly darker on hover */
+}
+
+.cancel-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #A68A64; /* Medium earthy tone for button */
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 16px;
+    font-family: 'Roboto', sans-serif; /* Ensure font applies here too */
+    font-weight: 500; /* Medium weight for buttons */
+}
+
+.cancel-button:hover {
+    background-color: #8D6E4A; /* Slightly darker on hover */
+}

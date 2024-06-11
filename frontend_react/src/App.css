@@ -55,15 +55,29 @@ a:focus {
   padding: 0;
 }
 
+.bottom-menu-bar {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  background-color: #4A4A4A; /* Dark earthy tone for background */
+  padding: 10px 0;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2); /* Slight shadow for depth */
+}
+
 .main-container {
+  position: relative;
   margin: 20px;
   margin-left: 270px; /* Adjusted to make room for the sidebar */
   padding: 20px;
+  padding-bottom: 150px; /* Adjust this value based on the height of your bottom menu bar */
   background-color: var(--color-primary-a10); /* Light green background */
   border-radius: 10px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  min-height: 100vh; /* Ensure it covers the full height minus the navbar if any */
+  min-height: 160vh; /* Ensure it covers the full height minus the navbar if any */
 }
+
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
