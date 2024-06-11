@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { Button, Stack, Input, InputGroup, InputRightElement, IconButton } from '@chakra-ui/react';
 import { SearchIcon } from '@chakra-ui/icons';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import InventoryItem from './components/InventoryItem';
 import BottomMenuBar from './components/BottomMenuBar';
 import RecipeList from './components/RecipeList';
 import CameraComponent from './components/Camera';
 import './App.css';
+import EditItemForm from './components/EditItemForm'; // Import the EditItemForm component
 
-const Groceries = ({ inventoryItems, onDecrement, onDelete, handleFilterChange, handleSearchChange, searchQuery }) => (
+const Groceries = ({ inventoryItems, onDecrement, onDelete, handleFilterChange, handleSearchChange, searchQuery, fetchInventoryItems }) => (
     <>
         <div className="search-container">
             <InputGroup>
@@ -44,16 +45,16 @@ const Groceries = ({ inventoryItems, onDecrement, onDelete, handleFilterChange, 
                     item={item.item}
                     category={item.category}
                     quantity={item.quantity}
-                    purchaseCar_date={item.purchase_date}
+                    purchase_date={item.purchase_date}
                     expiry_date={item.expiry_date}
                     onDecrement={onDecrement}
                     onDelete={() => onDelete(item.item, item.purchase_date, item.expiry_date)}
+                    fetchInventoryItems={fetchInventoryItems} // Pass fetchInventoryItems prop
                 />
             ))}
         </div>
     </>
 );
-
 
 const AddItem = () => (
     <div>
@@ -94,7 +95,6 @@ function App() {
     const handleSearchChange = (event) => {
         const value = event.target.value;
         setSearchQuery(value);
-        // to be implemented
         console.log("Search initiated with query:", value);
     };
 
@@ -217,7 +217,8 @@ function App() {
     };
 
     const filteredItems = inventoryItems.filter(item => {
-        return filter === 'All' || item.category === filter;
+        return (filter === 'All' || item.category === filter) &&
+               (searchQuery === '' || item.item.toLowerCase().includes(searchQuery.toLowerCase()));
     });
 
     return (
@@ -227,10 +228,10 @@ function App() {
                     <Routes>
                         <Route path="/" element={<Navigate to="/groceries" />} />
                         <Route path="/recipes" element={<RecipeList userId={userId} />} />
-                        <Route path="/groceries" element={<Groceries inventoryItems={filteredItems} onDecrement={onDecrement} onDelete={onDelete} filter={filter} handleFilterChange={handleFilterChange} handleSearchChange={handleSearchChange} />} />
+                        <Route path="/groceries" element={<Groceries inventoryItems={filteredItems} onDecrement={onDecrement} onDelete={onDelete} filter={filter} handleFilterChange={handleFilterChange} handleSearchChange={handleSearchChange} fetchInventoryItems={fetchInventoryItems} />} />
                         <Route path="/add" element={<AddItem />} />
-                        <Route path="/scanner"element={<CameraComponent userId={userId}/>} />
-                        {/* Add more routes as needed */}
+                        <Route path="/scanner" element={<CameraComponent userId={userId} />} />
+                        <Route path="/edit-item" element={<EditItemForm fetchInventoryItems={fetchInventoryItems} />} /> {/* Add EditItemForm route */}
                     </Routes>
                 </div>
                 <BottomMenuBar fetchInventoryItems={fetchInventoryItems} />
