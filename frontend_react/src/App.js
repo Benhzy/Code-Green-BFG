@@ -1,22 +1,40 @@
 import React, { useState, useEffect } from 'react';
+import { Button, Stack, Input, InputGroup, InputRightElement, IconButton } from '@chakra-ui/react';
+import { SearchIcon } from '@chakra-ui/icons';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import InventoryItem from './components/InventoryItem';
-import Clock from './components/Clock';
 import BottomMenuBar from './components/BottomMenuBar';
 import RecipeList from './components/RecipeList';
 import CameraComponent from './components/Camera';
 import './App.css';
 
-const Groceries = ({ inventoryItems, onDecrement, onDelete, filter, handleFilterChange }) => (
+const Groceries = ({ inventoryItems, onDecrement, onDelete, handleFilterChange, handleSearchChange, searchQuery }) => (
     <>
-        <Clock />
-        <div className="filter-bar">
-            <button onClick={() => handleFilterChange('All')}>🛒 All 🛒</button>
-            <button onClick={() => handleFilterChange('Vegetables')}>🍅 Vegetables 🍅</button> 
-            <button onClick={() => handleFilterChange('Meat')}>🍖 Meat 🍖</button>
-            <button onClick={() => handleFilterChange('Dairy')}>🥛 Dairy 🥛</button>
-            <button onClick={() => handleFilterChange('Fruits')}>🍎 Fruits 🍎</button>
-            <button onClick={() => handleFilterChange('Breads')}>🍞 Breads 🍞</button>
+        <div className="search-container">
+            <InputGroup>
+                <Input 
+                    placeholder="Search items..."
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                />
+                <InputRightElement>
+                    <IconButton
+                        aria-label="Search database"
+                        icon={<SearchIcon />}
+                        onClick={handleSearchChange}
+                    />
+                </InputRightElement>
+            </InputGroup>
+        </div>
+        <div className="filter-container">
+            <Stack direction="row" spacing={4}>
+                <Button colorScheme="gray" variant="solid" onClick={() => handleFilterChange('All')}>All</Button>
+                <Button colorScheme="gray" variant="solid" onClick={() => handleFilterChange('Vegetables')}>🍅 Vegetables</Button>
+                <Button colorScheme="gray" variant="solid" onClick={() => handleFilterChange('Meat')}>🍖 Meat</Button>
+                <Button colorScheme="gray" variant="solid" onClick={() => handleFilterChange('Dairy')}>🥛 Dairy</Button>
+                <Button colorScheme="gray" variant="solid" onClick={() => handleFilterChange('Fruits')}>🍎 Fruits</Button>
+                <Button colorScheme="gray" variant="solid" onClick={() => handleFilterChange('Breads')}>🍞 Breads</Button>
+            </Stack>
         </div>
         <div className="inventory-grid">
             {inventoryItems.map(item => (
@@ -26,7 +44,7 @@ const Groceries = ({ inventoryItems, onDecrement, onDelete, filter, handleFilter
                     item={item.item}
                     category={item.category}
                     quantity={item.quantity}
-                    purchase_date={item.purchase_date}
+                    purchaseCar_date={item.purchase_date}
                     expiry_date={item.expiry_date}
                     onDecrement={onDecrement}
                     onDelete={() => onDelete(item.item, item.purchase_date, item.expiry_date)}
@@ -35,6 +53,7 @@ const Groceries = ({ inventoryItems, onDecrement, onDelete, filter, handleFilter
         </div>
     </>
 );
+
 
 const AddItem = () => (
     <div>
@@ -68,6 +87,15 @@ function App() {
 
     const handleFilterChange = (category) => {
         setFilter(category);
+    };
+
+    const [searchQuery, setSearchQuery] = useState('');
+
+    const handleSearchChange = (event) => {
+        const value = event.target.value;
+        setSearchQuery(value);
+        // to be implemented
+        console.log("Search initiated with query:", value);
     };
 
     const updateServer = async (updatedItem) => {
@@ -199,7 +227,7 @@ function App() {
                     <Routes>
                         <Route path="/" element={<Navigate to="/groceries" />} />
                         <Route path="/recipes" element={<RecipeList userId={userId} />} />
-                        <Route path="/groceries" element={<Groceries inventoryItems={filteredItems} onDecrement={onDecrement} onDelete={onDelete} filter={filter} handleFilterChange={handleFilterChange} />} />
+                        <Route path="/groceries" element={<Groceries inventoryItems={filteredItems} onDecrement={onDecrement} onDelete={onDelete} filter={filter} handleFilterChange={handleFilterChange} handleSearchChange={handleSearchChange} />} />
                         <Route path="/add" element={<AddItem />} />
                         <Route path="/scanner"element={<CameraComponent userId={userId}/>} />
                         {/* Add more routes as needed */}

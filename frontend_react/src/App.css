@@ -4,8 +4,8 @@
   --color-primary-a10: #c5dad0;
   --color-primary-a20: #8db5a3;
   --color-primary-a30: #559178;
-  --color-primary-a50: #0b6e4f;
-  --color-primary-a60: #13523c;
+  --color-primary-a50: #e0e0e0;
+  --color-primary-a60: #ffffff;
   --color-primary-a70: #133829;
   --color-primary-a80: #101f18;
   --color-primary-a90: #000000;
@@ -72,7 +72,7 @@ a:focus {
   margin-left: 270px; /* Adjusted to make room for the sidebar */
   padding: 20px;
   padding-bottom: 150px; /* Adjust this value based on the height of your bottom menu bar */
-  background-color: var(--color-primary-a10); /* Light green background */
+  background-color: #ffffff;
   border-radius: 10px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   min-height: 160vh; /* Ensure it covers the full height minus the navbar if any */
@@ -107,14 +107,6 @@ h1, h2, h3, h4, h5, h6 {
 .mb-5 { margin-bottom: 3rem; }
 .hidden { display: none !important; }
 
-/* css for InventoryItem */
-.main-container {
-  margin: 20px;
-  padding: 20px;
-  background-color: var(--color-primary-a10); /* Light green background */
-  border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
 
 /* Ensure overall nice styles for the inventory items */
 .inventory-item {
@@ -280,4 +272,28 @@ h1, h2, h3, h4, h5, h6 {
   padding: 10px;
   border-radius: 5px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.filter-container {
+  overflow-x: auto;
+  white-space: nowrap;
+  padding-bottom: 10px; /* To ensure the scrollbar does not overlap content */
+}
+
+.filter-container .chakra-stack {
+  display: inline-flex;
+}
+
+.filter-container {
+  overflow-x: auto;
+  white-space: nowrap;
+  padding-bottom: 10px; /* To ensure the scrollbar does not overlap content */
+}
+
+.filter-container .chakra-stack {
+  display: inline-flex;
+}
+
+.search-container {
+  margin-bottom: 10px;
 }
