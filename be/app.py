@@ -6,7 +6,7 @@ from scripts.db_connection import get_grocery_data_by_user_id
 from scripts.db_connection import upsert_user_recipes
 from scripts.db_connection import delete_user_grocery
 from scripts.db_connection import delete_user_recipe
-from scripts.recipe_recommender import recommend_recipes
+from scripts.recipe_recommender import recommend_recipes, store_recipe
 from scripts.receipt_scanner import extract_text
 from scripts.receipt_scanner import post_data
 import base64
@@ -121,7 +121,10 @@ def recommend_recipe(user_id):
     # Assuming the cuisine type can also be passed as a query parameter
     cuisine = request.args.get('cuisine', 'Singaporean')
     try:
-        return recommend_recipes(user_id, cuisine)
+        recipe = recommend_recipes(user_id, cuisine)
+        store_recipe(user_id, recipe)
+        return recipe
+    
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

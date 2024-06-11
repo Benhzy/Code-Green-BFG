@@ -41,24 +41,27 @@ def analyze_user_recipes(user_id):
 # INSERT RECIPE RECOMMENDER CODE HERE 
 
 
-def fetch_ingredients_near_expiry(user_id):
+def fetch_ingredients(user_id):
     # Assuming the function `analyze_data` returns a dictionary sorted by purchase dates.
     groceries = analyze_user_data(user_id)
     near_expiry_ingredients = []
+    all_groceries = []
 
     # Check for items within 3 days of expiry
     cutoff_date = datetime.now() + timedelta(days=10) 
     for date_str, items in groceries.items():
+        all_groceries.extend(items)
         if datetime.strptime(str(date_str), "%Y-%m-%d") <= cutoff_date:
-            near_expiry_ingredients.extend(items)
+            near_expiry_ingredients.append(items[0])
     processed_near_expiry_ingredients = []
     for ele in near_expiry_ingredients:
         processed_near_expiry_ingredients.append(ele[0])
-    return ",".join(processed_near_expiry_ingredients)
+    return all_groceries, processed_near_expiry_ingredients
 
-def generate_recipe_suggestions(ingredients, user_recipes, cuisine = "Singaporean"): # where ingredients is a string of comma-separated ingredients
+def generate_recipe_suggestions(ingredients, exp_ingredients, user_recipes, cuisine = "Singaporean"): # where ingredients is a string of comma-separated ingredients
     # Prepare the prompt for GPT based on near expiry ingredients and user's recipes
-    ingredients_list = ', '.join([item[0] for item in ingredients])
+    all_ingredients_list = ', '.join([item[0] for item in ingredients])
+    exp_ingredients_list = ', '.join([item[0] for item in exp_ingredients])
     recipes_list = ', '.join([recipe[0] for recipe in user_recipes])
 
     extra_prompt = ""
@@ -66,7 +69,9 @@ def generate_recipe_suggestions(ingredients, user_recipes, cuisine = "Singaporea
         extra_prompt = f"Base your recipe on the cuisines from these recipes if possible: {recipes_list}"
 
     prompt = f"""
-    Create a {cuisine} food recipe using the following ingredients close to expiry: {ingredients_list}.
+    Create a {cuisine} food recipe using the following ingredients close to expiry: {exp_ingredients_list}.
+
+    Make sure this recipe can be prepared with the ingredients here: {all_ingredients_list}.
 
     Make sure the recipe is an authentic {cuisine} recipe.
 
@@ -161,17 +166,19 @@ def jsonify_recipe(recipe_data, user_id):
 
 
 def recommend_recipes(user_id, cuisine):
-    near_expiry_ingredients = fetch_ingredients_near_expiry(user_id)
+    all_ingredients, near_expiry_ingredients = fetch_ingredients(user_id)
     user_recipes = analyze_user_recipes(user_id)
     if near_expiry_ingredients:
-        raw_recipe = generate_recipe_suggestions(near_expiry_ingredients, user_recipes, cuisine)
+        raw_recipe = generate_recipe_suggestions(all_ingredients, near_expiry_ingredients, user_recipes, cuisine)
         recipe_dict = extract_recipe(raw_recipe)
-        recipe_json = jsonify_recipe(recipe_dict, user_id)  # Make sure this returns the correct structure
-        response = upsert_user_recipes([recipe_json])  # Ensure this is a list of dictionaries
-        return response
+        return recipe_dict
     else:
         return "No ingredients are close to expiry."
 
+def store_recipe(user_id, recipe_dict):
+    recipe_json = jsonify_recipe(recipe_dict, user_id)  # Make sure this returns the correct structure
+    response = upsert_user_recipes([recipe_json])  # Ensure this is a list of dictionaries
+    return response
 
 # near_expiry_ingredients = "Fish, Potato, Carrot, Onion, Garlic, Ginger, Soy Sauce, Oyster Sauce, Cornstarch, Sugar, Salt, Pepper, Oil"
 # user_recipes = []
