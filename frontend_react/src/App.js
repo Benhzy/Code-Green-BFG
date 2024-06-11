@@ -4,6 +4,7 @@ import InventoryItem from './components/InventoryItem';
 import Clock from './components/Clock';
 import BottomMenuBar from './components/BottomMenuBar';
 import RecipeList from './components/RecipeList';
+import CameraComponent from './components/Camera';
 import './App.css';
 
 const Groceries = ({ inventoryItems, onDecrement, onDelete, filter, handleFilterChange }) => (
@@ -200,6 +201,7 @@ function App() {
                         <Route path="/recipes" element={<RecipeList userId={userId} />} />
                         <Route path="/groceries" element={<Groceries inventoryItems={filteredItems} onDecrement={onDecrement} onDelete={onDelete} filter={filter} handleFilterChange={handleFilterChange} />} />
                         <Route path="/add" element={<AddItem />} />
+                        <Route path="/scanner"element={<CameraComponent userId={userId}/>} />
                         {/* Add more routes as needed */}
                     </Routes>
                 </div>

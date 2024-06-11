@@ -7,6 +7,9 @@ from scripts.db_connection import upsert_user_recipes
 from scripts.db_connection import delete_user_grocery
 from scripts.db_connection import delete_user_recipe
 from scripts.recipe_recommender import recommend_recipes
+from scripts.receipt_scanner import extract_text
+from scripts.receipt_scanner import post_data
+import base64
 
 app = Flask(__name__)
 CORS(app)
@@ -121,6 +124,26 @@ def recommend_recipe(user_id):
         return recommend_recipes(user_id, cuisine)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+@app.route('/upload_receipt/<user_id>', methods=['POST'])
+def upload_receipt(user_id):
+    data = request.get_json()
+    image_data = data['image']
+    
+    # Decode the image from base64
+    image_data = base64.b64decode(image_data.split(',')[1])
+
+    # Save the image to a temporary file
+    with open("temp_image.png", "wb") as f:
+        f.write(image_data)
+    
+    extracted_items = extract_text("temp_image.png")
+
+    post_data(user_id, extracted_items)
+
+    return jsonify({'extracted_text': extracted_items, 'user_id': user_id})
+
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -3,10 +3,15 @@
 import base64
 import requests
 import json
-from post_grocery_data import upsert_user_groceries
+import os
+from openai import OpenAI
+from scripts.db_connection import upsert_user_groceries
 from datetime import datetime, timedelta
 from sklearn.metrics.pairwise import cosine_similarity
 from sentence_transformers import SentenceTransformer
+from dotenv import load_dotenv
+load_dotenv("/be/scripts/.env")
+api_key=os.environ.get("OPENAI_API_KEY")
 
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
@@ -21,7 +26,9 @@ def post_data(user_id, items):
 
 ### Write receipt scanner code here and call post_data with the extracted data
 def encode_image(image_path):
-  with open(image_path, "rb") as image_file:
+  script_dir = os.path.dirname(os.path.abspath(__file__))  # Get the absolute path of the current script
+  image_abs_path = os.path.join(script_dir, '..', image_path)
+  with open(image_abs_path, "rb") as image_file:
     return base64.b64encode(image_file.read()).decode('utf-8')
 
 ### Extract food items from a given image
@@ -56,6 +63,7 @@ def extract_text(image_path):
 
     response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
     
+    print(response.json())
     # Extract items from LLm response
     content = response.json()['choices'][0]['message']['content']
     json_content = content.split('```json\n')[1].split('\n```')[0]
@@ -73,12 +81,16 @@ def extract_text(image_path):
             "expiry_date": expiry_date
         }
         output_items.append(output_item)
+    return output_items
+    
+    """
     output = {
         "user_id": "1",
         "items": output_items
     }
     output_json = json.dumps(output, indent=2)
     print(output_json)
+    """
     
 def determine_category(item_name):
     categories = {

@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import AddItemForm from './AddItemForm';
 import './BottomMenuBar.css';
 
 const BottomMenuBar = ({ fetchInventoryItems }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isFormOpen, setIsFormOpen] = useState(false);
+    const navigate = useNavigate();
 
     const toggleButtons = () => {
         setIsOpen(!isOpen);
@@ -20,6 +21,10 @@ const BottomMenuBar = ({ fetchInventoryItems }) => {
         setIsFormOpen(false);
     };
 
+    const handleScanReceiptClick = () => {
+        navigate('/scanner'); // Redirect to the camera page
+    };
+
     return (
         <div className="bottom-menu-bar">
             <Link to="/groceries" className="menu-button">Grocery</Link>
@@ -29,7 +34,7 @@ const BottomMenuBar = ({ fetchInventoryItems }) => {
             {isOpen && (
                 <div className="floating-buttons">
                     <button className="floating-button-item" onClick={openForm}>Add item</button>
-                    <button className="floating-button-item" onClick={() => alert('Scan receipt clicked!')}>Scan receipt</button>
+                    <button className="floating-button-item" onClick={handleScanReceiptClick}>Scan receipt</button>
                 </div>
             )}
 
