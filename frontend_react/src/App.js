@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Button, Stack } from '@chakra-ui/react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import InventoryItem from './components/InventoryItem';
 import Clock from './components/Clock';
@@ -9,14 +10,14 @@ import './App.css';
 const Groceries = ({ inventoryItems, onDecrement, onDelete, filter, handleFilterChange }) => (
     <>
         <Clock />
-        <div className="filter-bar">
-            <button onClick={() => handleFilterChange('All')}>🛒 All 🛒</button>
-            <button onClick={() => handleFilterChange('Vegetables')}>🍅 Vegetables 🍅</button> 
-            <button onClick={() => handleFilterChange('Meat')}>🍖 Meat 🍖</button>
-            <button onClick={() => handleFilterChange('Dairy')}>🥛 Dairy 🥛</button>
-            <button onClick={() => handleFilterChange('Fruits')}>🍎 Fruits 🍎</button>
-            <button onClick={() => handleFilterChange('Breads')}>🍞 Breads 🍞</button>
-        </div>
+        <Stack direction="row" spacing={4}>
+        <Button colorScheme="blue" variant="solid" onClick={() => handleFilterChange('All')}>🛒 All 🛒</Button>
+        <Button colorScheme="green" variant="solid" onClick={() => handleFilterChange('Vegetables')}>🍅 Vegetables 🍅</Button>
+        <Button colorScheme="red" variant="solid" onClick={() => handleFilterChange('Meat')}>🍖 Meat 🍖</Button>
+        <Button colorScheme="purple" variant="solid" onClick={() => handleFilterChange('Dairy')}>🥛 Dairy 🥛</Button>
+        <Button colorScheme="orange" variant="solid" onClick={() => handleFilterChange('Fruits')}>🍎 Fruits 🍎</Button>
+        <Button colorScheme="yellow" variant="solid" onClick={() => handleFilterChange('Breads')}>🍞 Breads 🍞</Button>
+        </Stack>
         <div className="inventory-grid">
             {inventoryItems.map(item => (
                 <InventoryItem
@@ -25,7 +26,7 @@ const Groceries = ({ inventoryItems, onDecrement, onDelete, filter, handleFilter
                     item={item.item}
                     category={item.category}
                     quantity={item.quantity}
-                    purchase_date={item.purchase_date}
+                    purchaseCar_date={item.purchase_date}
                     expiry_date={item.expiry_date}
                     onDecrement={onDecrement}
                     onDelete={() => onDelete(item.item, item.purchase_date, item.expiry_date)}
@@ -34,6 +35,7 @@ const Groceries = ({ inventoryItems, onDecrement, onDelete, filter, handleFilter
         </div>
     </>
 );
+
 
 const AddItem = () => (
     <div>
