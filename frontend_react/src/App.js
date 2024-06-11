@@ -1,23 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { Button, Stack } from '@chakra-ui/react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import InventoryItem from './components/InventoryItem';
 import Clock from './components/Clock';
 import BottomMenuBar from './components/BottomMenuBar';
 import RecipeList from './components/RecipeList';
 import './App.css';
 
-// Dummy components for Groceries and Add
 const Groceries = ({ inventoryItems, onDecrement, onDelete, filter, handleFilterChange }) => (
     <>
         <Clock />
-        <div className="filter-bar">
-            <button onClick={() => handleFilterChange('All')}>🛒 All 🛒</button>
-            <button onClick={() => handleFilterChange('Vegetables')}>🍅 Vegetables 🍅</button> 
-            <button onClick={() => handleFilterChange('Meat')}>🍖 Meat 🍖</button>
-            <button onClick={() => handleFilterChange('Dairy')}>🥛 Dairy 🥛</button>
-            <button onClick={() => handleFilterChange('Fruits')}>🍎 Fruits 🍎</button>
-            <button onClick={() => handleFilterChange('Breads')}>🍞 Breads 🍞</button>
-        </div>
+        <Stack direction="row" spacing={4}>
+        <Button colorScheme="blue" variant="solid" onClick={() => handleFilterChange('All')}>🛒 All 🛒</Button>
+        <Button colorScheme="green" variant="solid" onClick={() => handleFilterChange('Vegetables')}>🍅 Vegetables 🍅</Button>
+        <Button colorScheme="red" variant="solid" onClick={() => handleFilterChange('Meat')}>🍖 Meat 🍖</Button>
+        <Button colorScheme="purple" variant="solid" onClick={() => handleFilterChange('Dairy')}>🥛 Dairy 🥛</Button>
+        <Button colorScheme="orange" variant="solid" onClick={() => handleFilterChange('Fruits')}>🍎 Fruits 🍎</Button>
+        <Button colorScheme="yellow" variant="solid" onClick={() => handleFilterChange('Breads')}>🍞 Breads 🍞</Button>
+        </Stack>
         <div className="inventory-grid">
             {inventoryItems.map(item => (
                 <InventoryItem
@@ -26,7 +26,7 @@ const Groceries = ({ inventoryItems, onDecrement, onDelete, filter, handleFilter
                     item={item.item}
                     category={item.category}
                     quantity={item.quantity}
-                    purchase_date={item.purchase_date}
+                    purchaseCar_date={item.purchase_date}
                     expiry_date={item.expiry_date}
                     onDecrement={onDecrement}
                     onDelete={() => onDelete(item.item, item.purchase_date, item.expiry_date)}
@@ -36,35 +36,34 @@ const Groceries = ({ inventoryItems, onDecrement, onDelete, filter, handleFilter
     </>
 );
 
+
 const AddItem = () => (
     <div>
         <h2>Add a new item</h2>
-        {/* Form to add new item goes here */}
     </div>
 );
 
 function App() {
     const [filter, setFilter] = useState('All');
     const [inventoryItems, setInventoryItems] = useState([]);
-    const userId = 123456; // Replace with the actual user ID
+    const userId = 5; // Replace with the actual user ID
 
-    // Fetch inventory items from an API
-    useEffect(() => {
-        const fetchInventoryItems = async () => {
-            try {
-                const response = await fetch(`http://localhost:5000/grocery/${userId}`);
-                const data = await response.json();
-                if (response.ok) {
-                    console.log("Fetched inventory items:", data); // Debugging statement
-                    setInventoryItems(data);
-                } else {
-                    throw new Error('Failed to fetch items');
-                }
-            } catch (error) {
-                console.error('Error fetching inventory items:', error);
+    const fetchInventoryItems = async () => {
+        try {
+            const response = await fetch(`http://localhost:5000/grocery/${userId}`);
+            const data = await response.json();
+            if (response.ok) {
+                console.log("Fetched inventory items:", data); // Debugging statement
+                setInventoryItems(data);
+            } else {
+                throw new Error('Failed to fetch items');
             }
-        };
+        } catch (error) {
+            console.error('Error fetching inventory items:', error);
+        }
+    };
 
+    useEffect(() => {
         fetchInventoryItems();
     }, [userId]);
 
@@ -199,13 +198,14 @@ function App() {
             <div className="main-container">
                 <div className="content">
                     <Routes>
+                        <Route path="/" element={<Navigate to="/groceries" />} />
                         <Route path="/recipes" element={<RecipeList userId={userId} />} />
                         <Route path="/groceries" element={<Groceries inventoryItems={filteredItems} onDecrement={onDecrement} onDelete={onDelete} filter={filter} handleFilterChange={handleFilterChange} />} />
                         <Route path="/add" element={<AddItem />} />
                         {/* Add more routes as needed */}
                     </Routes>
                 </div>
-                <BottomMenuBar />
+                <BottomMenuBar fetchInventoryItems={fetchInventoryItems} />
             </div>
         </Router>
     );
