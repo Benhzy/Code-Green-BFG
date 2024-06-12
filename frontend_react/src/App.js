@@ -7,7 +7,7 @@ import BottomMenuBar from './components/BottomMenuBar';
 import RecipeList from './components/RecipeList';
 import CameraComponent from './components/Camera';
 import './App.css';
-import EditItemForm from './components/EditItemForm'; // Import the EditItemForm component
+import EditItemForm from './components/EditItemForm'; 
 
 const Groceries = ({ inventoryItems, onDecrement, onDelete, handleFilterChange, handleSearchChange, searchQuery, fetchInventoryItems }) => (
     <>

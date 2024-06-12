@@ -1,4 +1,4 @@
-// src/theme.js or src/theme.ts
+// src/theme.js
 import { extendTheme } from '@chakra-ui/react';
 
 const theme = extendTheme({
@@ -14,7 +14,16 @@ const theme = extendTheme({
       800: "#006BA1",
       900: "#005885",
     },
+    brand: {
+      100: "#f7fafc",
+      900: "#1a202c",
+    },
   },
+  fonts: {
+    heading: "'Roboto', sans-serif",
+    body: "'Open Sans', sans-serif",
+    mono: "'Menlo', monospace"
+  }
 });
-
 export default theme;
+

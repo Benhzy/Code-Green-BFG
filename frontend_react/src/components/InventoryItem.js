@@ -1,5 +1,5 @@
-// components/InventoryItem.js
 import React, { useState } from 'react';
+import { Button, Box, Text, Stack } from '@chakra-ui/react';
 import EditItemForm from './EditItemForm'; // Import the EditItemForm component
 
 const InventoryItem = ({ id, item, category, quantity, purchase_date, expiry_date, onDecrement, onDelete, fetchInventoryItems }) => {
@@ -14,17 +14,31 @@ const InventoryItem = ({ id, item, category, quantity, purchase_date, expiry_dat
     };
 
     return (
-        <div className="inventory-item">
+        <Box className="inventory-item" p={4} borderWidth="1px" borderRadius="md" boxShadow="sm">
             {!isEditing ? (
                 <>
-                    <h3>{item}</h3>
-                    <p>Category: {category}</p>
-                    <p>Quantity: {quantity}</p>
-                    <p>Purchase Date: {purchase_date}</p>
-                    <p>Expiry Date: {expiry_date}</p>
-                    <button onClick={() => onDecrement(id, 1)}>Decrement</button>
-                    <button onClick={() => onDelete(id)}>Delete</button>
-                    <button onClick={handleEdit}>Edit</button>
+                    <Text fontSize="2xl" fontWeight="bold">{item}</Text>
+                    <Text>
+                        <Text as="span" fontWeight="bold"> Category: </Text>
+                        <Text as="span">{category}</Text>
+                    </Text>
+                    <Text>
+                        <Text as="span" fontWeight="bold">Quantity: </Text> 
+                        <Text as="span"> {quantity} </Text>
+                    </Text>
+                    <Text>
+                        <Text as="span" fontWeight="bold"> Purchase Date: </Text>
+                        <Text as="span"> {purchase_date}</Text>
+                    </Text>
+                    <Text>
+                        <Text as="span" fontWeight="bold">Expiry Date: </Text>
+                        <Text as="span">{expiry_date} </Text>
+                    </Text>
+                    <Stack direction="row" spacing={4} mt={4}>
+                        <Button colorScheme="orange" onClick={() => onDecrement(id, 1)}>Decrement</Button>
+                        <Button colorScheme="red" onClick={() => onDelete(id)}>Delete</Button>
+                        <Button colorScheme="green" onClick={handleEdit}>Edit</Button>
+                    </Stack>
                 </>
             ) : (
                 <EditItemForm
@@ -38,7 +52,7 @@ const InventoryItem = ({ id, item, category, quantity, purchase_date, expiry_dat
                     fetchInventoryItems={fetchInventoryItems}
                 />
             )}
-        </div>
+        </Box>
     );
 };
 
