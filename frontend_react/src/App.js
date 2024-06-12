@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import { Button, Stack, Input, InputGroup, InputRightElement, IconButton } from '@chakra-ui/react';
-import { SearchIcon } from '@chakra-ui/icons';
+import {  Menu, MenuButton, MenuList, MenuItem, Button, Stack, Input, InputGroup, InputRightElement, IconButton} from '@chakra-ui/react';
+import { SearchIcon, ChevronDownIcon } from '@chakra-ui/icons';
 import InventoryItem from './components/InventoryItem';
 import BottomMenuBar from './components/BottomMenuBar';
 import RecipeList from './components/RecipeList';
@@ -9,7 +9,11 @@ import CameraComponent from './components/Camera';
 import './App.css';
 import EditItemForm from './components/EditItemForm'; 
 
-const Groceries = ({ inventoryItems, onDecrement, onDelete, handleFilterChange, handleSearchChange, searchQuery, fetchInventoryItems }) => (
+
+
+
+
+const Groceries = ({ inventoryItems, onDecrement, onDelete, handleFilterChange, handleSearchChange, searchQuery, fetchInventoryItems, handleSortChange, sortCriterion }) => (
     <>
         <div className="search-container">
             <InputGroup>
@@ -29,6 +33,7 @@ const Groceries = ({ inventoryItems, onDecrement, onDelete, handleFilterChange, 
         </div>
         <div className="filter-container">
             <Stack direction="row" spacing={4}>
+                <SortButton handleSortChange={handleSortChange} sortCriterion={sortCriterion} />
                 <Button colorScheme="gray" variant="solid" onClick={() => handleFilterChange('All')}>All</Button>
                 <Button colorScheme="gray" variant="solid" onClick={() => handleFilterChange('Vegetables')}>🍅 Vegetables</Button>
                 <Button colorScheme="gray" variant="solid" onClick={() => handleFilterChange('Meat')}>🍖 Meat</Button>
@@ -56,6 +61,21 @@ const Groceries = ({ inventoryItems, onDecrement, onDelete, handleFilterChange, 
     </>
 );
 
+const SortButton = ({ handleSortChange, sortCriterion }) => (
+    <Menu>
+        <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
+            Sort By: {sortCriterion.charAt(0).toUpperCase() + sortCriterion.slice(1).replace('_', ' ')}
+        </MenuButton>
+        <MenuList>
+            <MenuItem onClick={() => handleSortChange('alphabetical')}>Alphabetical</MenuItem>
+            <MenuItem onClick={() => handleSortChange('quantity')}>Quantity</MenuItem>
+            <MenuItem onClick={() => handleSortChange('purchase_date')}>Purchase Date</MenuItem>
+            <MenuItem onClick={() => handleSortChange('expiry_date')}>Expiry Date</MenuItem>
+        </MenuList>
+    </Menu>
+);
+
+
 const AddItem = () => (
     <div>
         <h2>Add a new item</h2>
@@ -65,6 +85,8 @@ const AddItem = () => (
 function App() {
     const [filter, setFilter] = useState('All');
     const [inventoryItems, setInventoryItems] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [sortCriterion, setSortCriterion] = useState('alphabetical');
     const userId = 5; // Replace with the actual user ID
 
     const fetchInventoryItems = async () => {
@@ -90,14 +112,34 @@ function App() {
         setFilter(category);
     };
 
-    const [searchQuery, setSearchQuery] = useState('');
-
     const handleSearchChange = (event) => {
         const value = event.target.value;
         setSearchQuery(value);
         console.log("Search initiated with query:", value);
     };
 
+    const handleSortChange = (criterion) => {
+        setSortCriterion(criterion);
+    };
+
+    const sortedItems = [...inventoryItems].sort((a, b) => {
+        if (sortCriterion === 'alphabetical') {
+            return a.item.localeCompare(b.item);
+        } else if (sortCriterion === 'quantity') {
+            return parseInt(a.quantity) - parseInt(b.quantity);
+        } else if (sortCriterion === 'purchase_date') {
+            return new Date(a.purchase_date) - new Date(b.purchase_date);
+        } else if (sortCriterion === 'expiry_date') {
+            return new Date(a.expiry_date) - new Date(b.expiry_date);
+        }
+        return 0;
+    });
+    
+    const filteredSortedItems = sortedItems.filter(item => {
+        return (filter === 'All' || item.category === filter) &&
+               (searchQuery === '' || item.item.toLowerCase().includes(searchQuery.toLowerCase()));
+    });
+    
     const updateServer = async (updatedItem) => {
         try {
             console.log('Updating server with item:', updatedItem); // Debugging statement
@@ -216,11 +258,6 @@ function App() {
         }
     };
 
-    const filteredItems = inventoryItems.filter(item => {
-        return (filter === 'All' || item.category === filter) &&
-               (searchQuery === '' || item.item.toLowerCase().includes(searchQuery.toLowerCase()));
-    });
-
     return (
         <Router>
             <div className="main-container">
@@ -228,7 +265,17 @@ function App() {
                     <Routes>
                         <Route path="/" element={<Navigate to="/groceries" />} />
                         <Route path="/recipes" element={<RecipeList userId={userId} />} />
-                        <Route path="/groceries" element={<Groceries inventoryItems={filteredItems} onDecrement={onDecrement} onDelete={onDelete} filter={filter} handleFilterChange={handleFilterChange} handleSearchChange={handleSearchChange} fetchInventoryItems={fetchInventoryItems} />} />
+                        <Route path="/groceries" element={<Groceries 
+                                                            inventoryItems={filteredSortedItems} 
+                                                            onDecrement={onDecrement} 
+                                                            onDelete={onDelete} 
+                                                            filter={filter} 
+                                                            handleFilterChange={handleFilterChange} 
+                                                            handleSearchChange={handleSearchChange} 
+                                                            fetchInventoryItems={fetchInventoryItems}
+                                                            handleSortChange={handleSortChange} 
+                                                            sortCriterion={sortCriterion} 
+                                                            />} />
                         <Route path="/add" element={<AddItem />} />
                         <Route path="/scanner" element={<CameraComponent userId={userId} />} />
                         <Route path="/edit-item" element={<EditItemForm fetchInventoryItems={fetchInventoryItems} />} /> {/* Add EditItemForm route */}
