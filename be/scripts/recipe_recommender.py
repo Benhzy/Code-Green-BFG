@@ -2,7 +2,7 @@
 import os
 from openai import OpenAI
 from datetime import datetime, timedelta
-from scripts.db_connection import get_grocery_data_by_user_id, get_user_recipes_by_user_id, upsert_user_recipes
+from scripts.db_connection import get_grocery_data_by_user_id, get_user_recipes_by_user_id, upsert_user_recipes, upsert_user_groceries
 from dotenv import load_dotenv
 load_dotenv("/be/scripts/.env")
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
@@ -110,7 +110,30 @@ def generate_recipe_suggestions(ingredients, exp_ingredients, user_recipes, cuis
     text = choices.message.content
     return text
 
-def extract_recipe(recipe_data): # where raw recipe data is the output from the GPT model
+def unit_convert(s):
+    index = len(s) - 1
+    while index >= 0 and not s[index].isdigit():
+        index -= 1
+
+    numeric_part = s[:index + 1]
+    unit_part = s[index + 1:].strip().lower()
+
+    conversions = {
+        1000: {"kg", "kilogram", "l", "liter", "litre"},
+        0.001: {"mg", "milligram"}
+    }
+
+    numeric_value = float(numeric_part) if '.' in numeric_part else int(numeric_part)
+
+    for multiplier, units in conversions.items():
+        if unit_part in units:
+            converted_value = numeric_value * multiplier
+            new_unit = "g" if "k" in unit_part or "m" in unit_part else "ml"
+            return converted_value, new_unit
+
+    return numeric_value, unit_part
+
+def extract_recipe(recipe_data):
     lines = recipe_data.strip().split('\n')
 
     recipe_dict = {}
@@ -140,7 +163,36 @@ def extract_recipe(recipe_data): # where raw recipe data is the output from the 
             # Extract ingredient
             ingredient_data = line.split('-', 1)[1].strip()
             if ':' in ingredient_data:
-                ingredient, quantity = ingredient_data.split(':', 1)
+                ingredient, quantity_raw = ingredient_data.split(':', 1)
+                
+                quantity_list = quantity_raw.split(' ', 1)
+                if len(quantity_list) == 1:
+                    quantity, unit = unit_convert(quantity_list[0])
+                    quantity = str(quantity)
+                    
+                elif quantity_list[0].isnumeric():
+                    if quantity_list[1].lower() in ['tsp', 't', 'tsp.', 't.', 'teaspoon']:
+                        quantity = str(float(quantity_list[0]) * 4.93)
+                    elif quantity_list[1].lower() in ['tbsp', 'tbs', 'tbl', 'tbl.', 'tbsp.', 'tablespoon']:
+                        quantity = str(float(quantity_list[0]) * 14.79)
+                    elif quantity_list[1].lower() in ['fl oz', 'floz', 'fluid ounce', 'fluid oz']:
+                        quantity = str(float(quantity_list[0]) * 29.57)
+                    elif quantity_list[1].lower() in ['cup', 'c', 'cups']:
+                        quantity = str(float(quantity_list[0]) * 236.59)
+                    elif quantity_list[1].lower() in ['pint', 'pt', 'pints']:
+                        quantity = str(float(quantity_list[0]) * 473.18)
+                    elif quantity_list[1].lower() in ['quart', 'qt', 'quarts']:
+                        quantity = str(float(quantity_list[0]) * 946.35)
+                    elif quantity_list[1].lower() in ['gallon', 'gal', 'gallons']:
+                        quantity = str(float(quantity_list[0]) * 3785.41)
+                    elif quantity_list[1].lower() in ['oz', 'ounce', 'ounces']:
+                        quantity = str(float(quantity_list[0]) * 28.35)
+                    elif quantity_list[1].lower() in ['lb', 'lbs', 'pound', 'pounds']:
+                        quantity = str(float(quantity_list[0]) * 453.59)
+
+
+                else:   # if its 'to taste' or some other bs
+                    quantity = '1'
                 ingredients.append((ingredient.strip(), quantity.strip()))
             else:
                 ingredients.append(ingredient_data)  # In case there's no quantity specified
@@ -164,6 +216,20 @@ def jsonify_recipe(recipe_data, user_id):
         "description": recipe_data.get('description', '')
     }
 
+def remove_used_ingredients(user_id, ingredients):
+    data = get_grocery_data_by_user_id(user_id)
+    for ingredient in ingredients:
+        for item in data:
+            item_name = item['item']
+            if item_name.lower() == ingredient(0).lower():
+                item_quantity = item['quantity']
+                if item_quantity.isnumeric():
+                    item['quantity'] = str(float(item_quantity) - float(ingredient(1)))
+                else:
+                    quantity, unit = unit_convert(item_quantity)
+                    item['quantity'] = str(float(item_quantity) - quantity) + unit
+
+                upsert_user_groceries(user_id, item)
 
 def recommend_recipes(user_id, cuisine):
     all_ingredients, near_expiry_ingredients = fetch_ingredients(user_id)
