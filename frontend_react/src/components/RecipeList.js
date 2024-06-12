@@ -1,7 +1,19 @@
 import React, { useState, useEffect } from 'react';
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  Button,
+  useDisclosure
+} from '@chakra-ui/react';
 import './RecipeList.css';
 
 function RecipeList({ userId }) {
+    const { isOpen, onOpen, onClose } = useDisclosure(); // Use the Chakra UI hook for modal dialogs
     const [recipes, setRecipes] = useState([]);
     const [selectedRecipe, setSelectedRecipe] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -27,15 +39,35 @@ function RecipeList({ userId }) {
     };
 
     useEffect(() => {
-        // Fetch initial recipe list
         fetchRecipes(`http://localhost:5000/recipe/${userId}`);
     }, [userId]);
 
     const fetchRecommendedRecipes = async (cuisine = 'Singaporean') => {
-        // Fetch recommended recipes, then refresh the list from the database
         await fetchRecipes(`http://localhost:5000/recommend_recipe/${userId}?cuisine=${cuisine}`);
-        // Optionally, re-fetch the complete list if needed or just update the list with new recommendations
-        fetchRecipes(`http://localhost:5000/recipe/${userId}`);
+        return fetchRecipes(`http://localhost:5000/recipe/${userId}`);
+    };
+
+    const handleRecipeSelect = (recipe) => {
+        setSelectedRecipe(recipe);
+        onOpen();
+    };
+
+    const logRecipe = async () => {
+        const url = `http://localhost:5000/add_recipe`;
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify([selectedRecipe])
+        };
+        try {
+            const response = await fetch(url, options);
+            if (!response.ok) throw new Error('Failed to log the recipe');
+            alert('Recipe logged successfully!');
+        } catch (error) {
+            alert('Error logging the recipe: ' + error.message);
+        }
     };
 
     return (
@@ -46,20 +78,33 @@ function RecipeList({ userId }) {
             {error && <p>{error}</p>}
             <ul>
                 {recipes.map((recipe, index) => (
-                    <li key={index} onClick={() => setSelectedRecipe(recipe)}>
+                    <li key={index} onClick={() => handleRecipeSelect(recipe)}>
                         {recipe.recipe_name}
                     </li>
                 ))}
             </ul>
             {selectedRecipe && (
-                <div className="recipe-details">
-                    <h2>{selectedRecipe.recipe_name}</h2>
-                    <p><strong>Description:</strong> {selectedRecipe.description}</p>
-                    <p><strong>Ingredients:</strong> {selectedRecipe.ingredients}</p>
-                    <p><strong>Instructions:</strong> {selectedRecipe.instructions}</p>
-                    <p><strong>Difficulty:</strong> {selectedRecipe.difficulty}</p>
-                    <p><strong>Time Required:</strong> {selectedRecipe.time_required}</p>
-                </div>
+                <Modal isOpen={isOpen} onClose={onClose}>
+                    <ModalOverlay />
+                    <ModalContent>
+                        <ModalHeader>{selectedRecipe.recipe_name}</ModalHeader>
+                        <ModalCloseButton />
+                        <ModalBody>
+                        <h2>{selectedRecipe.recipe_name}</h2>
+                            <p><strong>Description:</strong> {selectedRecipe.description}</p>
+                            <p><strong>Ingredients:</strong> {selectedRecipe.ingredients}</p>
+                            <p><strong>Instructions:</strong> {selectedRecipe.instructions}</p>
+                            <p><strong>Difficulty:</strong> {selectedRecipe.difficulty}</p>
+                            <p><strong>Time Required:</strong> {selectedRecipe.time_required}</p>
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button colorScheme="blue" mr={3} onClick={() => logRecipe()}>
+                                I Cooked This!
+                            </Button>
+                            <Button variant="ghost" onClick={onClose}>Close</Button>
+                        </ModalFooter>
+                    </ModalContent>
+                </Modal>
             )}
         </div>
     );
