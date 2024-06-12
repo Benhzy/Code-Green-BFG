@@ -63,7 +63,6 @@ def extract_text(image_path):
 
     response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
     
-    print(response.json())
     # Extract items from LLm response
     content = response.json()['choices'][0]['message']['content']
     json_content = content.split('```json\n')[1].split('\n```')[0]
@@ -81,6 +80,7 @@ def extract_text(image_path):
             "expiry_date": expiry_date
         }
         output_items.append(output_item)
+    print(output_items)
     return output_items
     
     """
@@ -94,11 +94,12 @@ def extract_text(image_path):
     
 def determine_category(item_name):
     categories = {
-        "fish":7,
-        "vegetable":5,
-        "meat":10,
-        "grain":30,
-        "unknown":3
+        "Fruits":7,
+        "Vegetable":7,
+        "Meat":2,
+        "Grain":365,
+        "Seafood":2,
+        "Dairy":7
     }
     category_embeddings = model.encode(list(categories.keys()))
     item_embedding = model.encode([item_name])
