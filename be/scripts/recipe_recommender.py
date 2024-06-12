@@ -243,6 +243,7 @@ def recommend_recipes(user_id, cuisine):
 
 def store_recipe(user_id, recipe_dict):
     recipe_json = jsonify_recipe(recipe_dict, user_id)  # Make sure this returns the correct structure
+    print(recipe_json)
     response = upsert_user_recipes([recipe_json])  # Ensure this is a list of dictionaries
     return response
 

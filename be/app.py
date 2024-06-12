@@ -47,37 +47,6 @@ def add_grocery():
 def get_grocery(user_id):
     return jsonify(get_grocery_data_by_user_id(user_id))
 
-@app.route('/add_recipe', methods=['POST'])
-def add_recipe():
-    data = request.get_json()
-    
-    # Basic validation to ensure data is in the expected format
-    if not data or not isinstance(data, list):  # Data should be a list of recipes
-        return jsonify({"error": "Invalid data format; expected a non-empty list of recipes."}), 400
-
-    # Validate each recipe's structure
-    required_keys = ['user_id', 'recipe_name', 'ingredients', 'instructions', 'difficulty', 'time_required', 'description']
-    for recipe in data:
-        if not all(key in recipe for key in required_keys):
-            return jsonify({"error": "Missing required recipe information."}), 400
-        if not isinstance(recipe['ingredients'], list) or not isinstance(recipe['instructions'], list):
-            return jsonify({"error": "Ingredients and instructions must be in list format."}), 400
-
-        # Convert ingredients from list of lists to list of tuples
-        try:
-            recipe['ingredients'] = [tuple(ingredient) for ingredient in recipe['ingredients']]
-        except ValueError:
-            return jsonify({"error": "Each ingredient must be a list with two elements (name and quantity)."}), 400
-
-    # Call the function to upsert recipes in the database
-    result, status_code = upsert_user_recipes(data)
-
-    if status_code != 201:
-        return jsonify({"error": result}), status_code
-    else:
-        return jsonify({"message": "Data posted successfully"}), 201
-
-
 @app.route('/recipe/<user_id>', methods=['GET'])
 def get_recipe(user_id):
     return jsonify(get_user_recipes_by_user_id(user_id))
@@ -118,15 +87,65 @@ def delete_recipe():
 
 @app.route('/recommend_recipe/<user_id>', methods=['GET'])
 def recommend_recipe(user_id):
-    # Assuming the cuisine type can also be passed as a query parameter
     cuisine = request.args.get('cuisine', 'Singaporean')
     try:
         recipe = recommend_recipes(user_id, cuisine)
-        store_recipe(user_id, recipe)
         return recipe
     
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route('/recommend_recipe/<user_id>', methods=['POST'])
+def store_recipe():
+    data = request.get_json()
+    
+    # Validate that necessary keys are present
+    required_keys = ['user_id', 'recipe_name', 'ingredients', 'instructions', 'difficulty', 'time_required', 'description']
+    if not data or not all(key in data for key in required_keys):
+        return jsonify({"error": "Missing required recipe information."}), 400
+
+    user_id = data['user_id']
+    recipe_dict = {key: data[key] for key in data if key != 'user_Tid'}
+
+    response, status_code = store_recipe(user_id, recipe_dict)
+    return jsonify(response), status_code
+
+@app.route('/add_recipe', methods=['POST'])
+def add_interest():
+    data = request.get_json()
+    
+    # Basic validation to ensure data is in the expected format
+    if not data or not isinstance(data, list):  # Data should be a list of recipes
+        return jsonify({"error": "Invalid data format; expected a non-empty list of recipes."}), 400
+
+    # Validate each recipe's structure
+    required_keys = ['user_id', 'recipe_name', 'ingredients', 'instructions', 'difficulty', 'time_required', 'description']
+    responses = []
+    
+    for recipe in data:
+        if not all(key in recipe for key in required_keys):
+            return jsonify({"error": "Missing required recipe information."}), 400
+        
+        if not isinstance(recipe['ingredients'], list) or not isinstance(recipe['instructions'], list):
+            return jsonify({"error": "Ingredients and instructions must be in list format."}), 400
+
+        # Convert ingredients from list of lists to list of tuples
+        try:
+            recipe['ingredients'] = [tuple(ingredient) for ingredient in recipe['ingredients']]
+        except ValueError:
+            return jsonify({"error": "Each ingredient must be a list with two elements (name and quantity)."}), 400
+        
+        # Extract the user ID and pass the entire recipe dictionary
+        user_id = recipe['user_id']
+        response, status_code = store_recipe(user_id, recipe)
+        responses.append((response, status_code))
+    
+    # Check all responses for errors
+    for response, status in responses:
+        if status != 201:
+            return jsonify({"error": response}), status
+    
+    return jsonify([{"message": "Data posted successfully", "response": resp} for resp, stat in responses]), 201
 
 
 @app.route('/upload_receipt/<user_id>', methods=['POST'])
