@@ -75,11 +75,12 @@ const AddItemForm = ({ onClose, fetchInventoryItems }) => {
                         required
                     >
                         <option value="" disabled>Select category</option>
-                        <option value="Vegetables">Vegetables</option>
-                        <option value="Meats">Meats</option>
+                        <option value="Vegetable">Vegetable</option>
+                        <option value="Meat">Meat</option>
                         <option value="Dairy">Dairy</option>
-                        <option value="Fruits">Fruits</option>
-                        <option value="Bread">Bread</option>
+                        <option value="Fruit">Fruit</option>
+                        <option value="Grain">Grain</option>
+                        <option value="Seafood">Seafood</option>
                     </select>
                 </label>
                 <label>

@@ -10,10 +10,7 @@ import './App.css';
 import EditItemForm from './components/EditItemForm'; 
 
 
-
-
-
-const Groceries = ({ inventoryItems, onDecrement, onDelete, handleFilterChange, handleSearchChange, searchQuery, fetchInventoryItems, handleSortChange, sortCriterion }) => (
+const Groceries = ({ inventoryItems, onDecrement, onDelete, handleFilterChange, handleSearchChange, searchQuery, fetchInventoryItems, handleSortChange, sortCriterion, selectedFilter }) => (
     <>
         <div className="search-container">
             <InputGroup>
@@ -34,12 +31,13 @@ const Groceries = ({ inventoryItems, onDecrement, onDelete, handleFilterChange, 
         <div className="filter-container">
             <Stack direction="row" spacing={4}>
                 <SortButton handleSortChange={handleSortChange} sortCriterion={sortCriterion} />
-                <Button colorScheme="gray" variant="solid" onClick={() => handleFilterChange('All')}>All</Button>
-                <Button colorScheme="gray" variant="solid" onClick={() => handleFilterChange('Vegetables')}>🍅 Vegetables</Button>
-                <Button colorScheme="gray" variant="solid" onClick={() => handleFilterChange('Meat')}>🍖 Meat</Button>
-                <Button colorScheme="gray" variant="solid" onClick={() => handleFilterChange('Dairy')}>🥛 Dairy</Button>
-                <Button colorScheme="gray" variant="solid" onClick={() => handleFilterChange('Fruits')}>🍎 Fruits</Button>
-                <Button colorScheme="gray" variant="solid" onClick={() => handleFilterChange('Breads')}>🍞 Breads</Button>
+                <Button colorScheme={selectedFilter === 'All' ? 'green' : 'gray'} variant="solid" onClick={() => handleFilterChange('All')}>All</Button>
+                <Button colorScheme={selectedFilter === 'Vegetable' ? 'green' : 'gray'} variant="solid" onClick={() => handleFilterChange('Vegetable')}>🍅 Vegetable</Button>
+                <Button colorScheme={selectedFilter === 'Meat' ? 'green' : 'gray'} variant="solid" onClick={() => handleFilterChange('Meat')}>🍖 Meat</Button>
+                <Button colorScheme={selectedFilter === 'Dairy' ? 'green' : 'gray'} variant="solid" onClick={() => handleFilterChange('Dairy')}>🥛 Dairy</Button>
+                <Button colorScheme={selectedFilter === 'Fruit' ? 'green' : 'gray'} variant="solid" onClick={() => handleFilterChange('Fruit')}>🍎 Fruit</Button>
+                <Button colorScheme={selectedFilter === 'Grain' ? 'green' : 'gray'} variant="solid" onClick={() => handleFilterChange('Grain')}>🌾 Grain</Button>
+                <Button colorScheme={selectedFilter === 'Seafood' ? 'green' : 'gray'} variant="solid" onClick={() => handleFilterChange('Seafood')}>🐟 Seafood</Button>
             </Stack>
         </div>
         <div className="inventory-grid">
@@ -63,14 +61,15 @@ const Groceries = ({ inventoryItems, onDecrement, onDelete, handleFilterChange, 
 
 const SortButton = ({ handleSortChange, sortCriterion }) => (
     <Menu>
-        <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
+        <MenuButton as={Button} rightIcon={<ChevronDownIcon />} colorScheme="green">
             Sort By: {sortCriterion.charAt(0).toUpperCase() + sortCriterion.slice(1).replace('_', ' ')}
         </MenuButton>
         <MenuList>
-            <MenuItem onClick={() => handleSortChange('alphabetical')}>Alphabetical</MenuItem>
-            <MenuItem onClick={() => handleSortChange('quantity')}>Quantity</MenuItem>
-            <MenuItem onClick={() => handleSortChange('purchase_date')}>Purchase Date</MenuItem>
-            <MenuItem onClick={() => handleSortChange('expiry_date')}>Expiry Date</MenuItem>
+            <MenuItem onClick={() => handleSortChange('alphabetical')}>Alphabetical (A to Z)</MenuItem>
+            <MenuItem onClick={() => handleSortChange('Quantity (Lowest to Highest)')}>Quantity (Lowest to Highest)</MenuItem>
+            <MenuItem onClick={() => handleSortChange('Quantity (Highest to Lowest)')}>Quantity (Highest to Lowest)</MenuItem>
+            <MenuItem onClick={() => handleSortChange('purchase_date')}>Purchase Date (Earliest to latest)</MenuItem>
+            <MenuItem onClick={() => handleSortChange('expiry_date')}>Expiry Date (Earliest to latest)</MenuItem>
         </MenuList>
     </Menu>
 );
@@ -125,8 +124,10 @@ function App() {
     const sortedItems = [...inventoryItems].sort((a, b) => {
         if (sortCriterion === 'alphabetical') {
             return a.item.localeCompare(b.item);
-        } else if (sortCriterion === 'quantity') {
+        } else if (sortCriterion === 'Quantity (Lowest to Highest)') {
             return parseInt(a.quantity) - parseInt(b.quantity);
+        } else if (sortCriterion === 'Quantity (Highest to Lowest)') {
+            return parseInt(b.quantity) - parseInt(a.quantity);
         } else if (sortCriterion === 'purchase_date') {
             return new Date(a.purchase_date) - new Date(b.purchase_date);
         } else if (sortCriterion === 'expiry_date') {
@@ -275,6 +276,7 @@ function App() {
                                                             fetchInventoryItems={fetchInventoryItems}
                                                             handleSortChange={handleSortChange} 
                                                             sortCriterion={sortCriterion} 
+                                                            selectedFilter={filter} 
                                                             />} />
                         <Route path="/add" element={<AddItem />} />
                         <Route path="/scanner" element={<CameraComponent userId={userId} />} />

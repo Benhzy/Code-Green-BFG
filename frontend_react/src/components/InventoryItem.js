@@ -35,9 +35,9 @@ const InventoryItem = ({ id, item, category, quantity, purchase_date, expiry_dat
                         <Text as="span">{expiry_date} </Text>
                     </Text>
                     <Stack direction="row" spacing={4} mt={4}>
-                        <Button colorScheme="orange" onClick={() => onDecrement(id, 1)}>Decrement</Button>
-                        <Button colorScheme="red" onClick={() => onDelete(id)}>Delete</Button>
-                        <Button colorScheme="green" onClick={handleEdit}>Edit</Button>
+                        <Button bg="warning.500" color="white" _hover={{ bg: "warning.600" }}onClick={handleEdit}>Decrement</Button>
+                        <Button bg="danger.800" color="white" _hover={{ bg: "danger.900" }}onClick={handleEdit}>Delete</Button>
+                        <Button bg="primary.700" color="white" _hover={{ bg: "primary.800" }}onClick={handleEdit}>Edit</Button>
                     </Stack>
                 </>
             ) : (
