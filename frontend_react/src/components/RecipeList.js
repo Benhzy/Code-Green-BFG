@@ -11,10 +11,10 @@ import {
   useDisclosure
 } from '@chakra-ui/react';
 import './RecipeList.css';
-import { apiUrl } from './IpAdr'; 
+import { apiUrl } from './IpAdr';
 
 function RecipeList({ userId }) {
-    const { isOpen, onOpen, onClose } = useDisclosure(); // Use the Chakra UI hook for modal dialogs
+    const { isOpen, onOpen, onClose } = useDisclosure();
     const [recipes, setRecipes] = useState([]);
     const [selectedRecipe, setSelectedRecipe] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -29,6 +29,7 @@ function RecipeList({ userId }) {
             const data = await response.json();
             if (response.ok) {
                 setRecipes(data);
+                return data; // Return the fetched data
             } else {
                 throw new Error('Failed to fetch recipes');
             }
@@ -44,8 +45,10 @@ function RecipeList({ userId }) {
     }, [userId]);
 
     const fetchRecommendedRecipes = async (cuisine = 'Singaporean') => {
-        await fetchRecipes(`${apiUrl}/recommend_recipe/${userId}?cuisine=${cuisine}`);
-        return fetchRecipes(`${apiUrl}/recipe/${userId}`);
+        const recommendedRecipes = await fetchRecipes(`${apiUrl}/recommend_recipe/${userId}?cuisine=${cuisine}`);
+        if (recommendedRecipes && recommendedRecipes.length > 0) {
+            handleRecipeSelect(recommendedRecipes[0]); // Automatically select the first recipe
+        }
     };
 
     const handleRecipeSelect = (recipe) => {
@@ -60,7 +63,7 @@ function RecipeList({ userId }) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify([selectedRecipe])
+            body: JSON.stringify(selectedRecipe)
         };
         try {
             const response = await fetch(url, options);
@@ -91,7 +94,7 @@ function RecipeList({ userId }) {
                         <ModalHeader>{selectedRecipe.recipe_name}</ModalHeader>
                         <ModalCloseButton />
                         <ModalBody>
-                        <h2>{selectedRecipe.recipe_name}</h2>
+                            <h2>{selectedRecipe.recipe_name}</h2>
                             <p><strong>Description:</strong> {selectedRecipe.description}</p>
                             <p><strong>Ingredients:</strong> {selectedRecipe.ingredients}</p>
                             <p><strong>Instructions:</strong> {selectedRecipe.instructions}</p>
@@ -99,7 +102,7 @@ function RecipeList({ userId }) {
                             <p><strong>Time Required:</strong> {selectedRecipe.time_required}</p>
                         </ModalBody>
                         <ModalFooter>
-                            <Button colorScheme="blue" mr={3} onClick={() => logRecipe()}>
+                            <Button colorScheme="blue" mr={3} onClick={logRecipe}>
                                 I Cooked This!
                             </Button>
                             <Button variant="ghost" onClick={onClose}>Close</Button>
