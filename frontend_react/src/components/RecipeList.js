@@ -12,6 +12,9 @@ import {
 } from '@chakra-ui/react';
 import './RecipeList.css';
 
+// update to your own IP address
+const apiUrl = 'http://192.168.1.6:5000';
+
 function RecipeList({ userId }) {
     const { isOpen, onOpen, onClose } = useDisclosure(); // Use the Chakra UI hook for modal dialogs
     const [recipes, setRecipes] = useState([]);
@@ -39,12 +42,12 @@ function RecipeList({ userId }) {
     };
 
     useEffect(() => {
-        fetchRecipes(`http://localhost:5000/recipe/${userId}`);
+        fetchRecipes(`${apiUrl}/recipe/${userId}`);
     }, [userId]);
 
     const fetchRecommendedRecipes = async (cuisine = 'Singaporean') => {
-        await fetchRecipes(`http://localhost:5000/recommend_recipe/${userId}?cuisine=${cuisine}`);
-        return fetchRecipes(`http://localhost:5000/recipe/${userId}`);
+        await fetchRecipes(`${apiUrl}/recommend_recipe/${userId}?cuisine=${cuisine}`);
+        return fetchRecipes(`${apiUrl}/recipe/${userId}`);
     };
 
     const handleRecipeSelect = (recipe) => {
@@ -53,7 +56,7 @@ function RecipeList({ userId }) {
     };
 
     const logRecipe = async () => {
-        const url = `http://localhost:5000/add_recipe`;
+        const url = `${apiUrl}/add_recipe`;
         const options = {
             method: 'POST',
             headers: {
