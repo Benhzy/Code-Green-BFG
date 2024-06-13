@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './AddItemForm.css'; // Reuse the same CSS
+import { apiUrl } from './IpAdr'; 
 
 const EditItemForm = ({ id, item: initialItem, category: initialCategory, quantity: initialQuantity, purchase_date: initialPurchaseDate, 
     expiry_date: initialExpiryDate, onClose, fetchInventoryItems }) => {
@@ -23,7 +24,7 @@ const EditItemForm = ({ id, item: initialItem, category: initialCategory, quanti
 
         try {
             // Delete the old item
-            await fetch(`http://localhost:5000/delete_grocery`, {
+            await fetch(`${apiUrl}/delete_grocery`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -32,7 +33,7 @@ const EditItemForm = ({ id, item: initialItem, category: initialCategory, quanti
             });
 
             // Add the updated item
-            const response = await fetch('http://localhost:5000/add_grocery', {
+            const response = await fetch('${apiUrl}/add_grocery', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -11,9 +11,7 @@ import {
   useDisclosure
 } from '@chakra-ui/react';
 import './RecipeList.css';
-
-// update to your own IP address
-const apiUrl = 'http://192.168.1.6:5000';
+import { apiUrl } from './IpAdr'; 
 
 function RecipeList({ userId }) {
     const { isOpen, onOpen, onClose } = useDisclosure(); // Use the Chakra UI hook for modal dialogs

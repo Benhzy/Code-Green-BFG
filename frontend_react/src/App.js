@@ -8,9 +8,7 @@ import RecipeList from './components/RecipeList';
 import CameraComponent from './components/Camera';
 import './App.css';
 import EditItemForm from './components/EditItemForm'; 
-
-// update to your own IP address
-const apiUrl = 'http://192.168.1.6:5000';
+import { apiUrl } from './components/IpAdr'; 
 
 const Groceries = ({ inventoryItems, onDecrement, onDelete, handleFilterChange, handleSearchChange, searchQuery, fetchInventoryItems, handleSortChange, sortCriterion, selectedFilter }) => (
     <>

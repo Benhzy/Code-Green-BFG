@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './AddItemForm.css';
+import { apiUrl } from './IpAdr'; 
 
 const AddItemForm = ({ onClose, fetchInventoryItems }) => {
     const [item, setItem] = useState('');
@@ -19,9 +20,9 @@ const AddItemForm = ({ onClose, fetchInventoryItems }) => {
             purchase_date: purchaseDate,
             expiry_date: expiryDate
         };
-
+        
         try {
-            const response = await fetch('http://localhost:5000/add_grocery', {
+            const response = await fetch(`${apiUrl}/add_grocery`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
