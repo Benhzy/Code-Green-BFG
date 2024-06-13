@@ -58,8 +58,8 @@ const InventoryItem = ({ id, item, category, quantity, purchase_date, expiry_dat
             p={0}
             borderWidth="4px"
             borderRadius="2xl"
-            w="350px"
-            h="340px"
+            w="275px"
+            h="275px"
             overflow="auto"
             borderColor="black"
             sx={{
@@ -69,7 +69,7 @@ const InventoryItem = ({ id, item, category, quantity, purchase_date, expiry_dat
             <Box bg={boxColor}>
                 {!isEditing ? (
                     <Flex align="center" justify="flex-start" spacing="4">
-                        <Text fontSize="7xl">{getEmoji(category)}</Text>
+                        <Text fontSize="6xl">{getEmoji(category)}</Text>
                         <Flex align="center" justify="left">
                             <Text w="full">
                                 <Text fontSize="2xl" fontWeight="bold" ml="2">{item}</Text>
@@ -86,25 +86,25 @@ const InventoryItem = ({ id, item, category, quantity, purchase_date, expiry_dat
                     <EditItemForm id={id} item={item} category={category} quantity={quantity} purchase_date={purchase_date} expiry_date={expiry_date} onClose={handleCloseEditForm} fetchInventoryItems={fetchInventoryItems}/>
                 )}
             </Box>
-            <Box p={4}>
+            <Box p={2}>
                 {!isEditing ? (
                     <>
-                        <Text><Text as="span" fontWeight="bold">Category: </Text><Text as="span">{category}</Text></Text>
+                        {/* <Text><Text as="span" fontWeight="bold">Category: </Text><Text as="span">{category}</Text></Text> */}
                         <Text><Text as="span" fontWeight="bold">Purchase Date: </Text><Text as="span">{purchase_date}</Text></Text>
                         <Text><Text as="span" fontWeight="bold">Expiry Date: </Text><Text as="span">{expiry_date}</Text></Text>
                         <Box display="flex" flexDirection="column" alignItems="center" w="full">
                         <Stack direction="row" spacing={8} mt={3}>
                             <Flex gap={2}>
-                                <Button bg="green.400" color="white" size="lg" _hover={{ bg: "green.600" }} onClick={() => onDecrement(id, 1)}>Use 1</Button>
-                                <Button bg="green.500" color="white" size="lg" _hover={{ bg: "green.700" }} onClick={handleDecrementBy5}>Use 5</Button>
-                                <Button bg="green.600" color="white" size="lg" _hover={{ bg: "green.800" }} onClick={handleDecrementBy10}>Use 10</Button>
+                                <Button bg="green.400" color="white" size="md" _hover={{ bg: "green.600" }} onClick={() => onDecrement(id, 1)}>Use 1</Button>
+                                <Button bg="green.500" color="white" size="md" _hover={{ bg: "green.700" }} onClick={handleDecrementBy5}>Use 5</Button>
+                                <Button bg="green.600" color="white" size="md" _hover={{ bg: "green.800" }} onClick={handleDecrementBy10}>Use 10</Button>
                             </Flex>
                         </Stack>
                         <Stack direction="row" spacing={8} mt={3}>
                             <Flex gap={2}>
                                 <Text></Text>
-                                <Button bg="danger.800" color="white" size="lg" _hover={{ bg: "danger.900" }} onClick={onDelete}>Delete</Button>
-                                <Button bg="primary.700" color="white" size="lg" _hover={{ bg: "primary.800" }} onClick={handleEdit}>Edit</Button>
+                                <Button bg="danger.800" color="white" size="md" _hover={{ bg: "danger.900" }} onClick={onDelete}>Delete</Button>
+                                <Button bg="primary.700" color="white" size="md" _hover={{ bg: "primary.800" }} onClick={handleEdit}>Edit</Button>
                             </Flex>
                         </Stack>
                         </Box>

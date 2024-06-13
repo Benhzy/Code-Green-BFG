@@ -109,7 +109,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .inventory-item {
   background-color: var(--color-primary-a0); /* Light background */
-  padding: 15px; /* Increased padding for better spacing */
+  padding: 10px; /* Increased padding for better spacing */
   border: 2px solid var(--color-primary-a30); /* Slightly darker border */
   border-radius: 10px; /* Increased border-radius for smoother corners */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Slightly larger shadow for a floating effect */
@@ -175,8 +175,9 @@ h1, h2, h3, h4, h5, h6 {
 .inventory-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr); /* default to two columns */
-  gap: 16px;
-  padding: 10px;
+  gap: 10px;
+  padding: 5px;
+  column-gap: 0px;
 }
 
 @media (max-width: 600px) {
