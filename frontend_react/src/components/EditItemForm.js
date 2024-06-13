@@ -33,7 +33,7 @@ const EditItemForm = ({ id, item: initialItem, category: initialCategory, quanti
             });
 
             // Add the updated item
-            const response = await fetch('${apiUrl}/add_grocery', {
+            const response = await fetch(`${apiUrl}/add_grocery`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

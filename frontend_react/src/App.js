@@ -144,7 +144,7 @@ function App() {
     const updateServer = async (updatedItem) => {
         try {
             console.log('Updating server with item:', updatedItem); // Debugging statement
-            const response = await fetch('${apiUrl}/add_grocery', {
+            const response = await fetch(`${apiUrl}/add_grocery`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -167,7 +167,7 @@ function App() {
     const deleteItemFromServer = async (itemToDelete) => {
         try {
             console.log('Deleting item from server:', itemToDelete); // Debugging statement
-            const response = await fetch('${apiUrl}/delete_grocery', {
+            const response = await fetch(`${apiUrl}/delete_grocery`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -235,7 +235,7 @@ function App() {
 
             console.log('Deleting item with payload:', payload); // Debugging statement
 
-            const response = await fetch('${apiUrl}/delete_grocery', {
+            const response = await fetch(`${apiUrl}/delete_grocery`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',

@@ -58,8 +58,8 @@ const InventoryItem = ({ id, item, category, quantity, purchase_date, expiry_dat
             p={0}
             borderWidth="4px"
             borderRadius="2xl"
-            w="275px"
-            h="275px"
+            w="152px"
+            h="152px"
             overflow="auto"
             borderColor="black"
             sx={{
@@ -72,8 +72,8 @@ const InventoryItem = ({ id, item, category, quantity, purchase_date, expiry_dat
                         <Text fontSize="6xl">{getEmoji(category)}</Text>
                         <Flex align="center" justify="left">
                             <Text w="full">
-                                <Text fontSize="2xl" fontWeight="bold" ml="2">{item}</Text>
-                                <Divider my="1" borderColor="transparent"/>
+                                <Text fontSize="2xl" fontWeight="bold" ml="2" lineHeight="6">{item}</Text>
+                                <Divider my="0" borderColor="transparent"/>
                                 <Text fontSize="lg">
                                     <Text as="span" fontWeight="bold">&nbsp;&nbsp;</Text>
                                     <Text as="span" fontWeight="bold">Quantity: </Text>
