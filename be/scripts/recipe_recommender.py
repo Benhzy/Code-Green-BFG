@@ -165,7 +165,7 @@ def extract_recipe(recipe_data):
             if ':' in ingredient_data:
                 ingredient, quantity_raw = ingredient_data.split(':', 1)
                 
-                quantity_list = quantity_raw.split(' ', 1)
+                quantity_list = quantity_raw.strip().split(' ', 1)
                 if len(quantity_list) == 1:
                     quantity, unit = unit_convert(quantity_list[0])
                     quantity = str(quantity)
@@ -237,13 +237,14 @@ def recommend_recipes(user_id, cuisine):
     if near_expiry_ingredients:
         raw_recipe = generate_recipe_suggestions(all_ingredients, near_expiry_ingredients, user_recipes, cuisine)
         recipe_dict = extract_recipe(raw_recipe)
-        return recipe_dict
+        recipe_json = jsonify_recipe(recipe_dict, user_id) 
+        print(recipe_json)
+        return recipe_json
     else:
         return "No ingredients are close to expiry."
 
 def store_recipe(user_id, recipe_dict):
     recipe_json = jsonify_recipe(recipe_dict, user_id)  # Make sure this returns the correct structure
-    print(recipe_json)
     response = upsert_user_recipes([recipe_json])  # Ensure this is a list of dictionaries
     return response
 

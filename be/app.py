@@ -89,15 +89,16 @@ def delete_recipe():
 def recommend_recipe(user_id):
     cuisine = request.args.get('cuisine', 'Singaporean')
     try:
-        recipe = recommend_recipes(user_id, cuisine)
+        recipe = [recommend_recipes(user_id, cuisine)]
         return recipe
     
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route('/recommend_recipe/<user_id>', methods=['POST'])
+@app.route('/add_recipe', methods=['POST'])
 def store_recipe():
     data = request.get_json()
+    user_id = data.get('user_id')
     
     # Validate that necessary keys are present
     required_keys = ['user_id', 'recipe_name', 'ingredients', 'instructions', 'difficulty', 'time_required', 'description']
