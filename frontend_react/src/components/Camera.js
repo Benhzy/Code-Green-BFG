@@ -2,11 +2,12 @@
 import React from 'react';
 import Camera from 'react-html5-camera-photo';
 import 'react-html5-camera-photo/build/css/index.css';
+import { apiUrl } from './IpAdr'; 
 
 function CameraComponent({ userId }) {
   function handleTakePhoto(dataUri) {
     // Construct the URL with the user ID
-    const url = `http://localhost:5000/upload_receipt/${userId}`;
+    const url = `${apiUrl}/upload_receipt/${userId}`;
 
     // Send the captured photo to the backend
     fetch(url, {
