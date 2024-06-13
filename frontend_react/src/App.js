@@ -282,8 +282,9 @@ function App() {
                         <Route path="/scanner" element={<CameraComponent userId={userId} />} />
                         <Route path="/edit-item" element={<EditItemForm fetchInventoryItems={fetchInventoryItems} />} /> {/* Add EditItemForm route */}
                     </Routes>
+                    <BottomMenuBar fetchInventoryItems={fetchInventoryItems} />
                 </div>
-                <BottomMenuBar fetchInventoryItems={fetchInventoryItems} />
+                
             </div>
         </Router>
     );
