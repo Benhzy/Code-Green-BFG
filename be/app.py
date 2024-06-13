@@ -168,5 +168,11 @@ def upload_receipt(user_id):
     return jsonify({'extracted_text': extracted_items, 'user_id': user_id})
 
 
+# DONT DELETE THIS, FOR ZHIYI TO USE
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0/0', debug=True)
+
+
+# DONT DELETE THIS, FOR EDWARD TO USE
+# if __name__ == '__main__':
+#     app.run(host='0.0.0.0/0', debug=True)
