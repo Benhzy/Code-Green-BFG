@@ -9,6 +9,8 @@ import CameraComponent from './components/Camera';
 import './App.css';
 import EditItemForm from './components/EditItemForm'; 
 
+// update to your own IP address
+const apiUrl = 'http://192.168.1.6:5000';
 
 const Groceries = ({ inventoryItems, onDecrement, onDelete, handleFilterChange, handleSearchChange, searchQuery, fetchInventoryItems, handleSortChange, sortCriterion, selectedFilter }) => (
     <>
@@ -90,7 +92,7 @@ function App() {
 
     const fetchInventoryItems = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/grocery/${userId}`);
+            const response = await fetch(`${apiUrl}/grocery/${userId}`);
             const data = await response.json();
             if (response.ok) {
                 console.log("Fetched inventory items:", data); // Debugging statement
@@ -144,7 +146,7 @@ function App() {
     const updateServer = async (updatedItem) => {
         try {
             console.log('Updating server with item:', updatedItem); // Debugging statement
-            const response = await fetch('http://localhost:5000/add_grocery', {
+            const response = await fetch('${apiUrl}/add_grocery', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -167,7 +169,7 @@ function App() {
     const deleteItemFromServer = async (itemToDelete) => {
         try {
             console.log('Deleting item from server:', itemToDelete); // Debugging statement
-            const response = await fetch('http://localhost:5000/delete_grocery', {
+            const response = await fetch('${apiUrl}/delete_grocery', {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -235,7 +237,7 @@ function App() {
 
             console.log('Deleting item with payload:', payload); // Debugging statement
 
-            const response = await fetch('http://localhost:5000/delete_grocery', {
+            const response = await fetch('${apiUrl}/delete_grocery', {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
