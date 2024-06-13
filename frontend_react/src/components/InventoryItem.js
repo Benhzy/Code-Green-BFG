@@ -53,7 +53,19 @@ const InventoryItem = ({ id, item, category, quantity, purchase_date, expiry_dat
     };
 
     return (
-        <Box className="inventory-item" p={0} borderWidth="4px" borderRadius="2xl" boxShadow="2xl" w="350px" h="340px" overflow="auto" borderColor="black">
+        <Box
+            className="inventory-item"
+            p={0}
+            borderWidth="4px"
+            borderRadius="2xl"
+            w="350px"
+            h="340px"
+            overflow="auto"
+            borderColor="black"
+            sx={{
+                boxShadow: "4px 4px 6px rgba(0, 0, 0, 0.5)" // Custom shadow casting to the right and bottom
+            }}
+            >
             <Box bg={boxColor}>
                 {!isEditing ? (
                     <Flex align="center" justify="flex-start" spacing="4">

@@ -261,32 +261,32 @@ function App() {
 
     return (
         <Router>
-            <div className="main-container">
-                <div className="content">
-                    <Routes>
-                        <Route path="/" element={<Navigate to="/groceries" />} />
-                        <Route path="/recipes" element={<RecipeList userId={userId} />} />
-                        <Route path="/groceries" element={<Groceries 
-                                                            inventoryItems={filteredSortedItems} 
-                                                            onDecrement={onDecrement} 
-                                                            onDelete={onDelete} 
-                                                            filter={filter} 
-                                                            handleFilterChange={handleFilterChange} 
-                                                            handleSearchChange={handleSearchChange} 
-                                                            fetchInventoryItems={fetchInventoryItems}
-                                                            handleSortChange={handleSortChange} 
-                                                            sortCriterion={sortCriterion} 
-                                                            selectedFilter={filter} 
-                                                            />} />
-                        <Route path="/add" element={<AddItem />} />
-                        <Route path="/scanner" element={<CameraComponent userId={userId} />} />
-                        <Route path="/edit-item" element={<EditItemForm fetchInventoryItems={fetchInventoryItems} />} /> {/* Add EditItemForm route */}
-                    </Routes>
-                    <BottomMenuBar fetchInventoryItems={fetchInventoryItems} />
-                </div>
-                
+        <div className="main-container">
+            <div className="content">
+                <Routes>
+                    <Route path="/" element={<Navigate to="/groceries" />} />
+                    <Route path="/recipes" element={<RecipeList userId={userId} />} />
+                    <Route path="/groceries" element={
+                        <Groceries 
+                            inventoryItems={filteredSortedItems} 
+                            onDecrement={onDecrement} 
+                            onDelete={onDelete} 
+                            handleFilterChange={handleFilterChange} 
+                            handleSearchChange={handleSearchChange} 
+                            fetchInventoryItems={fetchInventoryItems}
+                            handleSortChange={handleSortChange} 
+                            sortCriterion={sortCriterion} 
+                            selectedFilter={filter} 
+                        />
+                    } />
+                    <Route path="/add" element={<AddItem />} />
+                    <Route path="/scanner" element={<CameraComponent userId={userId} />} />
+                    <Route path="/edit-item" element={<EditItemForm fetchInventoryItems={fetchInventoryItems} />} />
+                </Routes>
             </div>
-        </Router>
+            <BottomMenuBar fetchInventoryItems={fetchInventoryItems} />
+        </div>
+    </Router>    
     );
 }
 

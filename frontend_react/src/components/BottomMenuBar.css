@@ -1,11 +1,13 @@
 .bottom-menu-bar {
-    position: fixed;
+    position: fixed; /* Position relative to main-container */
     bottom: 0;
-    width: 100%;
+    left: 0; /* Align to the left */
+    right: 0; /* Stretch right to match container width */
+    width: 100%; /* Full width of its parent container */
     display: flex;
     justify-content: space-around;
     background-color: #4A4A4A; /* Dark earthy tone for background */
-    padding: 10px 0;
+    padding: 1vw;
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2); /* Slight shadow for depth */
 }
 
