@@ -58,7 +58,7 @@ def fetch_ingredients(user_id):
         processed_near_expiry_ingredients.append(ele[0])
     return all_groceries, processed_near_expiry_ingredients
 
-def generate_recipe_suggestions(ingredients, exp_ingredients, user_recipes, cuisine = "Singaporean"): # where ingredients is a string of comma-separated ingredients
+def generate_recipe_suggestions(ingredients, exp_ingredients, user_recipes, cuisine, servings=1): # where ingredients is a string of comma-separated ingredients
     # Prepare the prompt for GPT based on near expiry ingredients and user's recipes
     all_ingredients_list = ', '.join([item[0] for item in ingredients])
     exp_ingredients_list = ', '.join([item[0] for item in exp_ingredients])
@@ -70,6 +70,8 @@ def generate_recipe_suggestions(ingredients, exp_ingredients, user_recipes, cuis
 
     prompt = f"""
     Create a {cuisine} food recipe using the following ingredients close to expiry: {exp_ingredients_list}.
+
+    The recipe should be for {servings} servings.
 
     Make sure this recipe can be prepared with the ingredients here: {all_ingredients_list}.
 
@@ -233,11 +235,11 @@ def remove_used_ingredients(user_id, ingredients):
 
                 upsert_user_groceries(user_id, item)
 
-def recommend_recipes(user_id, cuisine):
+def recommend_recipes(user_id, cuisine, servings):
     all_ingredients, near_expiry_ingredients = fetch_ingredients(user_id)
     user_recipes = analyze_user_recipes(user_id)
     if near_expiry_ingredients:
-        raw_recipe = generate_recipe_suggestions(all_ingredients, near_expiry_ingredients, user_recipes, cuisine)
+        raw_recipe = generate_recipe_suggestions(all_ingredients, near_expiry_ingredients, user_recipes, cuisine, servings)
         recipe_dict = extract_recipe(raw_recipe)
         recipe_json = jsonify_recipe(recipe_dict, user_id) 
         print(recipe_json)

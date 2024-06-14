@@ -88,8 +88,9 @@ def delete_recipe():
 @app.route('/recommend_recipe/<user_id>', methods=['GET'])
 def recommend_recipe(user_id):
     cuisine = request.args.get('cuisine', 'Singaporean')
+    servings = request.args.get('servings', '1')
     try:
-        recipe = [recommend_recipes(user_id, cuisine)]
+        recipe = [recommend_recipes(user_id, cuisine, servings)]
         return recipe
     
     except Exception as e:
