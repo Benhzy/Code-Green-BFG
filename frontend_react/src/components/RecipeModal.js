@@ -10,7 +10,7 @@ import {
   Button
 } from '@chakra-ui/react';
 
-
+// npm install @react-sandbox/heart if necessary
 import Heart from '@react-sandbox/heart'
 
 function RecipeModal({ isOpen, onClose, recipe, onLogRecipe }) {
