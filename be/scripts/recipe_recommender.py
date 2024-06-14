@@ -73,6 +73,8 @@ def generate_recipe_suggestions(ingredients, exp_ingredients, user_recipes, cuis
 
     Make sure this recipe can be prepared with the ingredients here: {all_ingredients_list}.
 
+    Make sure the unit of measurement for ingredients is in metric.
+
     Make sure the recipe is an authentic {cuisine} recipe.
 
     You do not need to use all the ingredients, if a ingredient does not being in the recipe, omit it.
@@ -168,27 +170,27 @@ def extract_recipe(recipe_data):
                 quantity_list = quantity_raw.strip().split(' ', 1)
                 if len(quantity_list) == 1:
                     quantity, unit = unit_convert(quantity_list[0])
-                    quantity = str(quantity)
+                    quantity = str(quantity) + unit
                     
                 elif quantity_list[0].isnumeric():
                     if quantity_list[1].lower() in ['tsp', 't', 'tsp.', 't.', 'teaspoon']:
-                        quantity = str(float(quantity_list[0]) * 4.93)
+                        quantity = f"{round(float(quantity_list[0]) * 4.93)} ml"
                     elif quantity_list[1].lower() in ['tbsp', 'tbs', 'tbl', 'tbl.', 'tbsp.', 'tablespoon']:
-                        quantity = str(float(quantity_list[0]) * 14.79)
+                        quantity = f"{round(float(quantity_list[0]) * 14.79)} g"
                     elif quantity_list[1].lower() in ['fl oz', 'floz', 'fluid ounce', 'fluid oz']:
-                        quantity = str(float(quantity_list[0]) * 29.57)
+                        quantity = f"{round(float(quantity_list[0]) * 29.57)} ml"
                     elif quantity_list[1].lower() in ['cup', 'c', 'cups']:
-                        quantity = str(float(quantity_list[0]) * 236.59)
+                        quantity = f"{round(float(quantity_list[0]) * 236.59)} g"
                     elif quantity_list[1].lower() in ['pint', 'pt', 'pints']:
-                        quantity = str(float(quantity_list[0]) * 473.18)
+                        quantity = f"{round(float(quantity_list[0]) * 473.18)} ml"
                     elif quantity_list[1].lower() in ['quart', 'qt', 'quarts']:
-                        quantity = str(float(quantity_list[0]) * 946.35)
+                        quantity = f"{round(float(quantity_list[0]) * 946.35)} ml"
                     elif quantity_list[1].lower() in ['gallon', 'gal', 'gallons']:
-                        quantity = str(float(quantity_list[0]) * 3785.41)
+                        quantity = f"{round(float(quantity_list[0]) * 3785.41)} ml"
                     elif quantity_list[1].lower() in ['oz', 'ounce', 'ounces']:
-                        quantity = str(float(quantity_list[0]) * 28.35)
+                        quantity = f"{round(float(quantity_list[0]) * 28.35)} g"
                     elif quantity_list[1].lower() in ['lb', 'lbs', 'pound', 'pounds']:
-                        quantity = str(float(quantity_list[0]) * 453.59)
+                        quantity = f"{round(float(quantity_list[0]) * 453.59)} g"
 
 
                 else:   # if its 'to taste' or some other bs
