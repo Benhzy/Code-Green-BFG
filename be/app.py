@@ -175,9 +175,9 @@ def upload_receipt(user_id):
 
 # # DONT DELETE THIS, FOR EDWARD TO USE
 # if __name__ == '__main__':
-#     app.run(host='0.0.0.0/0', debug=True)
+#     app.run(host='172.20.10.5', debug=True)
 
-# DONT DELETE THIS, FOR EDWARD TO USE
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
+# # DONT DELETE THIS, FOR ANYBODY TO USE
+# if __name__ == '__main__':
+#     app.run(host='0.0.0.0', debug=True)
 
