@@ -60,19 +60,19 @@ const InventoryItem = ({ id, item, category, quantity, purchase_date, expiry_dat
             overflow="auto"
             borderColor="black"
             sx={{
-                boxShadow: "4px 4px 6px rgba(0, 0, 0, 0.5)" // Custom shadow casting to the right and bottom
+                boxShadow: "2px 2px 3px rgba(0, 0, 0, 0.5)" // Custom shadow casting to the right and bottom
             }}
             >
             <Box bg={boxColor}>
                 {!isEditing ? (
                     <Flex align="center" justify="flex-start" spacing="4">
-                        <Text fontSize="3xl">{getEmoji(category)}</Text>
+                        <Text paddingLeft="6px" fontSize="3xl">{getEmoji(category)}</Text>
                         <Flex align="center" justify="left">
                             <Text w="full">
                                 <Text fontSize="xs" fontWeight="bold" ml="2" lineHeight="3" paddingTop={0.5}>{item}</Text>
                                 <Divider height="1px" borderColor="transparent"/>
                                 <Text fontSize="xs" padding={0}>
-                                    <Text as="span" fontWeight="bold">&nbsp;&nbsp;&nbsp;</Text>
+                                    <Text as="span" fontWeight="bold" paddingLeft="1px">&nbsp;&nbsp;</Text>
                                     <Text as="span" fontWeight="bold" lineHeight="1">Amt: </Text>
                                     <Text as="span">{quantity}</Text>
                                 </Text>
@@ -87,8 +87,8 @@ const InventoryItem = ({ id, item, category, quantity, purchase_date, expiry_dat
                 {!isEditing ? (
                     <>
                         {/* <Text><Text as="span" fontWeight="bold">Category: </Text><Text as="span">{category}</Text></Text> */}
-                        <Text paddingLeft="4px" fontSize="xs"><Text as="span" fontWeight="bold" >🛒: </Text><Text as="span">{purchase_date}</Text></Text>
-                        <Text paddingLeft="4px" fontSize="xs">
+                        <Text paddingLeft="7px" fontSize="xs" paddingTop="2px"><Text as="span" fontWeight="bold" >🛒: </Text><Text as="span">{purchase_date}</Text></Text>
+                        <Text paddingLeft="7px" fontSize="xs" paddingTop="2px" paddingBottom="0px">
                             <Text as="span">🚮: </Text>
                             <Text as="span">{expiry_date}</Text>
                             <Text as="span" color={wordHighlight} fontWeight="bold" fontSize="xs"> ({daysUntilExpiry} days)</Text>
@@ -96,11 +96,13 @@ const InventoryItem = ({ id, item, category, quantity, purchase_date, expiry_dat
                         <Box display="flex" flexDirection="column" alignItems="center" w="full">
                         <Stack direction="row" spacing={5} mt={1}>
                             <Flex gap={1} align="center">
-                                <Button bg="green.400" color="white" fontSize="sm" size="xs" width="65px" _hover={{ bg: "green.600" }} onClick={() => onDecrement(id, 1)}>Use 1</Button>
-                                <Button bg="green.500" color="white" fontSize="sm" size="xs" width="65px" _hover={{ bg: "green.700" }} onClick={handleDecrementBy5}>Use 5</Button>
+                                <Button  color="black" fontSize="sm" size="xs" width="65px"  border="2px solid"  borderColor="gray.700"
+                                _hover={{ bg: "gray.600", color: 'white' }} onClick={() => onDecrement(id, 1)}>Use 1</Button>
+                                <Button color="black" fontSize="sm" size="xs" width="65px" border="2px solid"  borderColor="gray.700"
+                                _hover={{ bg: "gray.600", color: 'white'}} onClick={handleDecrementBy5}>Use 5</Button>
                             </Flex>
                         </Stack>
-                        <Stack direction="row" spacing={5} mt={2}>
+                        <Stack direction="row" spacing={5} mt={1.5}>
                             <Flex gap={1} align="center">
                                 <Button bg="danger.800" color="white" fontSize="sm" size="xs" width="65px" _hover={{ bg: "danger.900" }} onClick={onDelete}>Delete</Button>
                                 <Button bg="primary.700" color="white" fontSize="sm" size="xs" width="65px" _hover={{ bg: "primary.800" }} onClick={handleEdit}>Edit</Button>

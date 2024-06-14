@@ -10,6 +10,9 @@ const EditItemForm = ({ id, item: initialItem, category: initialCategory, quanti
     const [purchaseDate, setPurchaseDate] = useState(initialPurchaseDate);
     const [expiryDate, setExpiryDate] = useState(initialExpiryDate);
 
+    const incrementQuantity = () => setQuantity(prev => prev + 1);
+    const decrementQuantity = () => setQuantity(prev => (prev > 0 ? prev - 1 : 0));
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -63,29 +66,19 @@ const EditItemForm = ({ id, item: initialItem, category: initialCategory, quanti
                 <h2>Edit Item</h2>
                 <label>
                     Item:
-                    <input
-                        type="text"
-                        value={item}
-                        onChange={(e) => setItem(e.target.value)}
-                        required
-                    />
+                    <input type="text" value={item} onChange={(e) => setItem(e.target.value)} required />
                 </label>
                 <label>
                     Quantity:
-                    <input
-                        type="number"
-                        value={quantity}
-                        onChange={(e) => setQuantity(e.target.value)}
-                        required
-                    />
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <button type="button" onClick={decrementQuantity} className="quantity-modify">-</button>
+                        <input type="number" value={quantity} onChange={(e) => setQuantity(Number(e.target.value))} required style={{ textAlign: 'center' }} />
+                        <button type="button" onClick={incrementQuantity} className="quantity-modify">+</button>
+                    </div>
                 </label>
                 <label>
                     Category:
-                    <select
-                        value={category}
-                        onChange={(e) => setCategory(e.target.value)}
-                        required
-                    >
+                    <select value={category} onChange={(e) => setCategory(e.target.value)} required>
                         <option value="" disabled>Select category</option>
                         <option value="Vegetables">Vegetables</option>
                         <option value="Meat">Meat</option>
@@ -96,21 +89,11 @@ const EditItemForm = ({ id, item: initialItem, category: initialCategory, quanti
                 </label>
                 <label>
                     Purchase Date:
-                    <input
-                        type="date"
-                        value={purchaseDate}
-                        onChange={(e) => setPurchaseDate(e.target.value)}
-                        required
-                    />
+                    <input type="date" value={purchaseDate} onChange={(e) => setPurchaseDate(e.target.value)} required />
                 </label>
                 <label>
                     Expiry Date:
-                    <input
-                        type="date"
-                        value={expiryDate}
-                        onChange={(e) => setExpiryDate(e.target.value)}
-                        required
-                    />
+                    <input type="date" value={expiryDate} onChange={(e) => setExpiryDate(e.target.value)} required />
                 </label>
                 <div className="button-group">
                     <button type="submit" className="submit-button">Update Item</button>

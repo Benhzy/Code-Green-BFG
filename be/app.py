@@ -170,7 +170,7 @@ def upload_receipt(user_id):
 
 # DONT DELETE THIS, FOR ZHIYI TO USE
 if __name__ == '__main__':
-    app.run(host='0.0.0.0/0', debug=True)
+    app.run(host='0.0.0.0/0', debug=True) # insert ur ip address here
 
 
 # DONT DELETE THIS, FOR EDWARD TO USE
