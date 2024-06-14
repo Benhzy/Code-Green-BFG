@@ -12,6 +12,7 @@ import {
 } from '@chakra-ui/react';
 import './RecipeList.css';
 import { apiUrl } from './IpAdr';
+import RecipeCard from './RecipeCard';
 
 function RecipeList({ userId }) {
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -55,6 +56,24 @@ function RecipeList({ userId }) {
         setSelectedRecipe(recipe);
         onOpen();
     };
+    const deleteRecipeFromServer = async (recipeId) => {
+        const url = `${apiUrl}/delete_recipe/${recipeId}`;
+        const options = {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        };
+        try {
+            const response = await fetch(url, options);
+            if (!response.ok) throw new Error('Failed to delete the recipe');
+            alert('Recipe deleted successfully!');
+            // Update the recipes list by removing the deleted recipe
+            setRecipes(prevRecipes => prevRecipes.filter(recipe => recipe.id !== recipeId));
+        } catch (error) {
+            alert('Error deleting the recipe: ' + error.message);
+        }
+    };
 
     const logRecipe = async () => {
         const url = `${apiUrl}/add_recipe`;
@@ -73,42 +92,76 @@ function RecipeList({ userId }) {
             alert('Error logging the recipe: ' + error.message);
         }
     };
-
+    const parseIngredients = (ingredientsStr) => {
+        try {
+            // Remove the enclosing square brackets and then split the string on "), (" to get each tuple-like substring
+            const ingredientsArray = ingredientsStr.slice(1, -1).split("), (").map(item =>
+                // Remove the parentheses and any single quotes, then split each string into ingredient name and quantity
+                item.replace(/[()']/g, '').split(", ")
+            );
+    
+            // Convert each tuple-like array into an object with name and quantity properties
+            return ingredientsArray.map(item => ({
+                name: item[0],
+                quantity: item[1]
+            }));
+        } catch (error) {
+            console.error('Failed to parse ingredients:', error);
+            return [];
+        }
+    };
+    
+    
+    const parseInstructions = (instructionsStr) => {
+        try {
+            // Remove the square brackets and split the string into array entries
+            return instructionsStr.slice(2, -2).split("', '").map(instruction =>
+                instruction.trim().replace(/^'/, "").replace(/'$/, "")
+            );
+        } catch (error) {
+            console.error('Failed to parse instructions:', error);
+            return [];
+        }
+    };
     return (
         <div>
             <h1>Recipes</h1>
             <button onClick={() => fetchRecommendedRecipes()}>Get Recommended Recipes</button>
             {isLoading && <p>Loading...</p>}
             {error && <p>{error}</p>}
-            <ul>
+            <div>
                 {recipes.map((recipe, index) => (
-                    <li key={index} onClick={() => handleRecipeSelect(recipe)}>
-                        {recipe.recipe_name}
-                    </li>
+                    <RecipeCard key={index} recipe={recipe} onRecipeSelect={handleRecipeSelect} />
                 ))}
-            </ul>
+            </div>
             {selectedRecipe && (
                 <Modal isOpen={isOpen} onClose={onClose}>
-                    <ModalOverlay />
-                    <ModalContent>
-                        <ModalHeader>{selectedRecipe.recipe_name}</ModalHeader>
-                        <ModalCloseButton />
-                        <ModalBody>
-                            <h2>{selectedRecipe.recipe_name}</h2>
-                            <p><strong>Description:</strong> {selectedRecipe.description}</p>
-                            <p><strong>Ingredients:</strong> {selectedRecipe.ingredients}</p>
-                            <p><strong>Instructions:</strong> {selectedRecipe.instructions}</p>
-                            <p><strong>Difficulty:</strong> {selectedRecipe.difficulty}</p>
-                            <p><strong>Time Required:</strong> {selectedRecipe.time_required}</p>
-                        </ModalBody>
-                        <ModalFooter>
-                            <Button colorScheme="blue" mr={3} onClick={logRecipe}>
-                                I Cooked This!
-                            </Button>
-                            <Button variant="ghost" onClick={onClose}>Close</Button>
-                        </ModalFooter>
-                    </ModalContent>
-                </Modal>
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader>{selectedRecipe.recipe_name}</ModalHeader>
+                    <ModalCloseButton />
+                    <ModalBody>
+                        <h2>Ingredients</h2>
+                        <ul>
+                            {parseIngredients(selectedRecipe.ingredients).map((ingredient, index) => (
+                                <li key={index}>{ingredient.name}: {ingredient.quantity}</li>
+                            ))}
+                        </ul>
+                        <h2>Instructions</h2>
+                        <ol>
+                            {parseInstructions(selectedRecipe.instructions).map((instruction, index) => (
+                                <li key={index}>{instruction}</li>
+                            ))}
+                        </ol>
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button colorScheme="blue" mr={3} onClick={logRecipe}>
+                            I Cooked This!
+                        </Button>
+                        <Button variant="ghost" onClick={onClose}>Close</Button>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
             )}
         </div>
     );

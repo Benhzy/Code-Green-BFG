@@ -45,3 +45,16 @@ li:last-child {
 .recipe-details p strong {
     color: var(--color-primary-a70); /* Dark green for strong emphasis */
 }
+
+.recipe-card {
+    cursor: pointer;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 5px;
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.recipe-card:hover {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
