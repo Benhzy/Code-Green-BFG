@@ -1,6 +1,20 @@
 import React, { useState } from 'react';
 import './AddItemForm.css';
 import { apiUrl } from './IpAdr'; 
+import {
+    Button,
+    FormControl,
+    FormLabel,
+    Input,
+    NumberInput,
+    NumberInputField,
+    NumberInputStepper,
+    NumberIncrementStepper,
+    NumberDecrementStepper,
+    Select,
+    Flex,
+    Box,
+  } from '@chakra-ui/react';
 
 const AddItemForm = ({ onClose, fetchInventoryItems }) => {
     const [item, setItem] = useState('');
@@ -47,67 +61,47 @@ const AddItemForm = ({ onClose, fetchInventoryItems }) => {
     };
 
     return (
-        <div className="add-item-form-container">
-            <form className="add-item-form" onSubmit={handleSubmit}>
-                <h2>Add New Item</h2>
-                <label>
-                    Item:
-                    <input
-                        type="text"
-                        value={item}
-                        onChange={(e) => setItem(e.target.value)}
-                        required
-                    />
-                </label>
-                <label>
-                    Quantity:
-                    <input
-                        type="number"
-                        value={quantity}
-                        onChange={(e) => setQuantity(e.target.value)}
-                        required
-                    />
-                </label>
-                <label>
-                    Category:
-                    <select
-                        value={category}
-                        onChange={(e) => setCategory(e.target.value)}
-                        required
-                    >
-                        <option value="" disabled>Select category</option>
+        <Box className="add-item-form-container" p={4} boxShadow="md" rounded="md" bg="white">
+            <form onSubmit={handleSubmit}>
+                <FormControl isRequired>
+                    <FormLabel>Item</FormLabel>
+                    <Input type="text" value={item} onChange={(e) => setItem(e.target.value)} />
+                </FormControl>
+                <FormControl isRequired>
+                    <FormLabel>Quantity</FormLabel>
+                    <NumberInput min={0} value={quantity} onChange={valueString => setQuantity(valueString)}>
+                        <NumberInputField />
+                        <NumberInputStepper>
+                            <NumberIncrementStepper />
+                            <NumberDecrementStepper />
+                        </NumberInputStepper>
+                    </NumberInput>
+                </FormControl>
+                <FormControl isRequired>
+                    <FormLabel>Category</FormLabel>
+                    <Select placeholder="Select category" value={category} onChange={(e) => setCategory(e.target.value)}>
                         <option value="Vegetable">Vegetable</option>
                         <option value="Meat">Meat</option>
                         <option value="Dairy">Dairy</option>
                         <option value="Fruit">Fruit</option>
                         <option value="Grain">Grain</option>
                         <option value="Seafood">Seafood</option>
-                    </select>
-                </label>
-                <label>
-                    Purchase Date:
-                    <input
-                        type="date"
-                        value={purchaseDate}
-                        onChange={(e) => setPurchaseDate(e.target.value)}
-                        required
-                    />
-                </label>
-                <label>
-                    Expiry Date:
-                    <input
-                        type="date"
-                        value={expiryDate}
-                        onChange={(e) => setExpiryDate(e.target.value)}
-                        required
-                    />
-                </label>
-                <div className="button-group">
-                    <button type="submit" className="submit-button">Add Item</button>
-                    <button type="button" className="cancel-button" onClick={onClose}>Cancel</button>
-                </div>
+                    </Select>
+                </FormControl>
+                <FormControl isRequired>
+                    <FormLabel>Purchase Date</FormLabel>
+                    <Input type="date" value={purchaseDate} onChange={(e) => setPurchaseDate(e.target.value)} />
+                </FormControl>
+                <FormControl isRequired>
+                    <FormLabel>Expiry Date</FormLabel>
+                    <Input type="date" value={expiryDate} onChange={(e) => setExpiryDate(e.target.value)} />
+                </FormControl>
+                <Flex mt={4} justifyContent="space-between">
+                    <Button colorScheme="blue" onClick={onClose}>Cancel</Button>
+                    <Button colorScheme="teal" type="submit">Add Item</Button>
+                </Flex>
             </form>
-        </div>
+        </Box>
     );
 };
 

@@ -1,23 +1,35 @@
 import React, { useState } from 'react';
-import './AddItemForm.css'; // Reuse the same CSS
-import { apiUrl } from './IpAdr'; 
+import {
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
+  Select,
+  Flex,
+  Box,
+  useToast
+} from '@chakra-ui/react';
+import { apiUrl } from './IpAdr';
 
-const EditItemForm = ({ id, item: initialItem, category: initialCategory, quantity: initialQuantity, purchase_date: initialPurchaseDate, 
-    expiry_date: initialExpiryDate, onClose, fetchInventoryItems }) => {
+const EditItemForm = ({ id, item: initialItem, category: initialCategory, quantity: initialQuantity, purchase_date: initialPurchaseDate, expiry_date: initialExpiryDate, onClose, fetchInventoryItems }) => {
     const [item, setItem] = useState(initialItem);
     const [quantity, setQuantity] = useState(initialQuantity);
     const [category, setCategory] = useState(initialCategory);
     const [purchaseDate, setPurchaseDate] = useState(initialPurchaseDate);
     const [expiryDate, setExpiryDate] = useState(initialExpiryDate);
 
-    const incrementQuantity = () => setQuantity(prev => prev + 1);
-    const decrementQuantity = () => setQuantity(prev => (prev > 0 ? prev - 1 : 0));
+    const toast = useToast();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         const updatedItem = {
-            user_id: 5, // Replace with actual user ID
+            user_id: 5,
             item,
             quantity,
             category,
@@ -26,7 +38,6 @@ const EditItemForm = ({ id, item: initialItem, category: initialCategory, quanti
         };
 
         try {
-            // Delete the old item
             await fetch(`${apiUrl}/delete_grocery`, {
                 method: 'DELETE',
                 headers: {
@@ -35,72 +46,88 @@ const EditItemForm = ({ id, item: initialItem, category: initialCategory, quanti
                 body: JSON.stringify({ user_id: '5', item: id, purchase_date: initialPurchaseDate, expiry_date: initialExpiryDate }),
             });
 
-            // Add the updated item
             const response = await fetch(`${apiUrl}/add_grocery`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify([updatedItem]), // Send data as an array
+                body: JSON.stringify([updatedItem]),
             });
 
             const result = await response.json();
 
             if (response.ok) {
-                console.log("Item updated successfully:", result);
-                fetchInventoryItems(); // Fetch updated inventory items
-                onClose(); // Close the form after successful submission
+                toast({
+                    title: "Item Updated Successfully",
+                    description: JSON.stringify(result),
+                    status: "success",
+                    duration: 5000,
+                    isClosable: true
+                });
+                fetchInventoryItems();
+                onClose();
             } else {
-                console.error("Failed to update item:", result.error);
-                alert("Failed to update item: " + result.error);
+                toast({
+                    title: "Failed to Update Item",
+                    description: result.error,
+                    status: "error",
+                    duration: 5000,
+                    isClosable: true
+                });
             }
         } catch (error) {
-            console.error("Error updating item:", error);
-            alert("Error updating item: " + error.message);
+            toast({
+                title: "Error Updating Item",
+                description: error.message,
+                status: "error",
+                duration: 5000,
+                isClosable: true
+            });
         }
     };
 
     return (
-        <div className="add-item-form-container">
-            <form className="add-item-form" onSubmit={handleSubmit}>
-                <h2>Edit Item</h2>
-                <label>
-                    Item:
-                    <input type="text" value={item} onChange={(e) => setItem(e.target.value)} required />
-                </label>
-                <label>
-                    Quantity:
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <button type="button" onClick={decrementQuantity} className="quantity-modify">-</button>
-                        <input type="number" value={quantity} onChange={(e) => setQuantity(Number(e.target.value))} required style={{ textAlign: 'center' }} />
-                        <button type="button" onClick={incrementQuantity} className="quantity-modify">+</button>
-                    </div>
-                </label>
-                <label>
-                    Category:
-                    <select value={category} onChange={(e) => setCategory(e.target.value)} required>
-                        <option value="" disabled>Select category</option>
-                        <option value="Vegetables">Vegetables</option>
+        <Box className="add-item-form-container" p={4} boxShadow="md" rounded="md" bg="white">
+            <form onSubmit={handleSubmit}>
+                <FormControl isRequired>
+                    <FormLabel>Item</FormLabel>
+                    <Input type="text" value={item} onChange={(e) => setItem(e.target.value)} />
+                </FormControl>
+                <FormControl isRequired>
+                    <FormLabel>Quantity</FormLabel>
+                    <NumberInput min={0} value={quantity} onChange={valueString => setQuantity(valueString)}>
+                        <NumberInputField />
+                        <NumberInputStepper>
+                            <NumberIncrementStepper />
+                            <NumberDecrementStepper />
+                        </NumberInputStepper>
+                    </NumberInput>
+                </FormControl>
+                <FormControl isRequired>
+                    <FormLabel>Category</FormLabel>
+                    <Select placeholder="Select category" value={category} onChange={(e) => setCategory(e.target.value)}>
+                        <option value="Vegetable">Vegetable</option>
                         <option value="Meat">Meat</option>
                         <option value="Dairy">Dairy</option>
-                        <option value="Fruits">Fruits</option>
-                        <option value="Breads">Breads</option>
-                    </select>
-                </label>
-                <label>
-                    Purchase Date:
-                    <input type="date" value={purchaseDate} onChange={(e) => setPurchaseDate(e.target.value)} required />
-                </label>
-                <label>
-                    Expiry Date:
-                    <input type="date" value={expiryDate} onChange={(e) => setExpiryDate(e.target.value)} required />
-                </label>
-                <div className="button-group">
-                    <button type="submit" className="submit-button">Update Item</button>
-                    <button type="button" className="cancel-button" onClick={onClose}>Cancel</button>
-                </div>
+                        <option value="Fruit">Fruit</option>
+                        <option value="Grain">Grain</option>
+                        <option value="Seafood">Seafood</option>
+                    </Select>
+                </FormControl>
+                <FormControl isRequired>
+                    <FormLabel>Purchase Date</FormLabel>
+                    <Input type="date" value={purchaseDate} onChange={(e) => setPurchaseDate(e.target.value)} />
+                </FormControl>
+                <FormControl isRequired>
+                    <FormLabel>Expiry Date</FormLabel>
+                    <Input type="date" value={expiryDate} onChange={(e) => setExpiryDate(e.target.value)} />
+                </FormControl>
+                <Flex mt={4} justifyContent="space-between">
+                    <Button colorScheme="blue" onClick={onClose}>Cancel</Button>
+                    <Button colorScheme="orange" type="submit">Update Item</Button>
+                </Flex>
             </form>
-        </div>
+        </Box>
     );
 };
 

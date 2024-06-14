@@ -63,7 +63,7 @@ a:focus {
 .main-container {
   position: relative;
   margin: 20px;
-  padding: 20px;
+  padding: 0px;
   padding-bottom: 150px; /* Adjust this value based on the height of your bottom menu bar */
   background-color: #ffffff;
   border-radius: 10px;
@@ -71,7 +71,7 @@ a:focus {
   min-height: 160vh; /* Ensure it covers the full height minus the navbar if any */
   flex-direction: column;
   display: flex;
-  width: 360px;
+  width: 420px;
 }
 content {
   flex: 1; /* Allows the content area to expand and fill available space */
@@ -82,8 +82,8 @@ content {
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .main-container {
-    margin-left: 20px; /* Reset margin on small screens */
-    margin-right: 20px;
+    margin-left: 5px; /* Reset margin on small screens */
+    margin-right: 5px;
   }
 }
 
@@ -94,6 +94,8 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 0.5em;
   line-height: 1.2;
 }
+
+
 
 .mt-1 { margin-top: 0.25rem; }
 .mt-2 { margin-top: 0.5rem; }
@@ -178,15 +180,12 @@ h1, h2, h3, h4, h5, h6 {
   display: grid;
   grid-template-columns: repeat(2, 1fr); /* default to two columns */
   gap: 10px;
-  padding: 5px;
-  column-gap: 10px;
+  padding-left: 40px;
+  padding-right: 40px;
+  column-gap: 25px;
 }
 
-@media (max-width: 600px) {
-  .inventory-grid {
-      grid-template-columns: 1fr; /* one column on smaller screens */
-  }
-}
+
 
 @media (min-width: 601px) and (max-width: 1200px) {
   .inventory-grid {

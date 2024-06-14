@@ -53,14 +53,12 @@ const InventoryItem = ({ id, item, category, quantity, purchase_date, expiry_dat
         <Box
             className="inventory-item"
             p={0}
-            borderWidth="2px"
+            borderWidth="0px"
             borderRadius="2xl"
-            w="152px"
-            h="152px"
             overflow="auto"
             borderColor="black"
             sx={{
-                boxShadow: "2px 2px 3px rgba(0, 0, 0, 0.5)" // Custom shadow casting to the right and bottom
+                boxShadow: "2px 2px 3px rgba(0, 0, 0, 0.25)" // Custom shadow casting to the right and bottom
             }}
             >
             <Box bg={boxColor}>
@@ -87,11 +85,11 @@ const InventoryItem = ({ id, item, category, quantity, purchase_date, expiry_dat
                 {!isEditing ? (
                     <>
                         {/* <Text><Text as="span" fontWeight="bold">Category: </Text><Text as="span">{category}</Text></Text> */}
-                        <Text paddingLeft="7px" fontSize="xs" paddingTop="2px"><Text as="span" fontWeight="bold" >🛒: </Text><Text as="span">{purchase_date}</Text></Text>
-                        <Text paddingLeft="7px" fontSize="xs" paddingTop="2px" paddingBottom="0px">
+                        <Text paddingLeft="12px" fontSize="xs" paddingTop="2px"><Text as="span" fontWeight="bold" >🛒: </Text><Text as="span">{purchase_date}</Text></Text>
+                        <Text paddingLeft="12px" fontSize="xs" paddingTop="2px" paddingBottom="0px">
                             <Text as="span">🚮: </Text>
                             <Text as="span">{expiry_date}</Text>
-                            <Text as="span" color={wordHighlight} fontWeight="bold" fontSize="xs"> ({daysUntilExpiry} days)</Text>
+                            <Text as="span" color={wordHighlight} fontWeight="bold" fontSize="xs"> ({daysUntilExpiry} d)</Text>
                         </Text>
                         <Box display="flex" flexDirection="column" alignItems="center" w="full">
                         <Stack direction="row" spacing={5} mt={1}>
@@ -103,7 +101,7 @@ const InventoryItem = ({ id, item, category, quantity, purchase_date, expiry_dat
                             </Flex>
                         </Stack>
                         <Stack direction="row" spacing={5} mt={1.5}>
-                            <Flex gap={1} align="center">
+                            <Flex gap={1} align="center" paddingBottom="10px">
                                 <Button bg="danger.800" color="white" fontSize="sm" size="xs" width="65px" _hover={{ bg: "danger.900" }} onClick={onDelete}>Delete</Button>
                                 <Button bg="primary.700" color="white" fontSize="sm" size="xs" width="65px" _hover={{ bg: "primary.800" }} onClick={handleEdit}>Edit</Button>
                             </Flex>

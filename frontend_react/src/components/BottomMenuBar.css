@@ -3,7 +3,7 @@
     bottom: 0;
     left: 0; /* Align to the left */
     right: 0; /* Stretch right to match container width */
-    width: 360px; /* Full width of its parent container */
+    width: 428px; /* Full width of its parent container */
     display: flex;
     justify-content: space-around;
     background-color: #4A4A4A; /* Dark earthy tone for background */
