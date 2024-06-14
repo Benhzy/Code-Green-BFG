@@ -13,6 +13,7 @@ import {
 import './RecipeList.css';
 import { apiUrl } from './IpAdr';
 import RecipeCard from './RecipeCard';
+import RecipeModal from './RecipeModal';
 
 function RecipeList({ userId }) {
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -135,33 +136,12 @@ function RecipeList({ userId }) {
                 ))}
             </div>
             {selectedRecipe && (
-                <Modal isOpen={isOpen} onClose={onClose}>
-                <ModalOverlay />
-                <ModalContent>
-                    <ModalHeader>{selectedRecipe.recipe_name}</ModalHeader>
-                    <ModalCloseButton />
-                    <ModalBody>
-                        <h2>Ingredients</h2>
-                        <ul>
-                            {parseIngredients(selectedRecipe.ingredients).map((ingredient, index) => (
-                                <li key={index}>{ingredient.name}: {ingredient.quantity}</li>
-                            ))}
-                        </ul>
-                        <h2>Instructions</h2>
-                        <ol>
-                            {parseInstructions(selectedRecipe.instructions).map((instruction, index) => (
-                                <li key={index}>{instruction}</li>
-                            ))}
-                        </ol>
-                    </ModalBody>
-                    <ModalFooter>
-                        <Button colorScheme="blue" mr={3} onClick={logRecipe}>
-                            I Cooked This!
-                        </Button>
-                        <Button variant="ghost" onClick={onClose}>Close</Button>
-                    </ModalFooter>
-                </ModalContent>
-            </Modal>
+                <RecipeModal
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    recipe={selectedRecipe}
+                    onLogRecipe={logRecipe}
+                />
             )}
         </div>
     );
