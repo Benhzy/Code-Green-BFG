@@ -94,9 +94,9 @@ const InventoryItem = ({ id, item, category, quantity, purchase_date, expiry_dat
                         <Box display="flex" flexDirection="column" alignItems="center" w="full">
                         <Stack direction="row" spacing={5} mt={1}>
                             <Flex gap={1} align="center">
-                                <Button  color="black" fontSize="sm" size="xs" width="65px"  border="2px solid"  borderColor="gray.700"
+                                <Button  color="black" fontSize="sm" size="xs" width="65px"  border="1px solid"  borderColor="gray.700"
                                 _hover={{ bg: "gray.600", color: 'white' }} onClick={() => onDecrement(id, 1)}>Use 1</Button>
-                                <Button color="black" fontSize="sm" size="xs" width="65px" border="2px solid"  borderColor="gray.700"
+                                <Button color="black" fontSize="sm" size="xs" width="65px" border="1px solid"  borderColor="gray.700"
                                 _hover={{ bg: "gray.600", color: 'white'}} onClick={handleDecrementBy5}>Use 5</Button>
                             </Flex>
                         </Stack>

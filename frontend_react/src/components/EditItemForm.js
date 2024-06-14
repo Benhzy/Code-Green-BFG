@@ -7,14 +7,15 @@ import {
   NumberInput,
   NumberInputField,
   NumberInputStepper,
-  NumberIncrementStepper,
-  NumberDecrementStepper,
   Select,
   Flex,
   Box,
-  useToast
+  useToast,
+  Stack,
+  IconButton
 } from '@chakra-ui/react';
 import { apiUrl } from './IpAdr';
+import { AddIcon, MinusIcon } from "@chakra-ui/icons";
 
 const EditItemForm = ({ id, item: initialItem, category: initialCategory, quantity: initialQuantity, purchase_date: initialPurchaseDate, expiry_date: initialExpiryDate, onClose, fetchInventoryItems }) => {
     const [item, setItem] = useState(initialItem);
@@ -89,46 +90,59 @@ const EditItemForm = ({ id, item: initialItem, category: initialCategory, quanti
     return (
         <Box className="add-item-form-container" p={4} boxShadow="md" rounded="md" bg="white">
             <form onSubmit={handleSubmit}>
-                <FormControl isRequired>
-                    <FormLabel>Item</FormLabel>
-                    <Input type="text" value={item} onChange={(e) => setItem(e.target.value)} />
-                </FormControl>
-                <FormControl isRequired>
-                    <FormLabel>Quantity</FormLabel>
-                    <NumberInput min={0} value={quantity} onChange={valueString => setQuantity(valueString)}>
-                        <NumberInputField />
-                        <NumberInputStepper>
-                            <NumberIncrementStepper />
-                            <NumberDecrementStepper />
-                        </NumberInputStepper>
-                    </NumberInput>
-                </FormControl>
-                <FormControl isRequired>
-                    <FormLabel>Category</FormLabel>
-                    <Select placeholder="Select category" value={category} onChange={(e) => setCategory(e.target.value)}>
-                        <option value="Vegetable">Vegetable</option>
-                        <option value="Meat">Meat</option>
-                        <option value="Dairy">Dairy</option>
-                        <option value="Fruit">Fruit</option>
-                        <option value="Grain">Grain</option>
-                        <option value="Seafood">Seafood</option>
-                    </Select>
-                </FormControl>
-                <FormControl isRequired>
-                    <FormLabel>Purchase Date</FormLabel>
-                    <Input type="date" value={purchaseDate} onChange={(e) => setPurchaseDate(e.target.value)} />
-                </FormControl>
-                <FormControl isRequired>
-                    <FormLabel>Expiry Date</FormLabel>
-                    <Input type="date" value={expiryDate} onChange={(e) => setExpiryDate(e.target.value)} />
-                </FormControl>
-                <Flex mt={4} justifyContent="space-between">
-                    <Button colorScheme="blue" onClick={onClose}>Cancel</Button>
-                    <Button colorScheme="orange" type="submit">Update Item</Button>
-                </Flex>
+                <Stack spacing={4}>
+                    <FormControl isRequired>
+                        <FormLabel mb={1}>Item</FormLabel>
+                        <Input type="text" value={item} onChange={(e) => setItem(e.target.value)} />
+                    </FormControl>
+                    <FormControl isRequired>
+                        <FormLabel mb={1}>Quantity</FormLabel>
+                        <NumberInput min={0} value={quantity} onChange={valueString => setQuantity(valueString)} position="relative">
+                            <NumberInputStepper position="absolute" left="0">
+                                <IconButton
+                                    aria-label="Decrement"
+                                    icon={<MinusIcon />}
+                                    size="md"
+                                    onClick={() => setQuantity((prevQuantity) => (parseInt(prevQuantity || "0") > 0 ? (parseInt(prevQuantity || "0") - 1).toString() : "0"))}
+                                />
+                            </NumberInputStepper>
+                            <NumberInputField pl="2rem" pr="2rem" paddingLeft="53px" /> {/* Adjust padding to ensure space for steppers */}
+                            <NumberInputStepper position="absolute" right="4">
+                                <IconButton
+                                    aria-label="Increment"
+                                    icon={<AddIcon />}
+                                    size="md"
+                                    onClick={() => setQuantity((prevQuantity) => (parseInt(prevQuantity || "0") + 1).toString())}
+                                />
+                            </NumberInputStepper>
+                        </NumberInput>
+                    </FormControl>
+                    <FormControl isRequired>
+                        <FormLabel mb={1}>Category</FormLabel>
+                        <Select placeholder="Select category" value={category} onChange={(e) => setCategory(e.target.value)}>
+                            <option value="Vegetable">Vegetable</option>
+                            <option value="Meat">Meat</option>
+                            <option value="Dairy">Dairy</option>
+                            <option value="Fruit">Fruit</option>
+                            <option value="Grain">Grain</option>
+                            <option value="Seafood">Seafood</option>
+                        </Select>
+                    </FormControl>
+                    <FormControl isRequired>
+                        <FormLabel mb={1}>Purchase Date</FormLabel>
+                        <Input type="date" value={purchaseDate} onChange={(e) => setPurchaseDate(e.target.value)} />
+                    </FormControl>
+                    <FormControl isRequired>
+                        <FormLabel mb={1}>Expiry Date</FormLabel>
+                        <Input type="date" value={expiryDate} onChange={(e) => setExpiryDate(e.target.value)} />
+                    </FormControl>
+                    <Flex mt={4} justifyContent="space-between">
+                        <Button colorScheme="blue" onClick={onClose} >Cancel</Button>
+                        <Button colorScheme="orange" type="submit" >Edit Item</Button>
+                    </Flex>
+                </Stack>
             </form>
         </Box>
     );
 };
-
 export default EditItemForm;
