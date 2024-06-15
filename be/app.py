@@ -19,7 +19,7 @@ def download_certificate():
 download_certificate()
 
 from flask import Flask, request, jsonify
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 from scripts.db_connection import get_user_recipes_by_user_id
 from scripts.db_connection import upsert_user_groceries
 from scripts.db_connection import get_grocery_data_by_user_id
@@ -33,7 +33,7 @@ import base64
 
 app = Flask(__name__)
 frontend_url = os.getenv('FRONTEND_URL')
-cors = CORS(app, resources={r"/*": {"origins": frontend_url}})
+cors = CORS(app)
 
 @app.route('/add_grocery', methods=['POST']) # POST request to add grocery items (can add multiple at the same time)
 def add_grocery():
@@ -107,6 +107,7 @@ def delete_recipe():
     return jsonify({"message": "Recipe deleted successfully"}), 200
 
 @app.route('/recommend_recipe/<user_id>', methods=['GET'])
+@cross_origin() 
 def recommend_recipe(user_id):
     cuisine = request.args.get('cuisine', 'Singaporean')
     servings = request.args.get('servings', '1')
