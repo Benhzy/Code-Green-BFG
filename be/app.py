@@ -1,3 +1,23 @@
+import os
+import requests
+
+def download_certificate():
+    cert_dir = os.path.expanduser("~/.postgresql")
+    os.makedirs(cert_dir, exist_ok=True)
+    cert_path = os.path.join(cert_dir, "root.crt")
+    
+    if not os.path.exists(cert_path):
+        url = "https://cockroachlabs.cloud/clusters/e3885e05-0fa9-450e-b512-2523fa52fcb6/cert"
+        response = requests.get(url)
+        
+        with open(cert_path, 'wb') as cert_file:
+            cert_file.write(response.content)
+        print("Certificate downloaded successfully")
+    else:
+        print("Certificate already exists")
+
+download_certificate()
+
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from scripts.db_connection import get_user_recipes_by_user_id
