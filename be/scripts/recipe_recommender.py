@@ -2,7 +2,7 @@
 import os
 from openai import OpenAI
 from datetime import datetime, timedelta
-from scripts.db_connection import get_grocery_data_by_user_id, get_user_recipes_by_user_id, upsert_user_recipes
+from scripts.db_connection import get_grocery_data_by_user_id, get_user_recipes_by_user_id, upsert_user_recipes, upsert_user_groceries
 from dotenv import load_dotenv
 load_dotenv("/be/scripts/.env")
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
@@ -41,24 +41,27 @@ def analyze_user_recipes(user_id):
 # INSERT RECIPE RECOMMENDER CODE HERE 
 
 
-def fetch_ingredients_near_expiry(user_id):
+def fetch_ingredients(user_id):
     # Assuming the function `analyze_data` returns a dictionary sorted by purchase dates.
     groceries = analyze_user_data(user_id)
     near_expiry_ingredients = []
+    all_groceries = []
 
     # Check for items within 3 days of expiry
     cutoff_date = datetime.now() + timedelta(days=10) 
     for date_str, items in groceries.items():
+        all_groceries.extend(items)
         if datetime.strptime(str(date_str), "%Y-%m-%d") <= cutoff_date:
-            near_expiry_ingredients.extend(items)
+            near_expiry_ingredients.append(items[0])
     processed_near_expiry_ingredients = []
     for ele in near_expiry_ingredients:
         processed_near_expiry_ingredients.append(ele[0])
-    return ",".join(processed_near_expiry_ingredients)
+    return all_groceries, processed_near_expiry_ingredients
 
-def generate_recipe_suggestions(ingredients, user_recipes, cuisine = "Singaporean"): # where ingredients is a string of comma-separated ingredients
+def generate_recipe_suggestions(ingredients, exp_ingredients, user_recipes, cuisine, servings=1): # where ingredients is a string of comma-separated ingredients
     # Prepare the prompt for GPT based on near expiry ingredients and user's recipes
-    ingredients_list = ', '.join([item[0] for item in ingredients])
+    all_ingredients_list = ', '.join([item[0] for item in ingredients])
+    exp_ingredients_list = ', '.join([item[0] for item in exp_ingredients])
     recipes_list = ', '.join([recipe[0] for recipe in user_recipes])
 
     extra_prompt = ""
@@ -66,7 +69,13 @@ def generate_recipe_suggestions(ingredients, user_recipes, cuisine = "Singaporea
         extra_prompt = f"Base your recipe on the cuisines from these recipes if possible: {recipes_list}"
 
     prompt = f"""
-    Create a {cuisine} food recipe using the following ingredients close to expiry: {ingredients_list}.
+    Create a {cuisine} food recipe using the following ingredients close to expiry: {exp_ingredients_list}.
+
+    The recipe should be for {servings} servings.
+
+    Make sure this recipe can be prepared with the ingredients here: {all_ingredients_list}.
+
+    Make sure the unit of measurement for ingredients is in metric.
 
     Make sure the recipe is an authentic {cuisine} recipe.
 
@@ -105,7 +114,30 @@ def generate_recipe_suggestions(ingredients, user_recipes, cuisine = "Singaporea
     text = choices.message.content
     return text
 
-def extract_recipe(recipe_data): # where raw recipe data is the output from the GPT model
+def unit_convert(s):
+    index = len(s) - 1
+    while index >= 0 and not s[index].isdigit():
+        index -= 1
+
+    numeric_part = s[:index + 1]
+    unit_part = s[index + 1:].strip().lower()
+
+    conversions = {
+        1000: {"kg", "kilogram", "l", "liter", "litre"},
+        0.001: {"mg", "milligram"}
+    }
+
+    numeric_value = float(numeric_part) if '.' in numeric_part else int(numeric_part)
+
+    for multiplier, units in conversions.items():
+        if unit_part in units:
+            converted_value = numeric_value * multiplier
+            new_unit = "g" if "k" in unit_part or "m" in unit_part else "ml"
+            return converted_value, new_unit
+
+    return numeric_value, unit_part
+
+def extract_recipe(recipe_data):
     lines = recipe_data.strip().split('\n')
 
     recipe_dict = {}
@@ -135,7 +167,36 @@ def extract_recipe(recipe_data): # where raw recipe data is the output from the 
             # Extract ingredient
             ingredient_data = line.split('-', 1)[1].strip()
             if ':' in ingredient_data:
-                ingredient, quantity = ingredient_data.split(':', 1)
+                ingredient, quantity_raw = ingredient_data.split(':', 1)
+                
+                quantity_list = quantity_raw.strip().split(' ', 1)
+                if len(quantity_list) == 1:
+                    quantity, unit = unit_convert(quantity_list[0])
+                    quantity = str(quantity) + unit
+                    
+                elif quantity_list[0].isnumeric():
+                    if quantity_list[1].lower() in ['tsp', 't', 'tsp.', 't.', 'teaspoon']:
+                        quantity = f"{round(float(quantity_list[0]) * 4.93)} ml"
+                    elif quantity_list[1].lower() in ['tbsp', 'tbs', 'tbl', 'tbl.', 'tbsp.', 'tablespoon']:
+                        quantity = f"{round(float(quantity_list[0]) * 14.79)} g"
+                    elif quantity_list[1].lower() in ['fl oz', 'floz', 'fluid ounce', 'fluid oz']:
+                        quantity = f"{round(float(quantity_list[0]) * 29.57)} ml"
+                    elif quantity_list[1].lower() in ['cup', 'c', 'cups']:
+                        quantity = f"{round(float(quantity_list[0]) * 236.59)} g"
+                    elif quantity_list[1].lower() in ['pint', 'pt', 'pints']:
+                        quantity = f"{round(float(quantity_list[0]) * 473.18)} ml"
+                    elif quantity_list[1].lower() in ['quart', 'qt', 'quarts']:
+                        quantity = f"{round(float(quantity_list[0]) * 946.35)} ml"
+                    elif quantity_list[1].lower() in ['gallon', 'gal', 'gallons']:
+                        quantity = f"{round(float(quantity_list[0]) * 3785.41)} ml"
+                    elif quantity_list[1].lower() in ['oz', 'ounce', 'ounces']:
+                        quantity = f"{round(float(quantity_list[0]) * 28.35)} g"
+                    elif quantity_list[1].lower() in ['lb', 'lbs', 'pound', 'pounds']:
+                        quantity = f"{round(float(quantity_list[0]) * 453.59)} g"
+
+
+                else:   # if its 'to taste' or some other bs
+                    quantity = '1'
                 ingredients.append((ingredient.strip(), quantity.strip()))
             else:
                 ingredients.append(ingredient_data)  # In case there's no quantity specified
@@ -159,19 +220,37 @@ def jsonify_recipe(recipe_data, user_id):
         "description": recipe_data.get('description', '')
     }
 
+def remove_used_ingredients(user_id, ingredients):
+    data = get_grocery_data_by_user_id(user_id)
+    for ingredient in ingredients:
+        for item in data:
+            item_name = item['item']
+            if item_name.lower() == ingredient(0).lower():
+                item_quantity = item['quantity']
+                if item_quantity.isnumeric():
+                    item['quantity'] = str(float(item_quantity) - float(ingredient(1)))
+                else:
+                    quantity, unit = unit_convert(item_quantity)
+                    item['quantity'] = str(float(item_quantity) - quantity) + unit
 
-def recommend_recipes(user_id, cuisine):
-    near_expiry_ingredients = fetch_ingredients_near_expiry(user_id)
+                upsert_user_groceries(user_id, item)
+
+def recommend_recipes(user_id, cuisine, servings):
+    all_ingredients, near_expiry_ingredients = fetch_ingredients(user_id)
     user_recipes = analyze_user_recipes(user_id)
     if near_expiry_ingredients:
-        raw_recipe = generate_recipe_suggestions(near_expiry_ingredients, user_recipes, cuisine)
+        raw_recipe = generate_recipe_suggestions(all_ingredients, near_expiry_ingredients, user_recipes, cuisine, servings)
         recipe_dict = extract_recipe(raw_recipe)
-        recipe_json = jsonify_recipe(recipe_dict, user_id)  # Make sure this returns the correct structure
-        response = upsert_user_recipes([recipe_json])  # Ensure this is a list of dictionaries
-        return response
+        recipe_json = jsonify_recipe(recipe_dict, user_id) 
+        print(recipe_json)
+        return recipe_json
     else:
         return "No ingredients are close to expiry."
 
+def store_recipe(user_id, recipe_dict):
+    recipe_json = jsonify_recipe(recipe_dict, user_id)  # Make sure this returns the correct structure
+    response = upsert_user_recipes([recipe_json])  # Ensure this is a list of dictionaries
+    return response
 
 # near_expiry_ingredients = "Fish, Potato, Carrot, Onion, Garlic, Ginger, Soy Sauce, Oyster Sauce, Cornstarch, Sugar, Salt, Pepper, Oil"
 # user_recipes = []

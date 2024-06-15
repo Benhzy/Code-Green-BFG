@@ -1,7 +1,22 @@
 import React, { useState, useEffect } from 'react';
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  Button,
+  useDisclosure
+} from '@chakra-ui/react';
 import './RecipeList.css';
+import { apiUrl } from './IpAdr';
+import RecipeCard from './RecipeCard';
+import RecipeModal from './RecipeModal';
 
 function RecipeList({ userId }) {
+    const { isOpen, onOpen, onClose } = useDisclosure();
     const [recipes, setRecipes] = useState([]);
     const [selectedRecipe, setSelectedRecipe] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -16,6 +31,7 @@ function RecipeList({ userId }) {
             const data = await response.json();
             if (response.ok) {
                 setRecipes(data);
+                return data; // Return the fetched data
             } else {
                 throw new Error('Failed to fetch recipes');
             }
@@ -27,39 +43,105 @@ function RecipeList({ userId }) {
     };
 
     useEffect(() => {
-        // Fetch initial recipe list
-        fetchRecipes(`http://localhost:5000/recipe/${userId}`);
+        fetchRecipes(`${apiUrl}/recipe/${userId}`);
     }, [userId]);
 
     const fetchRecommendedRecipes = async (cuisine = 'Singaporean') => {
-        // Fetch recommended recipes, then refresh the list from the database
-        await fetchRecipes(`http://localhost:5000/recommend_recipe/${userId}?cuisine=${cuisine}`);
-        // Optionally, re-fetch the complete list if needed or just update the list with new recommendations
-        fetchRecipes(`http://localhost:5000/recipe/${userId}`);
+        const recommendedRecipes = await fetchRecipes(`${apiUrl}/recommend_recipe/${userId}?cuisine=${cuisine}`);
+        if (recommendedRecipes && recommendedRecipes.length > 0) {
+            handleRecipeSelect(recommendedRecipes[0]); // Automatically select the first recipe
+        }
     };
 
+    const handleRecipeSelect = (recipe) => {
+        setSelectedRecipe(recipe);
+        onOpen();
+    };
+    const deleteRecipeFromServer = async (recipeId) => {
+        const url = `${apiUrl}/delete_recipe/${recipeId}`;
+        const options = {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        };
+        try {
+            const response = await fetch(url, options);
+            if (!response.ok) throw new Error('Failed to delete the recipe');
+            alert('Recipe deleted successfully!');
+            // Update the recipes list by removing the deleted recipe
+            setRecipes(prevRecipes => prevRecipes.filter(recipe => recipe.id !== recipeId));
+        } catch (error) {
+            alert('Error deleting the recipe: ' + error.message);
+        }
+    };
+
+    const logRecipe = async () => {
+        const url = `${apiUrl}/add_recipe`;
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(selectedRecipe)
+        };
+        try {
+            const response = await fetch(url, options);
+            if (!response.ok) throw new Error('Failed to log the recipe');
+            alert('Recipe logged successfully!');
+        } catch (error) {
+            alert('Error logging the recipe: ' + error.message);
+        }
+    };
+    const parseIngredients = (ingredientsStr) => {
+        try {
+            // Remove the enclosing square brackets and then split the string on "), (" to get each tuple-like substring
+            const ingredientsArray = ingredientsStr.slice(1, -1).split("), (").map(item =>
+                // Remove the parentheses and any single quotes, then split each string into ingredient name and quantity
+                item.replace(/[()']/g, '').split(", ")
+            );
+    
+            // Convert each tuple-like array into an object with name and quantity properties
+            return ingredientsArray.map(item => ({
+                name: item[0],
+                quantity: item[1]
+            }));
+        } catch (error) {
+            console.error('Failed to parse ingredients:', error);
+            return [];
+        }
+    };
+    
+    
+    const parseInstructions = (instructionsStr) => {
+        try {
+            // Remove the square brackets and split the string into array entries
+            return instructionsStr.slice(2, -2).split("', '").map(instruction =>
+                instruction.trim().replace(/^'/, "").replace(/'$/, "")
+            );
+        } catch (error) {
+            console.error('Failed to parse instructions:', error);
+            return [];
+        }
+    };
     return (
         <div>
             <h1>Recipes</h1>
             <button onClick={() => fetchRecommendedRecipes()}>Get Recommended Recipes</button>
             {isLoading && <p>Loading...</p>}
             {error && <p>{error}</p>}
-            <ul>
+            <div>
                 {recipes.map((recipe, index) => (
-                    <li key={index} onClick={() => setSelectedRecipe(recipe)}>
-                        {recipe.recipe_name}
-                    </li>
+                    <RecipeCard key={index} recipe={recipe} onRecipeSelect={handleRecipeSelect} />
                 ))}
-            </ul>
+            </div>
             {selectedRecipe && (
-                <div className="recipe-details">
-                    <h2>{selectedRecipe.recipe_name}</h2>
-                    <p><strong>Description:</strong> {selectedRecipe.description}</p>
-                    <p><strong>Ingredients:</strong> {selectedRecipe.ingredients}</p>
-                    <p><strong>Instructions:</strong> {selectedRecipe.instructions}</p>
-                    <p><strong>Difficulty:</strong> {selectedRecipe.difficulty}</p>
-                    <p><strong>Time Required:</strong> {selectedRecipe.time_required}</p>
-                </div>
+                <RecipeModal
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    recipe={selectedRecipe}
+                    onLogRecipe={logRecipe}
+                />
             )}
         </div>
     );

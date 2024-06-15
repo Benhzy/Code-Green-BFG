@@ -3,17 +3,18 @@
 
 .add-item-form-container {
     position: fixed;
-    top: 50%;
+    top: 45%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: #FFFFFF; /* White background for a clean look */
+    background-color: #FFFFFF;
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     padding: 20px;
     z-index: 1000;
-    width: 400px; /* Adjust width as needed */
-    font-family: 'Roboto', sans-serif; /* Modern font */
+    width: 100%; /* Make width responsive */
+    max-width: 340px; /* Slightly less than .main-container to fit padding */
 }
+
 
 .add-item-form {
     display: flex;

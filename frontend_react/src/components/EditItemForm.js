@@ -1,79 +1,94 @@
 import React, { useState } from 'react';
-import './AddItemForm.css';
-import { apiUrl } from './IpAdr'; 
 import {
-    Button,
-    FormControl,
-    FormLabel,
-    Input,
-    NumberInput,
-    NumberInputField,
-    NumberInputStepper,
-    Select,
-    Flex,
-    Box,
-    Spinner,
-    IconButton,
-    Stack
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  Select,
+  Flex,
+  Box,
+  useToast,
+  Stack,
+  IconButton
 } from '@chakra-ui/react';
+import { apiUrl } from './IpAdr';
 import { AddIcon, MinusIcon } from "@chakra-ui/icons";
 
-const AddItemForm = ({ onClose, fetchInventoryItems }) => {
-    const [item, setItem] = useState('');
-    const [quantity, setQuantity] = useState('');
-    const [category, setCategory] = useState('');
-    const [purchaseDate, setPurchaseDate] = useState('');
-    const [expiryDate, setExpiryDate] = useState('');
-    const [loading, setLoading] = useState(false);
+const EditItemForm = ({ id, item: initialItem, category: initialCategory, quantity: initialQuantity, purchase_date: initialPurchaseDate, expiry_date: initialExpiryDate, onClose, fetchInventoryItems }) => {
+    const [item, setItem] = useState(initialItem);
+    const [quantity, setQuantity] = useState(initialQuantity);
+    const [category, setCategory] = useState(initialCategory);
+    const [purchaseDate, setPurchaseDate] = useState(initialPurchaseDate);
+    const [expiryDate, setExpiryDate] = useState(initialExpiryDate);
+
+    const toast = useToast();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true); // Set loading to true when form is submitted
 
-        const newItem = {
-            user_id: 5, // Replace with actual user ID
+        const updatedItem = {
+            user_id: 5,
             item,
             quantity,
             category,
             purchase_date: purchaseDate,
             expiry_date: expiryDate
         };
-        
+
         try {
+            await fetch(`${apiUrl}/delete_grocery`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ user_id: '5', item: id, purchase_date: initialPurchaseDate, expiry_date: initialExpiryDate }),
+            });
+
             const response = await fetch(`${apiUrl}/add_grocery`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify([newItem]), // Send data as an array
+                body: JSON.stringify([updatedItem]),
             });
 
             const result = await response.json();
 
             if (response.ok) {
-                console.log("Item added successfully:", result);
-                fetchInventoryItems(); // Fetch updated inventory items
-                onClose(); // Close the form after successful submission
+                toast({
+                    title: "Item Updated Successfully",
+                    description: JSON.stringify(result),
+                    status: "success",
+                    duration: 5000,
+                    isClosable: true
+                });
+                fetchInventoryItems();
+                onClose();
             } else {
-                console.error("Failed to add item:", result.error);
-                alert("Failed to add item: " + result.error);
+                toast({
+                    title: "Failed to Update Item",
+                    description: result.error,
+                    status: "error",
+                    duration: 5000,
+                    isClosable: true
+                });
             }
         } catch (error) {
-            console.error("Error adding item:", error);
-            alert("Error adding item: " + error.message);
-        } finally {
-            setLoading(false); // Set loading to false after request is complete
+            toast({
+                title: "Error Updating Item",
+                description: error.message,
+                status: "error",
+                duration: 5000,
+                isClosable: true
+            });
         }
     };
-    
 
     return (
         <Box className="add-item-form-container" p={4} boxShadow="md" rounded="md" bg="white">
-            {loading && (
-                <Flex justify="center" align="center" position="absolute" top="0" left="0" right="0" bottom="0" bg="rgba(255, 255, 255, 0.8)" zIndex="10">
-                    <Spinner size="xl" color="teal.500" />
-                </Flex>
-            )}
             <form onSubmit={handleSubmit}>
                 <Stack spacing={4}>
                     <FormControl isRequired>
@@ -122,15 +137,12 @@ const AddItemForm = ({ onClose, fetchInventoryItems }) => {
                         <Input type="date" value={expiryDate} onChange={(e) => setExpiryDate(e.target.value)} />
                     </FormControl>
                     <Flex mt={4} justifyContent="space-between">
-                        <Button colorScheme="blue" onClick={onClose} disabled={loading}>Cancel</Button>
-                        <Button colorScheme="teal" type="submit" disabled={loading}>Add Item</Button>
+                        <Button colorScheme="blue" onClick={onClose} >Cancel</Button>
+                        <Button colorScheme="orange" type="submit" >Edit Item</Button>
                     </Flex>
                 </Stack>
             </form>
         </Box>
     );
 };
-
-export default AddItemForm;
-
-
+export default EditItemForm;
