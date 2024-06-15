@@ -32,7 +32,8 @@ from scripts.receipt_scanner import post_data
 import base64
 
 app = Flask(__name__)
-CORS(app)
+frontend_url = os.getenv('FRONTEND_URL')
+cors = CORS(app, resources={r"/*": {"origins": frontend_url}})
 
 @app.route('/add_grocery', methods=['POST']) # POST request to add grocery items (can add multiple at the same time)
 def add_grocery():
