@@ -107,7 +107,7 @@ def delete_recipe():
     return jsonify({"message": "Recipe deleted successfully"}), 200
 
 @app.route('/recommend_recipe/<user_id>', methods=['GET'])
-@cross_origin() 
+@cross_origin(origins="*", allow_headers=["Content-Type", "Authorization", "X-Requested-With"], supports_credentials=True)
 def recommend_recipe(user_id):
     cuisine = request.args.get('cuisine', 'Singaporean')
     servings = request.args.get('servings', '1')
