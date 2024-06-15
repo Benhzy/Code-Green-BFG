@@ -113,6 +113,8 @@ def recommend_recipe(user_id):
     servings = request.args.get('servings', '1')
     try:
         recipe = [recommend_recipes(user_id, cuisine, servings)]
+        recipe = jsonify(recipe)
+        recipe.headers['Access-Control-Allow-Origin'] = '*'
         return recipe
     
     except Exception as e:
