@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import {  Menu, MenuButton, MenuList, MenuItem, Button, Stack, Input, InputGroup, InputRightElement, IconButton} from '@chakra-ui/react';
+import { Menu, MenuButton, MenuList, MenuItem, Button, Stack, Input, InputGroup, InputRightElement, IconButton} from '@chakra-ui/react';
 import { SearchIcon, ChevronDownIcon } from '@chakra-ui/icons';
 import InventoryItem from './components/InventoryItem';
 import BottomMenuBar from './components/BottomMenuBar';
