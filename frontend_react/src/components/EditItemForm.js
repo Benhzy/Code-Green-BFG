@@ -126,6 +126,9 @@ const EditItemForm = ({ id, item: initialItem, category: initialCategory, quanti
                             <option value="Fruit">Fruit</option>
                             <option value="Grain">Grain</option>
                             <option value="Seafood">Seafood</option>
+                            <option value="Condiment">Condiment</option>
+                            <option value="Dried Good">Dried Good</option>
+                            <option value="Canned Food">Canned Food</option>
                         </Select>
                     </FormControl>
                     <FormControl isRequired>
@@ -137,8 +140,8 @@ const EditItemForm = ({ id, item: initialItem, category: initialCategory, quanti
                         <Input type="date" value={expiryDate} onChange={(e) => setExpiryDate(e.target.value)} />
                     </FormControl>
                     <Flex mt={4} justifyContent="space-between">
-                        <Button colorScheme="blue" onClick={onClose} >Cancel</Button>
-                        <Button colorScheme="orange" type="submit" >Edit Item</Button>
+                        <Button bg="#edf2f7" color="#888888" onClick={onClose} >Cancel</Button>
+                        <Button colorScheme="orange" type="submit" bg="#19956d">Edit Item</Button>
                     </Flex>
                 </Stack>
             </form>
