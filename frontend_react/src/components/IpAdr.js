@@ -4,4 +4,4 @@
 
 // Ed's
 // update to your own IP address
-export const apiUrl = 'code-green-bfg-benhzy-zhiyi-haos-projects.vercel.app';
+export const apiUrl = 'code-green-3aze62gsh-zhiyi-haos-projects.vercel.app';
