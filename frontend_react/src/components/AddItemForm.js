@@ -111,6 +111,9 @@ const AddItemForm = ({ onClose, fetchInventoryItems }) => {
                             <option value="Fruit">Fruit</option>
                             <option value="Grain">Grain</option>
                             <option value="Seafood">Seafood</option>
+                            <option value="Condiment">Condiment</option>
+                            <option value="Dried Good">Dried Good</option>
+                            <option value="Canned Food">Canned Food</option>
                         </Select>
                     </FormControl>
                     <FormControl isRequired>
@@ -122,8 +125,8 @@ const AddItemForm = ({ onClose, fetchInventoryItems }) => {
                         <Input type="date" value={expiryDate} onChange={(e) => setExpiryDate(e.target.value)} />
                     </FormControl>
                     <Flex mt={4} justifyContent="space-between">
-                        <Button colorScheme="blue" onClick={onClose} disabled={loading}>Cancel</Button>
-                        <Button colorScheme="teal" type="submit" disabled={loading}>Add Item</Button>
+                        <Button bg="#edf2f7" onClick={onClose} disabled={loading} color="#888888">Cancel</Button>
+                        <Button bg="#19956d" type="submit" disabled={loading} color="white">Add Item</Button>
                     </Flex>
                 </Stack>
             </form>
