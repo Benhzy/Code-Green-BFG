@@ -26,6 +26,8 @@ from scripts.db_connection import get_grocery_data_by_user_id
 from scripts.db_connection import upsert_user_recipes
 from scripts.db_connection import delete_user_grocery
 from scripts.db_connection import delete_user_recipe
+from scripts.db_connection import used_user_groceries
+from scripts.db_connection import thrown_user_groceries
 from scripts.recipe_recommender import recommend_recipes, store_recipe
 from scripts.receipt_scanner import extract_text
 from scripts.receipt_scanner import post_data
@@ -33,6 +35,7 @@ import base64
 
 app = Flask(__name__)
 frontend_url = os.getenv('FRONTEND_URL')
+# cors = CORS(app, resources={r"/api/*": {"origins": frontend_url}})
 cors = CORS(app)
 
 @app.route('/add_grocery', methods=['POST']) # POST request to add grocery items (can add multiple at the same time)
@@ -58,6 +61,64 @@ def add_grocery():
 
     # Now upsert the user's groceries
     result, status_code = upsert_user_groceries(user_id, items)
+    
+    if status_code != 201:
+        return jsonify(result), status_code
+    
+    return jsonify({"message": "Data posted successfully", "user_id": result}), 201
+
+@app.route('/used_grocery', methods=['POST']) # POST request to add grocery items (can add multiple at the same time)
+def used_grocery():
+    data = request.get_json()  # This should be a list of dictionaries
+    
+    # Check if data is a list and not empty
+    if not data or not isinstance(data, list):
+        return jsonify({"error": "Invalid data format; expected a non-empty list of items."}), 400
+
+    # Example of extracting user_id and items assuming all items belong to the same user
+    # and user_id is consistent across all items.
+    user_id = data[0].get('user_id')
+    if not user_id:
+        return jsonify({"error": "user_id is required for each item."}), 400
+    
+    items = []
+    for item in data:
+        if 'item' in item and 'quantity' in item and 'category' in item and 'purchase_date' in item and 'expiry_date' in item:
+            items.append(item)
+        else:
+            return jsonify({"error": "Each item must include item, quantity, category, purchase_date, and expiry_date."}), 400
+
+    # Now upsert the user's groceries
+    result, status_code = used_user_groceries(user_id, items)
+    
+    if status_code != 201:
+        return jsonify(result), status_code
+    
+    return jsonify({"message": "Data posted successfully", "user_id": result}), 201
+
+@app.route('/thrown_grocery', methods=['POST']) # POST request to add grocery items (can add multiple at the same time)
+def thrown_grocery():
+    data = request.get_json()  # This should be a list of dictionaries
+    
+    # Check if data is a list and not empty
+    if not data or not isinstance(data, list):
+        return jsonify({"error": "Invalid data format; expected a non-empty list of items."}), 400
+
+    # Example of extracting user_id and items assuming all items belong to the same user
+    # and user_id is consistent across all items.
+    user_id = data[0].get('user_id')
+    if not user_id:
+        return jsonify({"error": "user_id is required for each item."}), 400
+    
+    items = []
+    for item in data:
+        if 'item' in item and 'quantity' in item and 'category' in item and 'purchase_date' in item and 'expiry_date' in item:
+            items.append(item)
+        else:
+            return jsonify({"error": "Each item must include item, quantity, category, purchase_date, and expiry_date."}), 400
+
+    # Now upsert the user's groceries
+    result, status_code = thrown_user_groceries(user_id, items)
     
     if status_code != 201:
         return jsonify(result), status_code

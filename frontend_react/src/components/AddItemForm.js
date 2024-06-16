@@ -18,7 +18,7 @@ import {
 } from '@chakra-ui/react';
 import { AddIcon, MinusIcon } from "@chakra-ui/icons";
 
-const AddItemForm = ({ onClose, fetchInventoryItems }) => {
+const AddItemForm = ({ onClose, fetchInventoryItems, user_id }) => {
     const [item, setItem] = useState('');
     const [quantity, setQuantity] = useState('');
     const [category, setCategory] = useState('');
@@ -31,7 +31,7 @@ const AddItemForm = ({ onClose, fetchInventoryItems }) => {
         setLoading(true); // Set loading to true when form is submitted
 
         const newItem = {
-            user_id: 5, // Replace with actual user ID
+            user_id, // Replace with actual user ID
             item,
             quantity,
             category,

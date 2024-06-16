@@ -56,6 +56,7 @@ const Groceries = ({ inventoryItems, onDecrement, onDelete, handleFilterChange, 
                     onDecrement={onDecrement}
                     onDelete={() => onDelete(item.item, item.purchase_date, item.expiry_date)}
                     fetchInventoryItems={fetchInventoryItems} // Pass fetchInventoryItems prop
+                    user_id={item.user_id} // Pass user_id prop 
                 />
             ))}
         </div>
@@ -88,7 +89,7 @@ function App() {
     const [inventoryItems, setInventoryItems] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [sortCriterion, setSortCriterion] = useState('expiry_date'); // Change default sort criterion here
-    const userId = 5; // Replace with the actual user ID
+    const userId = 6; // Replace with the actual user ID
 
     const fetchInventoryItems = async () => {
         try {
@@ -282,12 +283,12 @@ function App() {
                                 selectedFilter={filter}
                             />
                         } />
-                        <Route path="/add" element={<AddItem />} />
-                        <Route path="/scanner" element={<CameraComponent userId={userId} />} />
+                        <Route path="/add" element={<AddItem user_id={userId} />} />
+                        <Route path="/scanner" element={<CameraComponent user_Id={userId} />} />
                         <Route path="/edit-item" element={<EditItemForm fetchInventoryItems={fetchInventoryItems} />} />
                     </Routes>
                 </div>
-                <BottomMenuBar fetchInventoryItems={fetchInventoryItems} />
+                <BottomMenuBar fetchInventoryItems={fetchInventoryItems} user_id={userId} />
             </div>
             </div>
         </Router>

@@ -17,7 +17,7 @@ import {
 import { apiUrl } from './IpAdr';
 import { AddIcon, MinusIcon } from "@chakra-ui/icons";
 
-const EditItemForm = ({ id, item: initialItem, category: initialCategory, quantity: initialQuantity, purchase_date: initialPurchaseDate, expiry_date: initialExpiryDate, onClose, fetchInventoryItems }) => {
+const EditItemForm = ({ id, item: initialItem, category: initialCategory, quantity: initialQuantity, purchase_date: initialPurchaseDate, expiry_date: initialExpiryDate, onClose, fetchInventoryItems, user_id }) => {
     const [item, setItem] = useState(initialItem);
     const [quantity, setQuantity] = useState(initialQuantity);
     const [category, setCategory] = useState(initialCategory);
@@ -30,7 +30,7 @@ const EditItemForm = ({ id, item: initialItem, category: initialCategory, quanti
         e.preventDefault();
 
         const updatedItem = {
-            user_id: 5,
+            user_id,
             item,
             quantity,
             category,
@@ -44,7 +44,7 @@ const EditItemForm = ({ id, item: initialItem, category: initialCategory, quanti
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ user_id: '5', item: id, purchase_date: initialPurchaseDate, expiry_date: initialExpiryDate }),
+                body: JSON.stringify({ user_id, item: id, purchase_date: initialPurchaseDate, expiry_date: initialExpiryDate }),
             });
 
             const response = await fetch(`${apiUrl}/add_grocery`, {
@@ -148,4 +148,5 @@ const EditItemForm = ({ id, item: initialItem, category: initialCategory, quanti
         </Box>
     );
 };
+
 export default EditItemForm;

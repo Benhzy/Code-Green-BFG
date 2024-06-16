@@ -3,7 +3,7 @@ import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { Box, Button, Flex, Link, HStack, Text, Stack } from '@chakra-ui/react';
 import AddItemForm from './AddItemForm';
 
-const BottomMenuBar = ({ fetchInventoryItems }) => {
+const BottomMenuBar = ({ fetchInventoryItems, user_id}) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isFormOpen, setIsFormOpen] = useState(false);
     const navigate = useNavigate();
@@ -78,7 +78,7 @@ const BottomMenuBar = ({ fetchInventoryItems }) => {
                 </HStack>
             )}
 
-            {isFormOpen && <AddItemForm onClose={closeForm} fetchInventoryItems={fetchInventoryItems} />}
+            {isFormOpen && <AddItemForm onClose={closeForm} fetchInventoryItems={fetchInventoryItems} user_id={user_id} />}
         </Box>
     );
 };
