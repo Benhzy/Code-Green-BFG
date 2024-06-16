@@ -20,17 +20,11 @@ download_certificate()
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
-from scripts.db_connection import get_user_recipes_by_user_id
-from scripts.db_connection import upsert_user_groceries
-from scripts.db_connection import get_grocery_data_by_user_id
-from scripts.db_connection import upsert_user_recipes
-from scripts.db_connection import delete_user_grocery
-from scripts.db_connection import delete_user_recipe
+from scripts.db_connection import get_user_recipes_by_user_id, upsert_user_groceries, get_grocery_data_by_user_id, upsert_user_recipes, delete_user_grocery, delete_user_recipe, update_inventory
 from scripts.db_connection import used_user_groceries
 from scripts.db_connection import thrown_user_groceries
 from scripts.recipe_recommender import recommend_recipes, store_recipe
-from scripts.receipt_scanner import extract_text
-from scripts.receipt_scanner import post_data
+from scripts.receipt_scanner import extract_text, post_data
 import base64
 
 app = Flask(__name__)
@@ -181,24 +175,9 @@ def recommend_recipe(user_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 @app.route('/add_recipe', methods=['POST'])
 def store_recipe():
-    data = request.get_json()
-    user_id = data.get('user_id')
-    
-    # Validate that necessary keys are present
-    required_keys = ['user_id', 'recipe_name', 'ingredients', 'instructions', 'difficulty', 'time_required', 'description']
-    if not data or not all(key in data for key in required_keys):
-        return jsonify({"error": "Missing required recipe information."}), 400
-
-    user_id = data['user_id']
-    recipe_dict = {key: data[key] for key in data if key != 'user_Tid'}
-
-    response, status_code = store_recipe(user_id, recipe_dict)
-    return jsonify(response), status_code
-
-@app.route('/add_recipe', methods=['POST'])
-def add_interest():
     data = request.get_json()
     
     # Basic validation to ensure data is in the expected format
@@ -224,7 +203,7 @@ def add_interest():
         
         # Extract the user ID and pass the entire recipe dictionary
         user_id = recipe['user_id']
-        response, status_code = store_recipe(user_id, recipe)
+        response, status_code = upsert_user_recipes(user_id, recipe)
         responses.append((response, status_code))
     
     # Check all responses for errors
@@ -234,7 +213,21 @@ def add_interest():
     
     return jsonify([{"message": "Data posted successfully", "response": resp} for resp, stat in responses]), 201
 
+@app.route('/update_inventory', methods=['PATCH'])
+def update_inventory_item():
+    data = request.json
+    user_id = data['user_id']
+    item = data['item']
+    quantity = data['quantity']
 
+    # Update inventory logic
+    success, message = update_inventory(user_id, item, quantity)
+
+    if success:
+        return jsonify({"message": "Inventory updated successfully"}), 200
+    else:
+        return jsonify({"error": message}), 400
+    
 @app.route('/upload_receipt/<user_id>', methods=['POST'])
 def upload_receipt(user_id):
     data = request.get_json()
@@ -255,8 +248,8 @@ def upload_receipt(user_id):
 
 
 # # DONT DELETE THIS, FOR ZHIYI TO USE
-# if __name__ == '__main__':
-#     app.run(host='0.0.0.0/0', debug=True) # insert ur ip address here
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', debug=True) # insert ur ip address here
 
 
 # DONT CHANGE THIS, FOR EDWARD TO USE  !!!!!!!!!!!!!!!!!!!!!!B R O T H E R    S T O P     D E L E T I N G     M Y    C O D E!!!!!!!!!!!!!!!!!!!!!!

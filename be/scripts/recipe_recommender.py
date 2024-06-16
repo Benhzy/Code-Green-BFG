@@ -73,11 +73,11 @@ def generate_recipe_suggestions(ingredients, exp_ingredients, user_recipes, cuis
 
     The recipe should be for {servings} servings.
 
+    Make sure the recipe follows the following preferences: {cuisine}.
+
     Make sure this recipe can be prepared with the ingredients here: {all_ingredients_list}.
 
     Make sure the unit of measurement for ingredients is in metric.
-
-    Make sure the recipe is an authentic {cuisine} recipe.
 
     You do not need to use all the ingredients, if a ingredient does not being in the recipe, omit it.
 
