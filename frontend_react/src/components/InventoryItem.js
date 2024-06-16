@@ -64,16 +64,15 @@ const InventoryItem = ({ id, item, category, quantity, purchase_date, expiry_dat
                 boxShadow: "2px 2px 3px rgba(0, 0, 0, 0.25)" // Custom shadow casting to the right and bottom
             }}
             width="200px"
-
-            >
-            <Box bg={boxColor}>
+        >
+            <Box bg={boxColor} onClick={handleEdit} cursor="pointer">
                 {!isEditing ? (
                     <Flex align="center" justify="flex-start" spacing="4">
                         <Text paddingLeft="6px" fontSize="5xl">{getEmoji(category)}</Text>
                         <Flex align="center" justify="left">
                             <Text w="full">
-                                <Text fontSize="md" fontWeight="bold" ml="2" lineHeight="3" paddingTop={0.5}>{item}</Text>
-                                <Divider height="1px" borderColor="transparent"/>
+                                <Text fontSize="md" fontWeight="bold" ml="2" lineHeight="4" paddingTop={0.5}>{item}</Text>
+                                <Divider height="1px" borderColor="transparent" />
                                 <Text fontSize="xs" padding={0}>
                                     <Text as="span" fontWeight="bold" paddingLeft="1px">&nbsp;&nbsp;</Text>
                                     <Text as="span" fontWeight="bold" lineHeight="1">Amt: </Text>
@@ -83,7 +82,7 @@ const InventoryItem = ({ id, item, category, quantity, purchase_date, expiry_dat
                         </Flex>
                     </Flex>
                 ) : (
-                    <EditItemForm id={id} item={item} category={category} quantity={quantity} purchase_date={purchase_date} expiry_date={expiry_date} onClose={handleCloseEditForm} fetchInventoryItems={fetchInventoryItems}/>
+                    <EditItemForm id={id} item={item} category={category} quantity={quantity} purchase_date={purchase_date} expiry_date={expiry_date} onClose={handleCloseEditForm} fetchInventoryItems={fetchInventoryItems} />
                 )}
             </Box>
             <Box paddingLeft="0px">
@@ -107,8 +106,8 @@ const InventoryItem = ({ id, item, category, quantity, purchase_date, expiry_dat
                         </Stack> */}
                         <Stack direction="row" spacing={5} mt={2}>
                             <Flex gap={2} align="center" paddingBottom="10px">
-                                <Button bg="#EDF2F7" color="#888888" fontSize="sm" size="xs" width="85px" height="40px" _hover={{ bg: "primary.800" }} onClick={handleEdit}>Edit</Button>
-                                <Button bg="red.200" color="black" fontSize="sm" size="xs" width="85px" height="40px" _hover={{ bg: "danger.900" }} onClick={onDelete}>Delete</Button>
+                                <Button bg="#EDF2F7" color="#888888" fontSize="sm" size="xs" width="85px" height="40px" _hover={{ bg: "primary.800" }} onClick={handleEdit}>Used</Button>
+                                <Button bg="red.200" color="black" fontSize="sm" size="xs" width="85px" height="40px" _hover={{ bg: "danger.900" }} onClick={onDelete}>Thrown</Button>
                                 
                             </Flex>
                         </Stack>
