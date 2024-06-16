@@ -14,7 +14,8 @@ import {
     Box,
     Spinner,
     IconButton,
-    Stack
+    Stack,
+    Text
 } from '@chakra-ui/react';
 import { AddIcon, MinusIcon } from "@chakra-ui/icons";
 
@@ -70,10 +71,12 @@ const AddItemForm = ({ onClose, fetchInventoryItems, user_id }) => {
     return (
         <Box className="add-item-form-container" p={4} boxShadow="md" rounded="md" bg="white">
             {loading && (
+                
                 <Flex justify="center" align="center" position="absolute" top="0" left="0" right="0" bottom="0" bg="rgba(255, 255, 255, 0.8)" zIndex="10">
                     <Spinner size="xl" color="teal.500" />
                 </Flex>
             )}
+            <Box display="flex" alignItems="center" justifyContent="center"><Text fontSize="2xl" as="b">Add an item</Text></Box>  
             <form onSubmit={handleSubmit}>
                 <Stack spacing={4}>
                     <FormControl isRequired>

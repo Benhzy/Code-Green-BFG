@@ -89,7 +89,7 @@ function App() {
     const [inventoryItems, setInventoryItems] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [sortCriterion, setSortCriterion] = useState('expiry_date'); // Change default sort criterion here
-    const userId = 6; // Replace with the actual user ID
+    const userId = 5; // Replace with the actual user ID
 
     const fetchInventoryItems = async () => {
         try {

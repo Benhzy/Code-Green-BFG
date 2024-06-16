@@ -12,7 +12,8 @@ import {
   Box,
   useToast,
   Stack,
-  IconButton
+  IconButton,
+  Text,
 } from '@chakra-ui/react';
 import { apiUrl } from './IpAdr';
 import { AddIcon, MinusIcon } from "@chakra-ui/icons";
@@ -89,6 +90,7 @@ const EditItemForm = ({ id, item: initialItem, category: initialCategory, quanti
 
     return (
         <Box className="add-item-form-container" p={4} boxShadow="md" rounded="md" bg="white">
+            <Box display="flex" alignItems="center" justifyContent="center"><Text fontSize="2xl" as="b">Edit an item</Text></Box>  
             <form onSubmit={handleSubmit}>
                 <Stack spacing={4}>
                     <FormControl isRequired>
