@@ -252,9 +252,9 @@ if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True) # insert ur ip address here
 
 
-# DONT CHANGE THIS, FOR EDWARD TO USE  !!!!!!!!!!!!!!!!!!!!!!B R O T H E R    S T O P     D E L E T I N G     M Y    C O D E!!!!!!!!!!!!!!!!!!!!!!
-if __name__ == '__main__':
-    app.run(host="172.20.10.5", debug=True)
+# # DONT CHANGE THIS, FOR EDWARD TO USE
+# if __name__ == '__main__':
+#     app.run(host="172.20.10.5", debug=True)
 
 # # DONT DELETE THIS, FOR ANYBODY TO USE
 # if __name__ == '__main__':
