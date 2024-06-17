@@ -33,7 +33,9 @@ app = Flask(__name__)
 frontend_url = os.getenv('FRONTEND_URL')
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-cors = CORS(app, supports_credentials=True)
+# cors = CORS(app, resources={r"/api/*": {"origins": frontend_url}})
+# cors = CORS(app, resources={r"/*": {"origins": "*", "allow_headers": ["Content-Type", "Token"]}})
+CORS(app)
 
 
 # Ensure the upload folder exists
@@ -287,6 +289,6 @@ def upload_file(user_id):
 #     app.run(host="172.20.10.5", debug=True)
 
 # # DONT DELETE THIS, FOR ANYBODY TO USE
-if __name__ == '__main__':
-    app.run(debug=True)
+# if __name__ == '__main__':
+#     app.run(debug=True)
 
