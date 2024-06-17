@@ -280,8 +280,8 @@ def upload_file(user_id):
         post_data(user_id, extracted_items)
         return jsonify({'extracted_text': extracted_items, 'user_id': user_id})
 
-# if __name__ == '__main__':
-#     app.run(host='0.0.0.0', debug=True) # insert ur ip address here
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', debug=True) # insert ur ip address here
 
 
 # # DONT CHANGE THIS, FOR EDWARD TO USE

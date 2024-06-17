@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Box,
   Button,
@@ -9,6 +9,7 @@ import {
   NumberInput,
   NumberInputField,
   NumberInputStepper,
+  useDisclosure,
   IconButton,
   Switch,
   Flex,
@@ -17,11 +18,12 @@ import {
 } from '@chakra-ui/react';
 import { AddIcon, MinusIcon } from '@chakra-ui/icons';
 import { apiUrl } from './IpAdr';
-import InventoryItem from './InventoryItem';
+import IngredientItem from './IngredientItem';
 import './RecipeList.css';
 
 const RecipeList = ({ userId }) => {
   const [recipes, setRecipes] = useState([]);
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -31,26 +33,34 @@ const RecipeList = ({ userId }) => {
   const [showExpiring, setShowExpiring] = useState(false);
   const toast = useToast();
 
+  const calculateDaysUntilExpiry = (expiryDate) => {
+    const today = new Date();
+    const expiry = new Date(expiryDate);
+    const diffTime = expiry - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+  const fetchRecommendedRecipes = async (cuisine = 'Singaporean') => {
+    const recommendedRecipes = await fetchRecipes(`${apiUrl}/recommend_recipe/${userId}?cuisine=${cuisine}`);
+    if (recommendedRecipes && recommendedRecipes.length > 0) {
+        handleRecipeSelect(recommendedRecipes[0]); // Automatically select the first recipe
+    }
+};
+
   const fetchRecipes = async (url) => {
     setIsLoading(true);
     setError('');
     try {
       const response = await fetch(url);
-      const contentType = response.headers.get('content-type');
-      if (contentType && contentType.includes('application/json')) {
-        const data = await response.json();
-        if (response.ok) {
-          setRecipes(data);
-        } else {
-          throw new Error('Failed to fetch recipes');
-        }
-      } else {
-        const text = await response.text();
-        console.error('Non-JSON response:', text);
-        throw new Error('Expected JSON response but got HTML or other content');
+      if (!response.ok) {
+        const errorMessage = await response.text();
+        throw new Error(errorMessage || 'Failed to fetch recipes');
       }
+      const data = await response.json();
+      setRecipes(data);
     } catch (error) {
-      setError('Error fetching recipes: ' + error.message);
+      setError(`Error fetching recipes: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -62,13 +72,13 @@ const RecipeList = ({ userId }) => {
 
   const fetchInventoryItems = async () => {
     try {
-      const response = await fetch(`${apiUrl}/groceries/${userId}`);
-      const data = await response.json();
-      if (response.ok) {
-        setInventory(data);
-      } else {
-        throw new Error('Failed to fetch inventory');
+      const response = await fetch(`${apiUrl}/grocery/${userId}`);
+      if (!response.ok) {
+        const errorMessage = await response.text();
+        throw new Error(errorMessage || 'Failed to fetch inventory');
       }
+      const data = await response.json();
+      setInventory(data);
     } catch (error) {
       toast({
         title: "Error fetching inventory",
@@ -84,29 +94,18 @@ const RecipeList = ({ userId }) => {
     fetchInventoryItems();
   }, [userId]);
 
-  const fetchRecommendedRecipes = async () => {
-    const recommendedRecipes = await fetchRecipes(`${apiUrl}/recommend_recipe/${userId}?cuisine=${preferences}`);
-    if (recommendedRecipes && recommendedRecipes.length > 0) {
-      handleRecipeSelect(recommendedRecipes[0]);
-    }
-  };
+
 
   const handleRecipeSelect = (recipe) => {
     setSelectedRecipe(recipe);
-    // Add code to open the recipe modal if required
-  };
+    onOpen();
+};
 
-  const filteredInventory = showExpiring
-    ? inventory.filter(item => calculateDaysUntilExpiry(item.expiry_date) <= 5)
-    : inventory;
-
-  const calculateDaysUntilExpiry = (expiryDate) => {
-    const today = new Date();
-    const expiry = new Date(expiryDate);
-    const diffTime = expiry - today;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
-  };
+  const filteredInventory = useMemo(() => {
+    return showExpiring
+      ? inventory.filter(item => calculateDaysUntilExpiry(item.expiry_date) <= 5)
+      : inventory;
+  }, [inventory, showExpiring]);
 
   return (
     <Box p={4}>
@@ -169,12 +168,11 @@ const RecipeList = ({ userId }) => {
       )}
       <Box>
         {filteredInventory.map((item, index) => (
-          <InventoryItem key={index} {...item} fetchInventoryItems={fetchInventoryItems} userId={userId} />
+          <IngredientItem key={index} {...item} fetchInventoryItems={fetchInventoryItems} userId={userId} />
         ))}
       </Box>
-      <Button onClick={fetchRecommendedRecipes} colorScheme="teal" mt={4}>Generate Recipe</Button>
+      <Button onClick={() => fetchRecommendedRecipes()}colorScheme="teal" mt={4}>Generate Recipe</Button>
     </Box>
-
   );
 };
 
