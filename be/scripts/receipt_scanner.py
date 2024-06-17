@@ -100,7 +100,7 @@ def determine_category(item_name):
         "Grain":365,
         "Seafood":2,
         "Dairy":7,
-        "Condiment":365,
+        "Condiment":365,    
         "Dried Good":365
     }
     category_embeddings = model.encode(list(categories.keys()))

@@ -1,22 +1,39 @@
+import os
+import requests
+
+def download_certificate():
+    cert_dir = os.path.expanduser("~/.postgresql")
+    os.makedirs(cert_dir, exist_ok=True)
+    cert_path = os.path.join(cert_dir, "root.crt")
+    
+    if not os.path.exists(cert_path):
+        url = "https://cockroachlabs.cloud/clusters/e3885e05-0fa9-450e-b512-2523fa52fcb6/cert"
+        response = requests.get(url)
+        
+        with open(cert_path, 'wb') as cert_file:
+            cert_file.write(response.content)
+        print("Certificate downloaded successfully")
+    else:
+        print("Certificate already exists")
+
+download_certificate()
+
 from flask import Flask, request, jsonify
-from flask_cors import CORS
-from scripts.db_connection import get_user_recipes_by_user_id
-from scripts.db_connection import upsert_user_groceries
-from scripts.db_connection import get_grocery_data_by_user_id
-from scripts.db_connection import upsert_user_recipes
-from scripts.db_connection import delete_user_grocery
-from scripts.db_connection import delete_user_recipe
+from flask_cors import CORS, cross_origin
+from scripts.db_connection import get_user_recipes_by_user_id, upsert_user_groceries, get_grocery_data_by_user_id, upsert_user_recipes, delete_user_grocery, delete_user_recipe, update_inventory
+from scripts.db_connection import used_user_groceries
+from scripts.db_connection import thrown_user_groceries
 from scripts.recipe_recommender import recommend_recipes, store_recipe
-from scripts.receipt_scanner import extract_text
-from scripts.receipt_scanner import post_data
+from scripts.receipt_scanner import extract_text, post_data
 import base64
 from werkzeug.utils import secure_filename
 import os
 
 app = Flask(__name__)
+frontend_url = os.getenv('FRONTEND_URL')
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-CORS(app)
+cors = CORS(app, supports_credentials=True)
 
 
 # Ensure the upload folder exists
@@ -47,6 +64,64 @@ def add_grocery():
 
     # Now upsert the user's groceries
     result, status_code = upsert_user_groceries(user_id, items)
+    
+    if status_code != 201:
+        return jsonify(result), status_code
+    
+    return jsonify({"message": "Data posted successfully", "user_id": result}), 201
+
+@app.route('/used_grocery', methods=['POST']) # POST request to add grocery items (can add multiple at the same time)
+def used_grocery():
+    data = request.get_json()  # This should be a list of dictionaries
+    
+    # Check if data is a list and not empty
+    if not data or not isinstance(data, list):
+        return jsonify({"error": "Invalid data format; expected a non-empty list of items."}), 400
+
+    # Example of extracting user_id and items assuming all items belong to the same user
+    # and user_id is consistent across all items.
+    user_id = data[0].get('user_id')
+    if not user_id:
+        return jsonify({"error": "user_id is required for each item."}), 400
+    
+    items = []
+    for item in data:
+        if 'item' in item and 'quantity' in item and 'category' in item and 'purchase_date' in item and 'expiry_date' in item:
+            items.append(item)
+        else:
+            return jsonify({"error": "Each item must include item, quantity, category, purchase_date, and expiry_date."}), 400
+
+    # Now upsert the user's groceries
+    result, status_code = used_user_groceries(user_id, items)
+    
+    if status_code != 201:
+        return jsonify(result), status_code
+    
+    return jsonify({"message": "Data posted successfully", "user_id": result}), 201
+
+@app.route('/thrown_grocery', methods=['POST']) # POST request to add grocery items (can add multiple at the same time)
+def thrown_grocery():
+    data = request.get_json()  # This should be a list of dictionaries
+    
+    # Check if data is a list and not empty
+    if not data or not isinstance(data, list):
+        return jsonify({"error": "Invalid data format; expected a non-empty list of items."}), 400
+
+    # Example of extracting user_id and items assuming all items belong to the same user
+    # and user_id is consistent across all items.
+    user_id = data[0].get('user_id')
+    if not user_id:
+        return jsonify({"error": "user_id is required for each item."}), 400
+    
+    items = []
+    for item in data:
+        if 'item' in item and 'quantity' in item and 'category' in item and 'purchase_date' in item and 'expiry_date' in item:
+            items.append(item)
+        else:
+            return jsonify({"error": "Each item must include item, quantity, category, purchase_date, and expiry_date."}), 400
+
+    # Now upsert the user's groceries
+    result, status_code = thrown_user_groceries(user_id, items)
     
     if status_code != 201:
         return jsonify(result), status_code
@@ -96,34 +171,21 @@ def delete_recipe():
     return jsonify({"message": "Recipe deleted successfully"}), 200
 
 @app.route('/recommend_recipe/<user_id>', methods=['GET'])
+@cross_origin(origins="*", allow_headers=["Content-Type", "Authorization", "X-Requested-With"], supports_credentials=True)
 def recommend_recipe(user_id):
     cuisine = request.args.get('cuisine', 'Singaporean')
     servings = request.args.get('servings', '1')
     try:
         recipe = [recommend_recipes(user_id, cuisine, servings)]
+        recipe = jsonify(recipe)
         return recipe
     
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 @app.route('/add_recipe', methods=['POST'])
 def store_recipe():
-    data = request.get_json()
-    user_id = data.get('user_id')
-    
-    # Validate that necessary keys are present
-    required_keys = ['user_id', 'recipe_name', 'ingredients', 'instructions', 'difficulty', 'time_required', 'description']
-    if not data or not all(key in data for key in required_keys):
-        return jsonify({"error": "Missing required recipe information."}), 400
-
-    user_id = data['user_id']
-    recipe_dict = {key: data[key] for key in data if key != 'user_Tid'}
-
-    response, status_code = store_recipe(user_id, recipe_dict)
-    return jsonify(response), status_code
-
-@app.route('/add_recipe', methods=['POST'])
-def add_interest():
     data = request.get_json()
     
     # Basic validation to ensure data is in the expected format
@@ -149,7 +211,7 @@ def add_interest():
         
         # Extract the user ID and pass the entire recipe dictionary
         user_id = recipe['user_id']
-        response, status_code = store_recipe(user_id, recipe)
+        response, status_code = upsert_user_recipes(user_id, recipe)
         responses.append((response, status_code))
     
     # Check all responses for errors
@@ -159,9 +221,23 @@ def add_interest():
     
     return jsonify([{"message": "Data posted successfully", "response": resp} for resp, stat in responses]), 201
 
+@app.route('/update_inventory', methods=['PATCH'])
+def update_inventory_item():
+    data = request.json
+    user_id = data['user_id']
+    item = data['item']
+    quantity = data['quantity']
 
-@app.route('/scan_receipt/<user_id>', methods=['POST'])
-def scan_receipt(user_id):
+    # Update inventory logic
+    success, message = update_inventory(user_id, item, quantity)
+
+    if success:
+        return jsonify({"message": "Inventory updated successfully"}), 200
+    else:
+        return jsonify({"error": message}), 400
+    
+@app.route('/upload_receipt/<user_id>', methods=['POST'])
+def upload_receipt(user_id):
     data = request.get_json()
     image_data = data['image']
     
@@ -203,19 +279,14 @@ def upload_file(user_id):
         return jsonify({'extracted_text': extracted_items, 'user_id': user_id})
 
 # if __name__ == '__main__':
-#    app.run(host='10.0.81.199', debug=True)
+#     app.run(host='0.0.0.0', debug=True) # insert ur ip address here
 
 
-# # DONT DELETE THIS, FOR ZHIYI TO USE
-if __name__ == '__main__':
-     app.run(host='0.0.0.0', debug=True) # insert ur ip address here
-
-
-# DONT DELETE THIS, FOR EDWARD TO USE
+# # DONT CHANGE THIS, FOR EDWARD TO USE
 # if __name__ == '__main__':
-#   app.run(host='172.20.10.5', debug=True)
+#     app.run(host="172.20.10.5", debug=True)
 
 # # DONT DELETE THIS, FOR ANYBODY TO USE
-# if __name__ == '__main__':
-#     app.run(host='0.0.0.0', debug=True)
+if __name__ == '__main__':
+    app.run(debug=True)
 

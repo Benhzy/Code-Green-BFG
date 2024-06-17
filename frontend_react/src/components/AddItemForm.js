@@ -14,11 +14,12 @@ import {
     Box,
     Spinner,
     IconButton,
-    Stack
+    Stack,
+    Text
 } from '@chakra-ui/react';
 import { AddIcon, MinusIcon } from "@chakra-ui/icons";
 
-const AddItemForm = ({ onClose, fetchInventoryItems }) => {
+const AddItemForm = ({ onClose, fetchInventoryItems, user_id }) => {
     const [item, setItem] = useState('');
     const [quantity, setQuantity] = useState('');
     const [category, setCategory] = useState('');
@@ -31,7 +32,7 @@ const AddItemForm = ({ onClose, fetchInventoryItems }) => {
         setLoading(true); // Set loading to true when form is submitted
 
         const newItem = {
-            user_id: 5, // Replace with actual user ID
+            user_id, // Replace with actual user ID
             item,
             quantity,
             category,
@@ -70,10 +71,12 @@ const AddItemForm = ({ onClose, fetchInventoryItems }) => {
     return (
         <Box className="add-item-form-container" p={4} boxShadow="md" rounded="md" bg="white">
             {loading && (
+                
                 <Flex justify="center" align="center" position="absolute" top="0" left="0" right="0" bottom="0" bg="rgba(255, 255, 255, 0.8)" zIndex="10">
                     <Spinner size="xl" color="teal.500" />
                 </Flex>
             )}
+            <Box display="flex" alignItems="center" justifyContent="center"><Text fontSize="2xl" as="b">Add an item</Text></Box>  
             <form onSubmit={handleSubmit}>
                 <Stack spacing={4}>
                     <FormControl isRequired>
@@ -111,6 +114,9 @@ const AddItemForm = ({ onClose, fetchInventoryItems }) => {
                             <option value="Fruit">Fruit</option>
                             <option value="Grain">Grain</option>
                             <option value="Seafood">Seafood</option>
+                            <option value="Condiment">Condiment</option>
+                            <option value="Dried Good">Dried Good</option>
+                            <option value="Canned Food">Canned Food</option>
                         </Select>
                     </FormControl>
                     <FormControl isRequired>
@@ -122,8 +128,8 @@ const AddItemForm = ({ onClose, fetchInventoryItems }) => {
                         <Input type="date" value={expiryDate} onChange={(e) => setExpiryDate(e.target.value)} />
                     </FormControl>
                     <Flex mt={4} justifyContent="space-between">
-                        <Button colorScheme="blue" onClick={onClose} disabled={loading}>Cancel</Button>
-                        <Button colorScheme="teal" type="submit" disabled={loading}>Add Item</Button>
+                        <Button bg="#edf2f7" onClick={onClose} disabled={loading} color="#888888">Cancel</Button>
+                        <Button bg="#19956d" type="submit" disabled={loading} color="white">Add Item</Button>
                     </Flex>
                 </Stack>
             </form>

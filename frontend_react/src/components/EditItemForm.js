@@ -12,12 +12,13 @@ import {
   Box,
   useToast,
   Stack,
-  IconButton
+  IconButton,
+  Text,
 } from '@chakra-ui/react';
 import { apiUrl } from './IpAdr';
 import { AddIcon, MinusIcon } from "@chakra-ui/icons";
 
-const EditItemForm = ({ id, item: initialItem, category: initialCategory, quantity: initialQuantity, purchase_date: initialPurchaseDate, expiry_date: initialExpiryDate, onClose, fetchInventoryItems }) => {
+const EditItemForm = ({ id, item: initialItem, category: initialCategory, quantity: initialQuantity, purchase_date: initialPurchaseDate, expiry_date: initialExpiryDate, onClose, fetchInventoryItems, user_id }) => {
     const [item, setItem] = useState(initialItem);
     const [quantity, setQuantity] = useState(initialQuantity);
     const [category, setCategory] = useState(initialCategory);
@@ -30,7 +31,7 @@ const EditItemForm = ({ id, item: initialItem, category: initialCategory, quanti
         e.preventDefault();
 
         const updatedItem = {
-            user_id: 5,
+            user_id,
             item,
             quantity,
             category,
@@ -44,7 +45,7 @@ const EditItemForm = ({ id, item: initialItem, category: initialCategory, quanti
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ user_id: '5', item: id, purchase_date: initialPurchaseDate, expiry_date: initialExpiryDate }),
+                body: JSON.stringify({ user_id, item: id, purchase_date: initialPurchaseDate, expiry_date: initialExpiryDate }),
             });
 
             const response = await fetch(`${apiUrl}/add_grocery`, {
@@ -89,6 +90,7 @@ const EditItemForm = ({ id, item: initialItem, category: initialCategory, quanti
 
     return (
         <Box className="add-item-form-container" p={4} boxShadow="md" rounded="md" bg="white">
+            <Box display="flex" alignItems="center" justifyContent="center"><Text fontSize="2xl" as="b">Edit an item</Text></Box>  
             <form onSubmit={handleSubmit}>
                 <Stack spacing={4}>
                     <FormControl isRequired>
@@ -126,6 +128,9 @@ const EditItemForm = ({ id, item: initialItem, category: initialCategory, quanti
                             <option value="Fruit">Fruit</option>
                             <option value="Grain">Grain</option>
                             <option value="Seafood">Seafood</option>
+                            <option value="Condiment">Condiment</option>
+                            <option value="Dried Good">Dried Good</option>
+                            <option value="Canned Food">Canned Food</option>
                         </Select>
                     </FormControl>
                     <FormControl isRequired>
@@ -137,12 +142,13 @@ const EditItemForm = ({ id, item: initialItem, category: initialCategory, quanti
                         <Input type="date" value={expiryDate} onChange={(e) => setExpiryDate(e.target.value)} />
                     </FormControl>
                     <Flex mt={4} justifyContent="space-between">
-                        <Button colorScheme="blue" onClick={onClose} >Cancel</Button>
-                        <Button colorScheme="orange" type="submit" >Edit Item</Button>
+                        <Button bg="#edf2f7" color="#888888" onClick={onClose} >Cancel</Button>
+                        <Button colorScheme="orange" type="submit" bg="#19956d">Edit Item</Button>
                     </Flex>
                 </Stack>
             </form>
         </Box>
     );
 };
+
 export default EditItemForm;
