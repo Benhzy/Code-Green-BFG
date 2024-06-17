@@ -30,7 +30,7 @@ import base64
 app = Flask(__name__)
 frontend_url = os.getenv('FRONTEND_URL')
 # cors = CORS(app, resources={r"/api/*": {"origins": frontend_url}})
-cors = CORS(app)
+cors = CORS(app, supports_credentials=True)
 
 @app.route('/add_grocery', methods=['POST']) # POST request to add grocery items (can add multiple at the same time)
 def add_grocery():
