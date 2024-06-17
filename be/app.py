@@ -263,7 +263,7 @@ def save_receipt_items(user_id):
     return jsonify({'extracted_text': extracted_items, 'user_id': user_id})
 
 
-@app.route('/upload_receipt/<user_id>', methods=['POST'])
+@app.route('/upload_receipt_two/<user_id>', methods=['POST'])
 def upload_file(user_id):
     if 'file' not in request.files:
         return jsonify({'error': 'No file part'}), 400
