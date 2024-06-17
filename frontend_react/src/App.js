@@ -287,7 +287,7 @@ function App() {
                             />
                         } />
                         <Route path="/add" element={<AddItem user_id={userId} />} />
-                        <Route path="/scanner" element={<CameraComponent user_Id={userId} />} />
+                        <Route path="/scanner" element={<CameraComponent userId={userId} />} />
                         <Route path="/edit-item" element={<EditItemForm fetchInventoryItems={fetchInventoryItems} />} />
                         <Route path="/upload-receipt" element={<ImageUpload userId={userId} />} />
                         <Route path="/edit/:index" element={<EditReceiptItem />} />

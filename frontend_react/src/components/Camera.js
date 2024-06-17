@@ -30,7 +30,7 @@ function CameraComponent({ userId }) {
   const navigate = useNavigate();
 
   function handleTakePhoto(dataUri) {
-    const url = `${apiUrl}/scan_receipt/${userId}`;
+    const url = `${apiUrl}/upload_receipt/${userId}`;
 
     fetch(url, {
       method: 'POST',
