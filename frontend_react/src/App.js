@@ -11,6 +11,7 @@ import ItemsList from './components/ReceiptItemsList';
 import './App.css';
 import EditItemForm from './components/EditItemForm'; 
 import EditReceiptItem from './components/EditReceiptItem';
+import Dashboard from './components/Dashboard.js'
 import { apiUrl } from './components/IpAdr'; 
 
 const Groceries = ({ inventoryItems, onDecrement, onDelete, handleFilterChange, handleSearchChange, searchQuery, fetchInventoryItems, handleSortChange, sortCriterion, selectedFilter }) => (
@@ -292,6 +293,7 @@ function App() {
                         <Route path="/upload-receipt" element={<ImageUpload userId={userId} />} />
                         <Route path="/edit/:index" element={<EditReceiptItem />} />
                         <Route path="/items" element={<ItemsList userId={userId} />} />
+                        <Route path="/dashboard" element={<Dashboard />} />
                     </Routes>
                 </div>
                 <BottomMenuBar fetchInventoryItems={fetchInventoryItems} user_id={userId} />
