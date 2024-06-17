@@ -94,12 +94,14 @@ def extract_text(image_path):
     
 def determine_category(item_name):
     categories = {
-        "Fruits":7,
+        "Fruit":7,
         "Vegetable":7,
         "Meat":2,
         "Grain":365,
         "Seafood":2,
-        "Dairy":7
+        "Dairy":7,
+        "Condiment":365,
+        "Dried Good":365
     }
     category_embeddings = model.encode(list(categories.keys()))
     item_embedding = model.encode([item_name])

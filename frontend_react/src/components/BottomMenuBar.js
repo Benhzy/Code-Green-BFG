@@ -22,8 +22,12 @@ const BottomMenuBar = ({ fetchInventoryItems }) => {
     };
 
     const handleScanReceiptClick = () => {
-        navigate('/scanner'); // Redirect to the camera page
+        navigate('/scanner'); // Redirect to the camera page 
     };
+
+    const uploadReceipt = () => {
+        navigate('/upload-receipt')
+    }
 
     return (
         <Box position="fixed" bottom="0" left="0" right="0" width="100%" bg="#4A4A4A" py={4} borderRadius="25px 25px 0 0" height="70px">
@@ -76,6 +80,8 @@ const BottomMenuBar = ({ fetchInventoryItems }) => {
                     </Button>
                 </HStack>
             )}
+
+            
 
             {isFormOpen && <AddItemForm onClose={closeForm} fetchInventoryItems={fetchInventoryItems} />}
         </Box>

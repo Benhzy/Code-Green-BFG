@@ -10,9 +10,19 @@ from scripts.recipe_recommender import recommend_recipes, store_recipe
 from scripts.receipt_scanner import extract_text
 from scripts.receipt_scanner import post_data
 import base64
+from werkzeug.utils import secure_filename
+import os
 
 app = Flask(__name__)
+UPLOAD_FOLDER = 'uploads'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 CORS(app)
+
+
+# Ensure the upload folder exists
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
 
 @app.route('/add_grocery', methods=['POST']) # POST request to add grocery items (can add multiple at the same time)
 def add_grocery():
@@ -150,8 +160,8 @@ def add_interest():
     return jsonify([{"message": "Data posted successfully", "response": resp} for resp, stat in responses]), 201
 
 
-@app.route('/upload_receipt/<user_id>', methods=['POST'])
-def upload_receipt(user_id):
+@app.route('/scan_receipt/<user_id>', methods=['POST'])
+def scan_receipt(user_id):
     data = request.get_json()
     image_data = data['image']
     
@@ -164,19 +174,46 @@ def upload_receipt(user_id):
     
     extracted_items = extract_text("temp_image.png")
 
-    post_data(user_id, extracted_items)
+    # post_data(user_id, extracted_items)
 
     return jsonify({'extracted_text': extracted_items, 'user_id': user_id})
 
 
-# # DONT DELETE THIS, FOR ZHIYI TO USE
+@app.route('/upload_items/<user_id>', methods=['POST'])
+def save_receipt_items(user_id):
+    extracted_items = request.json['items']
+    print(extracted_items)
+    post_data(user_id, extracted_items)
+    return jsonify({'extracted_text': extracted_items, 'user_id': user_id})
+
+
+@app.route('/upload_receipt/<user_id>', methods=['POST'])
+def upload_file(user_id):
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+    if file:
+        filename = secure_filename(file.filename)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(filepath)
+        extracted_items = extract_text(filepath)
+        post_data(user_id, extracted_items)
+        return jsonify({'extracted_text': extracted_items, 'user_id': user_id})
+
 # if __name__ == '__main__':
-#     app.run(host='0.0.0.0/0', debug=True) # insert ur ip address here
+#    app.run(host='10.0.81.199', debug=True)
+
+
+# # DONT DELETE THIS, FOR ZHIYI TO USE
+if __name__ == '__main__':
+     app.run(host='0.0.0.0', debug=True) # insert ur ip address here
 
 
 # DONT DELETE THIS, FOR EDWARD TO USE
-if __name__ == '__main__':
-    app.run(host='172.20.10.5', debug=True)
+# if __name__ == '__main__':
+#   app.run(host='172.20.10.5', debug=True)
 
 # # DONT DELETE THIS, FOR ANYBODY TO USE
 # if __name__ == '__main__':

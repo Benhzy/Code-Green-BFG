@@ -6,8 +6,11 @@ import InventoryItem from './components/InventoryItem';
 import BottomMenuBar from './components/BottomMenuBar';
 import RecipeList from './components/RecipeList';
 import CameraComponent from './components/Camera';
+import ImageUpload from './components/ImageUpload';
+import ItemsList from './components/ReceiptItemsList';
 import './App.css';
 import EditItemForm from './components/EditItemForm'; 
+import EditReceiptItem from './components/EditReceiptItem';
 import { apiUrl } from './components/IpAdr'; 
 
 const Groceries = ({ inventoryItems, onDecrement, onDelete, handleFilterChange, handleSearchChange, searchQuery, fetchInventoryItems, handleSortChange, sortCriterion, selectedFilter }) => (
@@ -281,7 +284,10 @@ function App() {
                     } />
                     <Route path="/add" element={<AddItem />} />
                     <Route path="/scanner" element={<CameraComponent userId={userId} />} />
+                    <Route path="/upload-receipt" element={<ImageUpload userId={userId} />} />
                     <Route path="/edit-item" element={<EditItemForm fetchInventoryItems={fetchInventoryItems} />} />
+                    <Route path="/edit/:index" element={<EditReceiptItem />} />
+                    <Route path="/items" element={<ItemsList userId={userId} />} />
                 </Routes>
             </div>
             <BottomMenuBar fetchInventoryItems={fetchInventoryItems} />
