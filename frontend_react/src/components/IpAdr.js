@@ -1,5 +1,5 @@
 // // update to your own IP address
-export const apiUrl = 'https://code-green-backend.vercel.app/';
+// export const apiUrl = 'https://code-green-backend.vercel.app/';
 
 
 
@@ -8,4 +8,4 @@ export const apiUrl = 'https://code-green-backend.vercel.app/';
 
 
 // zy
-// export const apiUrl = 'http://192.168.1.6:5000'
+export const apiUrl = 'http://192.168.1.6:5000'

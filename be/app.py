@@ -30,8 +30,9 @@ import base64
 app = Flask(__name__)
 frontend_url = os.getenv('FRONTEND_URL')
 # cors = CORS(app, resources={r"/api/*": {"origins": frontend_url}})
-cors = CORS(app, resources={r"/*": {"origins": "*", "allow_headers": ["Content-Type", "Token"]}})
-
+# cors = CORS(app, resources={r"/*": {"origins": "*", "allow_headers": ["Content-Type", "Token"]}})
+cors = CORS(app)
+            
 @app.route('/add_grocery', methods=['POST']) # POST request to add grocery items (can add multiple at the same time)
 def add_grocery():
     data = request.get_json()  # This should be a list of dictionaries
@@ -247,8 +248,8 @@ def upload_receipt(user_id):
 
 
 # # DONT DELETE THIS, FOR ZHIYI TO USE
-# if __name__ == '__main__':
-#     app.run(host='0.0.0.0', debug=True) # insert ur ip address here
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', debug=True) # insert ur ip address here
 
 
 # # DONT CHANGE THIS, FOR EDWARD TO USE
@@ -256,6 +257,6 @@ def upload_receipt(user_id):
 #     app.run(host="172.20.10.5", debug=True)
 
 # # DONT DELETE THIS, FOR ANYBODY TO USE
-if __name__ == '__main__':
-    app.run(debug=True)
+# if __name__ == '__main__':
+#     app.run(debug=True)
 
