@@ -25,6 +25,10 @@ from scripts.db_connection import used_user_groceries
 from scripts.db_connection import thrown_user_groceries
 from scripts.recipe_recommender import recommend_recipes, store_recipe
 from scripts.receipt_scanner import extract_text, post_data
+from scripts.db_connection import get_most_wasted
+from scripts.db_connection import get_most_used
+from scripts.db_connection import get_used_info
+from scripts.db_connection import get_thrown_info
 import base64
 from werkzeug.utils import secure_filename
 import os
@@ -279,6 +283,25 @@ def upload_file(user_id):
         extracted_items = extract_text(filepath)
         post_data(user_id, extracted_items)
         return jsonify({'extracted_text': extracted_items, 'user_id': user_id})
+
+@app.route('/get_most_wasted/<user_id>', methods=['GET'])
+def get_most_wasted_items(user_id):
+    return jsonify(get_most_wasted(user_id))
+
+@app.route('/get_most_used/<user_id>', methods=['GET'])
+def get_most_used_items(user_id):
+    return jsonify(get_most_used(user_id))
+
+@app.route('/get_used_info/<user_id>', methods=['GET']) 
+def get_used_info_items(user_id):
+    return jsonify(get_used_info(user_id))
+
+@app.route('/get_thrown_info/<user_id>', methods=['GET']) 
+def get_thrown_info_items(user_id):
+    return jsonify(get_thrown_info(user_id))
+
+
+
 
 # if __name__ == '__main__':
 #     app.run(host='0.0.0.0', debug=True) # insert ur ip address here

@@ -71,25 +71,26 @@ a:focus {
   margin: 20px;
   padding: 0px;
   padding-bottom: 150px; /* Adjust this value based on the height of your bottom menu bar */
-  /* background-color: #ffffff; */
   border-radius: 10px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  min-height: 160vh; /* Ensure it covers the full height minus the navbar if any */
-  flex-direction: column;
+  min-height: 100vh; /* Ensure it covers at least the full height of the viewport */
   display: flex;
+  flex-direction: column;
   width: 420px;
+  overflow-y: auto; /* Allows scrolling within the container */
 }
-content {
+
+.content {
   flex: 1; /* Allows the content area to expand and fill available space */
   overflow-y: auto; /* Allows scrolling within the content area */
 }
-
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .main-container {
     margin-left: 5px; /* Reset margin on small screens */
     margin-right: 5px;
+    width: 100%; /* Ensure the container takes full width on small screens */
   }
 }
 
@@ -100,6 +101,7 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 0.5em;
   line-height: 1.2;
 }
+
 
 
 

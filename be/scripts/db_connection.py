@@ -266,3 +266,78 @@ def update_inventory(user_id, item, change_in_quantity):
         return {"message": "Inventory updated successfully"}, 200
     except Exception as e:
         return {"error": f"An error occurred: {e}"}, 500
+    
+
+def get_most_wasted(user_id):
+    user_id = str(user_id)
+    try:
+        conn = psycopg2.connect(os.environ['DATABASE_URL'])
+        cursor = conn.cursor()
+        cursor.execute('''
+        SELECT item, category, COUNT(*) AS appearance_count
+        FROM public.thrown
+        WHERE user_id = %s
+        GROUP BY item, category
+        ORDER BY appearance_count DESC
+        LIMIT 3
+    ''', (user_id,))
+        result = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return result
+    except Exception as e:
+        return {"error": str(e)}, 500
+
+def get_most_used(user_id):
+    user_id = str(user_id)
+    try:
+        conn = psycopg2.connect(os.environ['DATABASE_URL'])
+        cursor = conn.cursor()
+        cursor.execute('''
+        SELECT item, category, COUNT(*) AS appearance_count
+        FROM public.used
+        WHERE user_id = %s
+        GROUP BY item, category
+        ORDER BY appearance_count DESC
+        LIMIT 3
+    ''', (user_id,))
+        result = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return result
+    except Exception as e:
+        return {"error": str(e)}, 500
+
+def get_used_info(user_id):
+    user_id = str(user_id)
+    try:
+        conn = psycopg2.connect(os.environ['DATABASE_URL'])
+        cursor = conn.cursor()
+        cursor.execute('''
+        SELECT COUNT(*)
+        FROM public.used
+        WHERE user_id = %s
+        ''', (user_id,))
+        result = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return result
+    except Exception as e:
+        return {"error": str(e)}, 500
+
+def get_thrown_info(user_id):
+    user_id = str(user_id)
+    try:
+        conn = psycopg2.connect(os.environ['DATABASE_URL'])
+        cursor = conn.cursor()
+        cursor.execute('''
+        SELECT COUNT(*)
+        FROM public.thrown
+        WHERE user_id = %s
+        ''', (user_id,))
+        result = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return result
+    except Exception as e:
+        return {"error": str(e)}, 500

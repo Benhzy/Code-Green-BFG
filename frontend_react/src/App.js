@@ -13,6 +13,8 @@ import EditItemForm from './components/EditItemForm';
 import EditReceiptItem from './components/EditReceiptItem';
 import Dashboard from './components/Dashboard.js'
 import { apiUrl } from './components/IpAdr'; 
+import axios from 'axios';
+
 
 const Groceries = ({ inventoryItems, onDecrement, onDelete, handleFilterChange, handleSearchChange, searchQuery, fetchInventoryItems, handleSortChange, sortCriterion, selectedFilter }) => (
     <>
@@ -89,11 +91,12 @@ const AddItem = () => (
 );
 
 function App() {
+    const userId = 5; // Replace with the actual user ID
     const [filter, setFilter] = useState('All');
     const [inventoryItems, setInventoryItems] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [sortCriterion, setSortCriterion] = useState('expiry_date'); // Change default sort criterion here
-    const userId = 5; // Replace with the actual user ID
+    
 
     const fetchInventoryItems = async () => {
         try {
@@ -293,7 +296,7 @@ function App() {
                         <Route path="/upload-receipt" element={<ImageUpload userId={userId} />} />
                         <Route path="/edit/:index" element={<EditReceiptItem />} />
                         <Route path="/items" element={<ItemsList userId={userId} />} />
-                        <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/dashboard" element={<Dashboard userId={userId} />} />
                     </Routes>
                 </div>
                 <BottomMenuBar fetchInventoryItems={fetchInventoryItems} user_id={userId} />
