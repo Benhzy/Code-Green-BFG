@@ -1,9 +1,10 @@
 // src/components/CameraComponent.js
-import React from 'react';
+import React, { useState } from 'react';
 import Camera from 'react-html5-camera-photo';
 import 'react-html5-camera-photo/build/css/index.css';
 import { useNavigate } from 'react-router-dom';
 import { apiUrl } from './IpAdr'; 
+import Loading from './LoadingPage';
 
 function CameraComponent({ userId }) {
   /* function handleTakePhoto(dataUri) {
@@ -27,9 +28,11 @@ function CameraComponent({ userId }) {
     });
   } */
 
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   function handleTakePhoto(dataUri) {
+    setIsLoading(true);
     const url = `${apiUrl}/upload_receipt/${userId}`;
 
     fetch(url, {
@@ -41,12 +44,18 @@ function CameraComponent({ userId }) {
     })
     .then(response => response.json())
     .then(data => {
+      setIsLoading(false);
       // Navigate to ItemsList and pass the extracted items data
       navigate('/items', { state: { items: data.extracted_text } });
     })
     .catch((error) => {
       console.error('Error:', error);
+      setIsLoading(false);
     });
+  }
+
+  if (isLoading) {
+    return <Loading />;  // Show loading component if isLoading is true
   }
 
   return (
@@ -55,6 +64,8 @@ function CameraComponent({ userId }) {
     />
   );
 }
+
+
 
 export default CameraComponent;
 
