@@ -308,8 +308,8 @@ def get_thrown_info_items(user_id):
 
 
 # DONT CHANGE THIS, FOR EDWARD TO USE
-if __name__ == '__main__':
-    app.run(host="172.20.10.5", debug=True)
+# if __name__ == '__main__':
+#     app.run(host="172.20.10.5", debug=True)
 
 # # DONT DELETE THIS, FOR ANYBODY TO USE
 # if __name__ == '__main__':

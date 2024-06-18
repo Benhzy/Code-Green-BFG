@@ -9,12 +9,11 @@ import {
   NumberInput,
   NumberInputField,
   NumberInputStepper,
-  useDisclosure,
   IconButton,
   Switch,
   Flex,
   useToast,
-  FormLabel
+  FormLabel,
 } from '@chakra-ui/react';
 import { AddIcon, MinusIcon } from '@chakra-ui/icons';
 import { apiUrl } from './IpAdr';
@@ -23,12 +22,11 @@ import './RecipeList.css';
 
 const RecipeList = ({ userId }) => {
   const [recipes, setRecipes] = useState([]);
-  const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [servings, setServings] = useState(1);
-  const [preferences, setPreferences] = useState('No preferences');
+  const [preferences, setPreferences] = useState('');
   const [inventory, setInventory] = useState([]);
   const [showExpiring, setShowExpiring] = useState(false);
   const toast = useToast();
@@ -44,9 +42,9 @@ const RecipeList = ({ userId }) => {
   const fetchRecommendedRecipes = async (cuisine = 'Singaporean') => {
     const recommendedRecipes = await fetchRecipes(`${apiUrl}/recommend_recipe/${userId}?cuisine=${cuisine}`);
     if (recommendedRecipes && recommendedRecipes.length > 0) {
-        handleRecipeSelect(recommendedRecipes[0]); // Automatically select the first recipe
+      handleRecipeSelect(recommendedRecipes[0]); // Automatically select the first recipe
     }
-};
+  };
 
   const fetchRecipes = async (url) => {
     setIsLoading(true);
@@ -94,12 +92,9 @@ const RecipeList = ({ userId }) => {
     fetchInventoryItems();
   }, [userId]);
 
-
-
   const handleRecipeSelect = (recipe) => {
     setSelectedRecipe(recipe);
-    onOpen();
-};
+  };
 
   const filteredInventory = useMemo(() => {
     return showExpiring
@@ -108,14 +103,14 @@ const RecipeList = ({ userId }) => {
   }, [inventory, showExpiring]);
 
   return (
-    <Box p={4}>
-      <Heading mb={4}>Recipe Generator</Heading>
+    <Box p={4} bg="yellow.100" borderRadius="md" boxShadow="md">
+      <Heading mb={4}>⭐  Recipe Generator</Heading>
       <Text mb={4}>Time to create some magic in the kitchen! Select the ingredients you would like to cook with.</Text>
       <Stack spacing={4} mb={4}>
-        <Box width="100%">
+        <Box bg="#19956D" p={4} borderRadius="md" boxShadow="md">
           <Flex align="center" mb={4}>
-            <FormLabel mb={1}>Servings</FormLabel>
-            <NumberInput min={1} value={servings} onChange={(valueString) => setServings(parseInt(valueString))} width="100%" position="relative">
+            <FormLabel mb={1}>Servings: </FormLabel>
+            <NumberInput min={1} value={servings} onChange={(valueString) => setServings(parseInt(valueString))} width="100%" position="relative" bg="white">
               <NumberInputStepper position="absolute" left="0">
                 <IconButton
                   aria-label="Decrement"
@@ -136,42 +131,54 @@ const RecipeList = ({ userId }) => {
             </NumberInput>
           </Flex>
           <Flex align="center" mb={4}>
-            <FormLabel mb={1}>Preferences:</FormLabel>
+            <FormLabel mb={1}>Preference:</FormLabel>
             <Input
               value={preferences}
               onChange={(e) => setPreferences(e.target.value)}
               placeholder="I want something with BBQ sauce..."
               maxLength={200}
               width="100%"
+              bg="white"
             />
           </Flex>
         </Box>
-        <Flex align="center">
-          <Text mr={2}>Ingredients:</Text>
-          <Stack direction="row" spacing={4}>
-            <Switch
-              isChecked={!showExpiring}
-              onChange={() => setShowExpiring(false)}
-            />
-            <Text>All</Text>
-            <Switch
-              isChecked={showExpiring}
-              onChange={() => setShowExpiring(true)}
-            />
-            <Text>Expiring</Text>
-          </Stack>
-        </Flex>
+        <Box bg="white" p={4} borderRadius="md" boxShadow="md">
+          <Flex align="center">
+            <Text mr={2}>Ingredients:</Text>
+            <Stack direction="row" spacing={4}>
+              <Switch
+                isChecked={!showExpiring}
+                onChange={() => setShowExpiring(false)}
+              />
+              <Text>All</Text>
+              <Switch
+                isChecked={showExpiring}
+                onChange={() => setShowExpiring(true)}
+              />
+              <Text>Expiring</Text>
+            </Stack>
+          </Flex>
+          <Box mt={4}>
+            {filteredInventory.map((item, index) => (
+              <IngredientItem key={index} {...item} fetchInventoryItems={fetchInventoryItems} userId={userId} />
+            ))}
+          </Box>
+        </Box>
       </Stack>
-      {isLoading && <Text>Loading...</Text>}
-      {error && (
-        <Text color="red.500">{error}</Text>
-      )}
-      <Box>
-        {filteredInventory.map((item, index) => (
-          <IngredientItem key={index} {...item} fetchInventoryItems={fetchInventoryItems} userId={userId} />
-        ))}
-      </Box>
-      <Button onClick={() => fetchRecommendedRecipes()}colorScheme="teal" mt={4}>Generate Recipe</Button>
+      <Button
+        onClick={() => fetchRecommendedRecipes()}
+        colorScheme="teal"
+        mt={4}
+        position="fixed"
+        bottom="100px"  // Increased from 16px to 24px
+        left="50%"
+        transform="translateX(-50%)"
+        zIndex="1000"
+        px={8}
+        py={6}
+      >
+        Generate Recipe
+      </Button>
     </Box>
   );
 };
