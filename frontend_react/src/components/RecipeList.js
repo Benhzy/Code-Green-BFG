@@ -173,7 +173,7 @@ const RecipeList = ({ userId }) => {
         bottom="100px"  // Increased from 16px to 24px
         left="50%"
         transform="translateX(-50%)"
-        zIndex="1000"
+        zIndex="10"
         px={8}
         py={6}
       >

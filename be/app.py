@@ -32,6 +32,24 @@ from scripts.db_connection import get_thrown_info
 import base64
 from werkzeug.utils import secure_filename
 import os
+import warnings
+
+# Suppress the specific FutureWarning related to resume_download
+warnings.filterwarnings("ignore", category=FutureWarning, message="`resume_download` is deprecated and will be removed in version 1.0.0.")
+
+try:
+    # Your imports and code here
+    from huggingface_hub import hf_hub_download
+
+    # Example function call that might trigger the warning
+    file_path = hf_hub_download(repo_id="your_repo_id", filename="your_filename", force_download=False)
+
+    # Add more of your code here
+    print("File downloaded to:", file_path)
+
+except Exception as e:
+    print("An error occurred:", e)
+
 
 app = Flask(__name__)
 frontend_url = os.getenv('FRONTEND_URL')
@@ -308,8 +326,8 @@ def get_thrown_info_items(user_id):
 
 
 # DONT CHANGE THIS, FOR EDWARD TO USE
-# if __name__ == '__main__':
-#     app.run(host="172.20.10.5", debug=True)
+if __name__ == '__main__':
+    app.run(host="172.20.10.5", debug=True)
 
 # # DONT DELETE THIS, FOR ANYBODY TO USE
 # if __name__ == '__main__':

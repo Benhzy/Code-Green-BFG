@@ -222,6 +222,7 @@ const Dashboard = ({ userId }) => {
             <Box paddingTop="10px"></Box>
             
             <Text paddingLeft="5px" fontSize="xl" as="b">Your top 3 most thrown groceries</Text>
+            <Box paddingTop="2px"/>
             <Box 
                
                 sx={{boxShadow: "2px 2px 3px rgba(0, 0, 0, 0.25)"}}
@@ -244,9 +245,9 @@ const Dashboard = ({ userId }) => {
                             flexDirection="column"
                             justifyContent="center"
                         >
-                            <Text fontSize="lg" as='b'>{item[0]}</Text>
-                            <Text paddingLeft="6px" fontSize="3xl">{getEmoji(item[1])}</Text>
-                            <Text fontSize="sm">Times thrown:</Text><Text fontSize="sm" as='u'>{item[2]}</Text>
+                            <Box width="100%" height="25%" overflow="hidden"><Text fontSize="lg" as="b" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">{item[0]}</Text></Box>
+                            <Box width="100%" height="40%" overflow="hidden"><Text paddingLeft="6px" fontSize="3xl">{getEmoji(item[1])}</Text></Box>
+                            <Box width="100%" height="40%" overflow="hidden"><Text fontSize="xs">Times thrown:</Text><Text fontSize="sm" as='u'>{item[2]}</Text></Box>
                         </Box>
                         {index < mostWastedItems.length - 1 && (
                             <Box
@@ -265,8 +266,8 @@ const Dashboard = ({ userId }) => {
 
                 <Box paddingTop="10px"></Box>
                 <Text paddingLeft="5px" fontSize="xl" as="b">Your top 3 most finished groceries</Text>
+                <Box paddingTop="2px"/>
                 <Box 
-               
                sx={{boxShadow: "2px 2px 3px rgba(0, 0, 0, 0.25)"}}
                borderRadius="2xl"
                borderWidth="0px"
@@ -287,9 +288,9 @@ const Dashboard = ({ userId }) => {
                            flexDirection="column"
                            justifyContent="center"
                        >
-                           <Text fontSize="lg" as='b'>{item[0]}</Text>
-                           <Text paddingLeft="6px" fontSize="3xl">{getEmoji(item[1])}</Text>
-                           <Text fontSize="sm">Times finished: </Text><Text as='u'>{item[2]}</Text>
+                           <Box width="100%" height="25%" overflow="hidden"><Text fontSize="lg" as='b'>{item[0]}</Text></Box>
+                           <Box width="100%" height="40%" overflow="hidden"><Text paddingLeft="6px" fontSize="3xl">{getEmoji(item[1])}</Text></Box>
+                           <Box width="100%" height="40%" overflow="hidden"><Text fontSize="xs">Times finished: </Text><Text fontSize='sm' as='u'>{item[2]}</Text></Box>
                        </Box>
                        {index < mostUsedItems.length - 1 && (
                            <Box
