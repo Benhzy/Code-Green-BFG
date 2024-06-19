@@ -189,7 +189,7 @@ def delete_recipe():
     if not user_id or not recipe_name:
         return jsonify({"error": "user_id and recipe_name are required"}), 400
     
-    result, status_code = delete_user_recipe(user_id, recipe_name)
+    result, status_code = delete_user_recipe(str(user_id), recipe_name)
     
     if status_code != 200:
         return jsonify(result), status_code
@@ -235,9 +235,7 @@ def store_recipe():
         except ValueError:
             return jsonify({"error": "Each ingredient must be a list with two elements (name and quantity)."}), 400
         
-        # Extract the user ID and pass the entire recipe dictionary
-        user_id = recipe['user_id']
-        response, status_code = upsert_user_recipes(user_id, recipe)
+        response, status_code = upsert_user_recipes(recipe)
         responses.append((response, status_code))
     
     # Check all responses for errors

@@ -21,17 +21,19 @@ import { FaRegBookmark } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { apiUrl } from './IpAdr';
 import IngredientItem from './IngredientItem';
+import RecipeModal from './RecipeModal'; // Import RecipeModal
 import './RecipeList.css';
 
 const RecipeList = ({ userId }) => {
   const [recipes, setRecipes] = useState([]);
-  const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [servings, setServings] = useState(1);
   const [preferences, setPreferences] = useState('');
   const [inventory, setInventory] = useState([]);
   const [showExpiring, setShowExpiring] = useState(false);
+  const [selectedRecipe, setSelectedRecipe] = useState(null); // State to hold the selected recipe
+  const [isModalOpen, setIsModalOpen] = useState(false); // State to control modal visibility
   const toast = useToast();
   const navigate = useNavigate(); // Use useNavigate instead of useHistory
 
@@ -43,14 +45,7 @@ const RecipeList = ({ userId }) => {
     return diffDays;
   };
 
-  const fetchRecommendedRecipes = useCallback(async (cuisine = 'Singaporean') => {
-    const recommendedRecipes = await fetchRecipes(`${apiUrl}/recommend_recipe/${userId}?cuisine=${cuisine}`);
-    if (recommendedRecipes && recommendedRecipes.length > 0) {
-      handleRecipeSelect(recommendedRecipes[0]); // Automatically select the first recipe
-    }
-  }, [userId]);
-
-  const fetchRecipes = useCallback(async (url) => {
+  const fetchRecommendedRecipes = useCallback(async (url = `${apiUrl}/recommend_recipe/${userId}?cuisine=${preferences}&servings=${servings}`) => {
     setIsLoading(true);
     setError('');
     try {
@@ -61,16 +56,14 @@ const RecipeList = ({ userId }) => {
       }
       const data = await response.json();
       setRecipes(data);
+      setSelectedRecipe(data[0]); // Set the first recipe as the selected recipe
+      setIsModalOpen(true); // Open the modal
     } catch (error) {
       setError(`Error fetching recipes: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
-  }, []);
-
-  useEffect(() => {
-    fetchRecipes(`${apiUrl}/recipe/${userId}`);
-  }, [userId, fetchRecipes]);
+  }, [userId, preferences, servings]);
 
   const fetchInventoryItems = useCallback(async () => {
     try {
@@ -96,15 +89,16 @@ const RecipeList = ({ userId }) => {
     fetchInventoryItems();
   }, [userId, fetchInventoryItems]);
 
-  const handleRecipeSelect = (recipe) => {
-    setSelectedRecipe(recipe);
-  };
-
   const filteredInventory = useMemo(() => {
     return showExpiring
       ? inventory.filter(item => calculateDaysUntilExpiry(item.expiry_date) <= 5)
       : inventory;
   }, [inventory, showExpiring]);
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedRecipe(null);
+  };
 
   return (
     <Box p={4} bg="yellow.100" borderRadius="md" boxShadow="md">
@@ -195,6 +189,15 @@ const RecipeList = ({ userId }) => {
         isRound
         onClick={() => navigate('/saved-recipes')}
       />
+      {selectedRecipe && (
+        <RecipeModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          recipe={selectedRecipe}
+          userId={userId}
+          onLogRecipe={(recipe) => console.log('Recipe logged:', recipe)}
+        />
+      )}
     </Box>
   );
 };

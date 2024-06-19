@@ -67,6 +67,7 @@ const SavedRecipes = ({ userId }) => {
           isOpen={isOpen}
           onClose={onClose}
           recipe={selectedRecipe}
+          userId={userId}
           onLogRecipe={(recipe) => console.log('Recipe logged:', recipe)}
         />
       )}
