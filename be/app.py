@@ -34,6 +34,7 @@ from werkzeug.utils import secure_filename
 import os
 import warnings
 import logging
+import json
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -232,12 +233,12 @@ def store_recipe():
         # Convert ingredients from list of lists to list of tuples
         try:
             recipe['ingredients'] = [tuple(ingredient) for ingredient in recipe['ingredients']]
+            
         except ValueError:
             return jsonify({"error": "Each ingredient must be a list with two elements (name and quantity)."}), 400
-        
+        print(recipe)
         # Extract the user ID and pass the entire recipe dictionary
-        user_id = recipe['user_id']
-        response, status_code = upsert_user_recipes(user_id, recipe)
+        response, status_code = upsert_user_recipes(recipe)
         responses.append((response, status_code))
     
     # Check all responses for errors

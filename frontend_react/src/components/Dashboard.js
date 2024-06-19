@@ -105,14 +105,14 @@ const Dashboard = ({ userId }) => {
             <Box display="flex" alignItems="center" justifyContent="center" mt="-30px">
                 <Image boxSize="30%" src='https://assets-global.website-files.com/5e51c674258ffe10d286d30a/5e5353e82b568af2d916cbbd_peep-26.svg'/>
             </Box>
-            <Box mb="5px" paddingLeft="7px">
+            <Box paddingBot="8px" paddingLeft="7px">
                 <Text fontSize="xl" as = 'b'>
                     Overview
                 </Text>
             </Box>
             <Box>
-                <SimpleGrid columns={2} spacing={2}>
-                    <Stack paddingLeft = '5px'>
+                <SimpleGrid columns={2} spacing="8px">
+                    <Stack >
                         <Box 
                         sx={{boxShadow: "2px 2px 3px rgba(0, 0, 0, 0.25)"}}
                         borderRadius="2xl"
@@ -134,7 +134,7 @@ const Dashboard = ({ userId }) => {
                         </Flex>
                         </Box>
                     </Stack>
-                    <Stack  paddingRight='5px'>
+                    <Stack  >
                         <Box
                         sx={{boxShadow: "2px 2px 3px rgba(0, 0, 0, 0.25)"}}
                         borderRadius="2xl"
@@ -156,7 +156,7 @@ const Dashboard = ({ userId }) => {
                         </Flex>
                         </Box>
                     </Stack>
-                    <Stack paddingLeft="5px">
+                    <Stack >
                     <Box
                         sx={{boxShadow: "2px 2px 3px rgba(0, 0, 0, 0.25)"}}
                         borderRadius="2xl"
@@ -178,7 +178,7 @@ const Dashboard = ({ userId }) => {
                         </Flex>
                         </Box>
                     </Stack>
-                    <Stack paddingRight="5px">
+                    <Stack >
                     <Box
                         sx={{boxShadow: "2px 2px 3px rgba(0, 0, 0, 0.25)"}}
                         borderRadius="2xl"
@@ -219,10 +219,8 @@ const Dashboard = ({ userId }) => {
                         <Text>rewards</Text>
                     </Stack>
                 </Box>
-            <Box paddingTop="10px"></Box>
-            
-            <Text paddingLeft="5px" fontSize="xl" as="b">Your top 3 most thrown groceries</Text>
-            <Box paddingTop="2px"/>
+            <Box mt="24px"></Box>
+            <Text paddingLeft="5px" fontSize="xl" as="b" paddingBot="8px">Your top 3 most thrown groceries</Text>
             <Box 
                
                 sx={{boxShadow: "2px 2px 3px rgba(0, 0, 0, 0.25)"}}
@@ -247,7 +245,7 @@ const Dashboard = ({ userId }) => {
                         >
                             <Box width="100%" height="25%" overflow="hidden"><Text fontSize="lg" as="b" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">{item[0]}</Text></Box>
                             <Box width="100%" height="40%" overflow="hidden"><Text paddingLeft="6px" fontSize="3xl">{getEmoji(item[1])}</Text></Box>
-                            <Box width="100%" height="40%" overflow="hidden"><Text fontSize="xs">Times thrown:</Text><Text fontSize="sm" as='u'>{item[2]}</Text></Box>
+                            <Box width="100%" height="40%" overflow="hidden" alignItems="center" display="center" justifyContent="center"><Text fontSize="sm">Thrown: {item[2]}x</Text></Box>
                         </Box>
                         {index < mostWastedItems.length - 1 && (
                             <Box
@@ -264,9 +262,8 @@ const Dashboard = ({ userId }) => {
                 </Box>
             
 
-                <Box paddingTop="10px"></Box>
-                <Text paddingLeft="5px" fontSize="xl" as="b">Your top 3 most finished groceries</Text>
-                <Box paddingTop="2px"/>
+                <Box mt="24px"></Box>
+                <Text paddingLeft="5px" fontSize="xl" as="b" paddingBot="8px">Your top 3 most finished groceries</Text>
                 <Box 
                sx={{boxShadow: "2px 2px 3px rgba(0, 0, 0, 0.25)"}}
                borderRadius="2xl"
@@ -290,7 +287,7 @@ const Dashboard = ({ userId }) => {
                        >
                            <Box width="100%" height="25%" overflow="hidden"><Text fontSize="lg" as='b'>{item[0]}</Text></Box>
                            <Box width="100%" height="40%" overflow="hidden"><Text paddingLeft="6px" fontSize="3xl">{getEmoji(item[1])}</Text></Box>
-                           <Box width="100%" height="40%" overflow="hidden"><Text fontSize="xs">Times finished: </Text><Text fontSize='sm' as='u'>{item[2]}</Text></Box>
+                           <Box width="100%" height="40%" overflow="hidden" alignItems="center" display="center" justifyContent="center"><Text fontSize="sm">Finished: {item[2]}x</Text></Box>
                        </Box>
                        {index < mostUsedItems.length - 1 && (
                            <Box

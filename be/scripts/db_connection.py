@@ -3,6 +3,7 @@ import psycopg2
 from psycopg2 import sql
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
+import json
 
 # Load environment variables from .env file
 load_dotenv()
@@ -51,7 +52,7 @@ def get_grocery_data_by_user_id(user_id):
     except Exception as e:
         return {"error": f"An error occurred: {e}"}, 500
 
-def upsert_user_recipes(recipes):
+def upsert_user_recipes(recipe):
     upsert_query = """
     INSERT INTO public.user_recipes (user_id, recipe_name, ingredients, instructions, difficulty, time_required, description)
     VALUES (%s, %s, %s, %s, %s, %s, %s)
@@ -67,23 +68,21 @@ def upsert_user_recipes(recipes):
     try:
         conn = psycopg2.connect(os.environ['DATABASE_URL'])
         cursor = conn.cursor()
-        for recipe in recipes:
-            cursor.execute(upsert_query, (
-                recipe['user_id'],
-                recipe['recipe_name'],
-                str(recipe['ingredients']), 
-                str(recipe['instructions']), 
-                recipe['difficulty'],
-                recipe['time_required'],
-                recipe['description']
-            ))
+        cursor.execute(upsert_query, (
+            str(recipe['user_id']),
+            str(recipe['recipe_name']),
+            str(recipe['ingredients']), 
+            str(recipe['instructions']), 
+            str(recipe['difficulty']),
+            str(recipe['time_required']),
+            str(recipe['description'])
+        ))
         conn.commit()
         cursor.close()
         conn.close()
         return "Upsert successful", 201
     except Exception as e:
         return {"error": f"An error occurred: {e}"}, 500
-
 
 def upsert_user_groceries(user_id, items):
     user_id = str(user_id)
