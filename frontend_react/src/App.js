@@ -8,6 +8,7 @@ import RecipeList from './components/RecipeList';
 import CameraComponent from './components/Camera';
 import ImageUpload from './components/ImageUpload';
 import ItemsList from './components/ReceiptItemsList';
+import SavedRecipes from './components/SavedRecipes';
 import './App.css';
 import EditItemForm from './components/EditItemForm'; 
 import EditReceiptItem from './components/EditReceiptItem';
@@ -274,30 +275,31 @@ function App() {
             <div className="main-background">
             <div className="main-container">
                 <div className="content">
-                    <Routes>
-                        <Route path="/" element={<Navigate to="/groceries" />} />
-                        <Route path="/recipes" element={<RecipeList userId={userId} />} />
-                        <Route path="/groceries" element={
-                            <Groceries
-                                inventoryItems={filteredSortedItems}
-                                onDecrement={onDecrement}
-                                onDelete={onDelete}
-                                handleFilterChange={handleFilterChange}
-                                handleSearchChange={handleSearchChange}
-                                fetchInventoryItems={fetchInventoryItems}
-                                handleSortChange={handleSortChange}
-                                sortCriterion={sortCriterion}
-                                selectedFilter={filter}
-                            />
-                        } />
-                        <Route path="/add" element={<AddItem user_id={userId} />} />
-                        <Route path="/scanner" element={<CameraComponent userId={userId} />} />
-                        <Route path="/edit-item" element={<EditItemForm fetchInventoryItems={fetchInventoryItems} />} />
-                        <Route path="/upload-receipt" element={<ImageUpload userId={userId} />} />
-                        <Route path="/edit/:index" element={<EditReceiptItem />} />
-                        <Route path="/items" element={<ItemsList userId={userId} />} />
-                        <Route path="/dashboard" element={<Dashboard userId={userId} />} />
-                    </Routes>
+                <Routes>
+                    <Route path="/" element={<Navigate to="/groceries" />} />
+                    <Route path="/recipes" element={<RecipeList userId={userId} />} />
+                    <Route path="/saved-recipes" element={<SavedRecipes userId={userId} />} />
+                    <Route path="/groceries" element={
+                        <Groceries
+                            inventoryItems={filteredSortedItems}
+                            onDecrement={onDecrement}
+                            onDelete={onDelete}
+                            handleFilterChange={handleFilterChange}
+                            handleSearchChange={handleSearchChange}
+                            fetchInventoryItems={fetchInventoryItems}
+                            handleSortChange={handleSortChange}
+                            sortCriterion={sortCriterion}
+                            selectedFilter={filter}
+                        />
+                    } />
+                    <Route path="/add" element={<AddItem user_id={userId} />} />
+                    <Route path="/scanner" element={<CameraComponent userId={userId} />} />
+                    <Route path="/edit-item" element={<EditItemForm fetchInventoryItems={fetchInventoryItems} />} />
+                    <Route path="/upload-receipt" element={<ImageUpload userId={userId} />} />
+                    <Route path="/edit/:index" element={<EditReceiptItem />} />
+                    <Route path="/items" element={<ItemsList userId={userId} />} />
+                    <Route path="/dashboard" element={<Dashboard userId={userId} />} />
+                </Routes>
                 </div>
                 <BottomMenuBar fetchInventoryItems={fetchInventoryItems} user_id={userId} />
             </div>

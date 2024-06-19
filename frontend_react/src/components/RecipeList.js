@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Box,
   Button,
@@ -14,8 +14,11 @@ import {
   Flex,
   useToast,
   FormLabel,
+  Spinner
 } from '@chakra-ui/react';
 import { AddIcon, MinusIcon } from '@chakra-ui/icons';
+import { FaRegBookmark } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 import { apiUrl } from './IpAdr';
 import IngredientItem from './IngredientItem';
 import './RecipeList.css';
@@ -30,6 +33,7 @@ const RecipeList = ({ userId }) => {
   const [inventory, setInventory] = useState([]);
   const [showExpiring, setShowExpiring] = useState(false);
   const toast = useToast();
+  const navigate = useNavigate(); // Use useNavigate instead of useHistory
 
   const calculateDaysUntilExpiry = (expiryDate) => {
     const today = new Date();
@@ -39,14 +43,14 @@ const RecipeList = ({ userId }) => {
     return diffDays;
   };
 
-  const fetchRecommendedRecipes = async (cuisine = 'Singaporean') => {
+  const fetchRecommendedRecipes = useCallback(async (cuisine = 'Singaporean') => {
     const recommendedRecipes = await fetchRecipes(`${apiUrl}/recommend_recipe/${userId}?cuisine=${cuisine}`);
     if (recommendedRecipes && recommendedRecipes.length > 0) {
       handleRecipeSelect(recommendedRecipes[0]); // Automatically select the first recipe
     }
-  };
+  }, [userId]);
 
-  const fetchRecipes = async (url) => {
+  const fetchRecipes = useCallback(async (url) => {
     setIsLoading(true);
     setError('');
     try {
@@ -62,13 +66,13 @@ const RecipeList = ({ userId }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchRecipes(`${apiUrl}/recipe/${userId}`);
-  }, [userId]);
+  }, [userId, fetchRecipes]);
 
-  const fetchInventoryItems = async () => {
+  const fetchInventoryItems = useCallback(async () => {
     try {
       const response = await fetch(`${apiUrl}/grocery/${userId}`);
       if (!response.ok) {
@@ -86,11 +90,11 @@ const RecipeList = ({ userId }) => {
         isClosable: true
       });
     }
-  };
+  }, [userId, toast]);
 
   useEffect(() => {
     fetchInventoryItems();
-  }, [userId]);
+  }, [userId, fetchInventoryItems]);
 
   const handleRecipeSelect = (recipe) => {
     setSelectedRecipe(recipe);
@@ -159,7 +163,7 @@ const RecipeList = ({ userId }) => {
             </Stack>
           </Flex>
           <Box mt={4}>
-            {filteredInventory.map((item, index) => (
+            {isLoading ? <Spinner /> : filteredInventory.map((item, index) => (
               <IngredientItem key={index} {...item} fetchInventoryItems={fetchInventoryItems} userId={userId} />
             ))}
           </Box>
@@ -170,7 +174,7 @@ const RecipeList = ({ userId }) => {
         colorScheme="teal"
         mt={4}
         position="fixed"
-        bottom="100px"  // Increased from 16px to 24px
+        bottom="100px"
         left="50%"
         transform="translateX(-50%)"
         zIndex="1000"
@@ -179,6 +183,18 @@ const RecipeList = ({ userId }) => {
       >
         Generate Recipe
       </Button>
+      <IconButton
+        icon={<FaRegBookmark />}
+        aria-label="Bookmark Recipes"
+        position="fixed"
+        top="30px"
+        right="16px"
+        zIndex="1000"
+        colorScheme="teal"
+        size="lg"
+        isRound
+        onClick={() => navigate('/saved-recipes')}
+      />
     </Box>
   );
 };
