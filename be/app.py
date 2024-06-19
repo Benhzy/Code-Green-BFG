@@ -208,6 +208,7 @@ def recommend_recipe(user_id):
         return recipe
     
     except Exception as e:
+        print(e)
         return jsonify({"error": str(e)}), 500
 
 
@@ -281,8 +282,6 @@ def update_inventory_item():
             old_quantity = updated_inventory[item_name]['quantity']
             updated_quantity = subtract_quantity(old_quantity, new_quantity)
             updated_inventory[item_name]['quantity'] = updated_quantity
-        else:
-            updated_inventory[item_name] = item
 
     # Convert the updated inventory back to a list
     updated_inventory_list = list(updated_inventory.values())
@@ -356,13 +355,13 @@ def get_thrown_info_items(user_id):
 
 
 
-# if __name__ == '__main__':
-#     app.run(host='0.0.0.0', debug=True) # insert ur ip address here
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', debug=True) # insert ur ip address here
 
 
 # DONT CHANGE THIS, FOR EDWARD TO USE
-if __name__ == '__main__':
-    app.run(host="172.20.10.5", debug=True)
+# if __name__ == '__main__':
+#     app.run(host="172.20.10.5", debug=True)
 
 # # DONT DELETE THIS, FOR ANYBODY TO USE
 # if __name__ == '__main__':
