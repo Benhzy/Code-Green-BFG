@@ -70,19 +70,13 @@ const InventoryItem = ({ id, item, category, quantity, purchase_date, expiry_dat
             const result = await response.json();
             if (response.ok) {
                 toast({
-                    title: "Item Updated Successfully",
-                    description: JSON.stringify(result),
-                    status: "success",
-                    duration: 5000,
+                    title: "Item used",
                     isClosable: true
                 });
                 fetchInventoryItems();
             } else {
                 toast({
                     title: "Failed to Update Item",
-                    description: result.error,
-                    status: "error",
-                    duration: 5000,
                     isClosable: true
                 });
             }
@@ -105,29 +99,16 @@ const InventoryItem = ({ id, item, category, quantity, purchase_date, expiry_dat
             const result2 = await response2.json();
 
             if (response2.ok) {
-                toast({
-                    title: "Item Updated Successfully",
-                    description: JSON.stringify(result2),
-                    status: "success",
-                    duration: 5000,
-                    isClosable: true
-                });
                 fetchInventoryItems();
             } else {
                 toast({
                     title: "Failed to Update Item",
-                    description: result2.error,
-                    status: "error",
-                    duration: 5000,
                     isClosable: true
                 });
             }
         } catch (error) {
             toast({
                 title: "Error Updating Item",
-                description: error.message,
-                status: "error",
-                duration: 5000,
                 isClosable: true
             });
         }
@@ -147,19 +128,13 @@ const InventoryItem = ({ id, item, category, quantity, purchase_date, expiry_dat
             const result = await response.json();
             if (response.ok) {
                 toast({
-                    title: "Item Updated Successfully",
-                    description: JSON.stringify(result),
-                    status: "success",
-                    duration: 5000,
+                    title: "Item thrown away",
                     isClosable: true
                 });
                 fetchInventoryItems();
             } else {
                 toast({
                     title: "Failed to Update Item",
-                    description: result.error,
-                    status: "error",
-                    duration: 5000,
                     isClosable: true
                 });
             }
@@ -182,29 +157,16 @@ const InventoryItem = ({ id, item, category, quantity, purchase_date, expiry_dat
             const result2 = await response2.json();
 
             if (response2.ok) {
-                toast({
-                    title: "Item Updated Successfully",
-                    description: JSON.stringify(result2),
-                    status: "success",
-                    duration: 5000,
-                    isClosable: true
-                });
                 fetchInventoryItems();
             } else {
                 toast({
                     title: "Failed to Update Item",
-                    description: result2.error,
-                    status: "error",
-                    duration: 5000,
                     isClosable: true
                 });
             }
         } catch (error) {
             toast({
                 title: "Error Updating Item",
-                description: error.message,
-                status: "error",
-                duration: 5000,
                 isClosable: true
             });
         }
@@ -255,8 +217,8 @@ const InventoryItem = ({ id, item, category, quantity, purchase_date, expiry_dat
                         <Box display="flex" flexDirection="column" alignItems="center" w="full">
                         <Stack direction="row" spacing={5} mt={2}>
                             <Flex gap={2} align="center" paddingBottom="10px">
-                                <Button bg="#EDF2F7" color="#888888" fontSize="sm" size="xs" width="85px" height="40px" _hover={{ bg: "primary.800" }} onClick={onUsed}>Used</Button>
-                                <Button bg="red.200" color="black" fontSize="sm" size="xs" width="85px" height="40px" _hover={{ bg: "danger.900" }} onClick={onThrown}>Thrown</Button>
+                                <Button bg="#EDF2F7" color="#888888" fontSize="sm" size="xs" width="85px" height="40px"  onClick={onUsed}>Used</Button>
+                                <Button bg="red.200" color="black" fontSize="sm" size="xs" width="85px" height="40px"  onClick={onThrown}>Thrown</Button>
                             </Flex>
                         </Stack>
                         </Box>

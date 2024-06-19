@@ -193,7 +193,7 @@ function RecipeModal({ isOpen, onClose, recipe, userId }) {
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
-            <ModalContent>
+            <ModalContent p={5}>
                 <Flex justifyContent="space-between" alignItems="center" p={3} bg="#FFF5BA" borderRadius="8px 8px 0 0" >
                     <IconButton 
                         icon={<ChevronLeftIcon boxSize={6} />} 

@@ -101,10 +101,10 @@ const RecipeList = ({ userId }) => {
   };
 
   return (
-    <Box p={4} bg="yellow.100" borderRadius="md" boxShadow="md">
+    <div className="recipe-container">
+    <div className="recipe-content">
       <Heading mb={4}>⭐  Recipe Generator</Heading>
       <Text mb={4}>Time to create some magic in the kitchen! Select the ingredients you would like to cook with.</Text>
-      <Stack spacing={4} mb={4}>
         <Box bg="#19956D" p={4} borderRadius="md" boxShadow="md">
           <Flex align="center" mb={4}>
             <FormLabel mb={1}>Servings: </FormLabel>
@@ -128,7 +128,7 @@ const RecipeList = ({ userId }) => {
               </NumberInputStepper>
             </NumberInput>
           </Flex>
-          <Flex align="center" mb={4}>
+          <Flex align="center" mb={1}>
             <FormLabel mb={1}>Preference:</FormLabel>
             <Input
               value={preferences}
@@ -140,10 +140,10 @@ const RecipeList = ({ userId }) => {
             />
           </Flex>
         </Box>
-        <Box bg="white" p={4} borderRadius="md" boxShadow="md">
+        <Box  p={0} borderRadius="md" boxShadow="md">
           <Flex align="center">
-            <Text mr={2}>Ingredients:</Text>
-            <Stack direction="row" spacing={4}>
+            <Text paddingLeft="8px" mr={2}>Ingredients:</Text>
+            <Stack direction="row" spacing={4} mt={2}>
               <Switch
                 isChecked={!showExpiring}
                 onChange={() => setShowExpiring(false)}
@@ -156,13 +156,20 @@ const RecipeList = ({ userId }) => {
               <Text>Expiring</Text>
             </Stack>
           </Flex>
-          <Box mt={4}>
+          <Box mt={2}   
+          display="flex" 
+          flexDirection="column" 
+          alignItems="center" 
+          justifyContent="center"
+          width="100%"
+          gap="0px"
+          padding="0px 0px"
+          >
             {isLoading ? <Spinner /> : filteredInventory.map((item, index) => (
-              <IngredientItem key={index} {...item} fetchInventoryItems={fetchInventoryItems} userId={userId} />
+              <IngredientItem key={index} {...item} fetchInventoryItems={fetchInventoryItems} userId={userId} style={{ width: '100%', margin: 0, padding: 0 }}/>
             ))}
           </Box>
         </Box>
-      </Stack>
       <Button
         onClick={() => fetchRecommendedRecipes()}
         colorScheme="teal"
@@ -198,7 +205,8 @@ const RecipeList = ({ userId }) => {
           onLogRecipe={(recipe) => console.log('Recipe logged:', recipe)}
         />
       )}
-    </Box>
+    </div>
+    </div>
   );
 };
 

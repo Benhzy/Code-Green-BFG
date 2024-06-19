@@ -274,6 +274,7 @@ function App() {
         <Router>
             <div className="main-background">
             <div className="main-container">
+            <div class="main-content">
                 <div className="content">
                 <Routes>
                     <Route path="/" element={<Navigate to="/groceries" />} />
@@ -302,6 +303,7 @@ function App() {
                 </Routes>
                 </div>
                 <BottomMenuBar fetchInventoryItems={fetchInventoryItems} user_id={userId} />
+            </div>
             </div>
             </div>
         </Router>

@@ -25,14 +25,20 @@ const BottomMenuBar = ({ fetchInventoryItems, user_id }) => {
   const openForm = () => {
     setIsFormOpen(true);
     setIsOpen(false); // Close the floating buttons when form is opened
+    closeMenu();
   };
 
   const closeForm = () => {
     setIsFormOpen(false);
   };
 
+  const closeMenu = () => {
+    setIsOpen(false);
+  };
+
   const handleScanReceiptClick = () => {
     navigate("/scanner"); // Redirect to the camera page
+    closeMenu();
   };
 
   const uploadReceipt = () => {

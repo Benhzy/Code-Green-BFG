@@ -44,7 +44,7 @@ const IngredientItem = ({ id, item, category, quantity, purchase_date, expiry_da
         <Box
             className="inventory-item"
             p={0}
-            m={4} // Increased margin for distance between cards
+            m={1} // Increased margin for distance between cards
             borderWidth="0px"
             borderRadius="2xl"
             overflow="hidden"
@@ -53,7 +53,7 @@ const IngredientItem = ({ id, item, category, quantity, purchase_date, expiry_da
             sx={{
                 boxShadow: "2px 2px 3px rgba(0, 0, 0, 0.25)" // Custom shadow casting to the right and bottom
             }}
-            width="300px" // Increased width of the card
+            width="95%" // Increased width of the card
             cursor="pointer"
         >
             <Flex alignItems="center"> {/* Align items center */}

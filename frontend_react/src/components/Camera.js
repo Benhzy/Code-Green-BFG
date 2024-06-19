@@ -77,11 +77,12 @@ function CameraComponent({ userId }) {
         position="absolute"
         zIndex="1002"
         top="20px"
-        bg="#19956d"
-        color="white"
+        left="20px"
+        bg="#EDF2F7"
+        color="#888888"
         borderRadius="20px"
-        width="190px"
-        height="60px"
+        width="95px"
+        height="30px"
         _hover={{ bg: "#19956d" }}
       >Cancel</Button>
     </div>
