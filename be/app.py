@@ -321,8 +321,8 @@ def get_thrown_info_items(user_id):
 
 
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True) # insert ur ip address here
+# if __name__ == '__main__':
+#     app.run(host='0.0.0.0', debug=True) # insert ur ip address here
 
 
 # DONT CHANGE THIS, FOR EDWARD TO USE
