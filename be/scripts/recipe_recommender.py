@@ -255,3 +255,29 @@ def store_recipe(user_id, recipe_dict):
 # near_expiry_ingredients = "Fish, Potato, Carrot, Onion, Garlic, Ginger, Soy Sauce, Oyster Sauce, Cornstarch, Sugar, Salt, Pepper, Oil"
 # user_recipes = []
 # print(recommend_recipes(123456, "Chinese"))
+
+
+## HELPER FUNCTIONS
+
+def split_quantity(quantity):
+    index = len(quantity) - 1
+    while index >= 0 and not quantity[index].isdigit():
+        index -= 1
+
+    numeric_part = quantity[:index + 1].strip()
+    unit_part = quantity[index + 1:].strip().lower()
+
+    numeric_value = float(numeric_part) if '.' in numeric_part else int(numeric_part)
+    return numeric_value, unit_part
+
+def subtract_quantity(old_quantity, new_quantity):
+    old_numeric, old_unit = split_quantity(old_quantity)
+    new_numeric, new_unit = split_quantity(new_quantity)
+
+    # if old_unit != new_unit:
+    #     raise ValueError(f"Units do not match.\n{old_unit} vs {new_unit}")
+
+    updated_numeric = old_numeric - new_numeric
+    updated_quantity = f"{updated_numeric} {old_unit}".strip()
+
+    return updated_quantity

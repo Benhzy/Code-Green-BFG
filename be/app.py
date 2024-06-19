@@ -20,10 +20,10 @@ download_certificate()
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
-from scripts.db_connection import get_user_recipes_by_user_id, upsert_user_groceries, get_grocery_data_by_user_id, upsert_user_recipes, delete_user_grocery, delete_user_recipe, update_inventory
+from scripts.db_connection import get_user_recipes_by_user_id, upsert_user_groceries, get_grocery_data_by_user_id, upsert_user_recipes, delete_user_grocery, delete_user_recipe
 from scripts.db_connection import used_user_groceries
 from scripts.db_connection import thrown_user_groceries
-from scripts.recipe_recommender import recommend_recipes, store_recipe
+from scripts.recipe_recommender import recommend_recipes, store_recipe, subtract_quantity
 from scripts.receipt_scanner import extract_text, post_data
 from scripts.db_connection import get_most_wasted
 from scripts.db_connection import get_most_used
@@ -33,6 +33,9 @@ import base64
 from werkzeug.utils import secure_filename
 import os
 import warnings
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
 
 # Suppress the specific FutureWarning related to resume_download
 warnings.filterwarnings("ignore", category=FutureWarning, message="`resume_download` is deprecated and will be removed in version 1.0.0.")
@@ -52,7 +55,6 @@ except Exception as e:
 
 
 app = Flask(__name__)
-frontend_url = os.getenv('FRONTEND_URL')
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # cors = CORS(app, resources={r"/api/*": {"origins": frontend_url}})
@@ -245,21 +247,54 @@ def store_recipe():
     
     return jsonify([{"message": "Data posted successfully", "response": resp} for resp, stat in responses]), 201
 
-@app.route('/update_inventory', methods=['PATCH'])
+
+@app.route('/update_inventory', methods=['POST'])
 def update_inventory_item():
-    data = request.json
-    user_id = data['user_id']
-    item = data['item']
-    quantity = data['quantity']
-
-    # Update inventory logic
-    success, message = update_inventory(user_id, item, quantity)
-
-    if success:
-        return jsonify({"message": "Inventory updated successfully"}), 200
-    else:
-        return jsonify({"error": message}), 400
+    data = request.get_json()
     
+    # Check if data is a list and not empty
+    if not data or not isinstance(data, list):
+        return jsonify({"error": "Invalid data format; expected a non-empty list of items."}), 400
+    user_id = data[0].get('user_id')
+    if not user_id:
+        return jsonify({"error": "user_id is required for each item."}), 400
+    
+    items = []
+    for item in data:
+        if 'item' in item and 'quantity' in item and 'category' in item and 'purchase_date' in item and 'expiry_date' in item:
+            items.append(item)
+        else:
+            return jsonify({"error": "Each item must include item, quantity, category, purchase_date, and expiry_date."}), 400
+
+    # Fetch the existing inventory items for the user
+    old_data = get_grocery_data_by_user_id(user_id)
+
+    # Create a dictionary to hold the updated inventory
+    updated_inventory = {item['item']: item for item in old_data}
+
+    # Iterate through the new data and update the quantities
+    for item in items:
+        item_name = item['item']
+        new_quantity = item['quantity']
+
+        if item_name in updated_inventory:
+            old_quantity = updated_inventory[item_name]['quantity']
+            updated_quantity = subtract_quantity(old_quantity, new_quantity)
+            updated_inventory[item_name]['quantity'] = updated_quantity
+        else:
+            updated_inventory[item_name] = item
+
+    # Convert the updated inventory back to a list
+    updated_inventory_list = list(updated_inventory.values())
+
+    # Now upsert the user's groceries
+    result, status_code = upsert_user_groceries(user_id, updated_inventory_list)
+    
+    if status_code != 201:
+        return jsonify(result), status_code
+
+    return jsonify({"message": "Inventory updated successfully."}), 201
+
 @app.route('/upload_receipt/<user_id>', methods=['POST'])
 def upload_receipt(user_id):
     data = request.get_json()
