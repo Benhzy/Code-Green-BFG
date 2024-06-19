@@ -75,11 +75,13 @@ def generate_recipe_suggestions(ingredients, exp_ingredients, user_recipes, cuis
 
     Make sure the recipe follows the following preferences: {cuisine}.
 
-    Make sure this recipe can be prepared with the ingredients here: {all_ingredients_list}.
+    I have the following ingredients available: {all_ingredients_list}.
+
+    IMPORTANT!!! YOU MUST NOT USE INGRIDIENTS THAT ARE NOT AVAILABLE!
 
     Make sure the unit of measurement for ingredients is in metric.
 
-    You do not need to use all the ingredients, if a ingredient does not being in the recipe, omit it.
+    You do not need to use all the ingredients.
 
     Give your output in the following format!
 
