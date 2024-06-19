@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Modal,
   ModalOverlay,
@@ -13,15 +13,41 @@ import {
   Divider,
   Box
 } from '@chakra-ui/react';
-import { ChevronDownIcon, ChevronUpIcon, ArrowBackIcon, ChevronLeftIcon } from '@chakra-ui/icons';
+import { ChevronDownIcon, ChevronUpIcon, ChevronLeftIcon } from '@chakra-ui/icons';
 import { apiUrl } from './IpAdr';
 import Heart from '@react-sandbox/heart';
 
-function RecipeModal({ isOpen, onClose, recipe, onLogRecipe }) {
+function RecipeModal({ isOpen, onClose, recipe, userId }) {
     const toast = useToast();
     const [active, setActive] = useState(false);
     const [showIngredients, setShowIngredients] = useState(false);
     const [showInstructions, setShowInstructions] = useState(false);
+
+    useEffect(() => {
+        const checkRecipeInDatabase = async () => {
+            try {
+                const response = await fetch(`${apiUrl}/recipe/${String(userId)}`);
+                const data = await response.json();
+                if (data.some(r => r.recipe_name === recipe.recipe_name)) {
+                    setActive(true);
+                } else {
+                    setActive(false);
+                }
+            } catch (error) {
+                toast({
+                    title: "Error",
+                    description: "Failed to check recipe in database.",
+                    status: "error",
+                    duration: 5000,
+                    isClosable: true
+                });
+            }
+        };
+
+        if (isOpen) {
+            checkRecipeInDatabase();
+        }
+    }, [isOpen, recipe.recipe_name, userId, toast]);
 
     const parseIngredients = (ingredientsStr) => {
         return ingredientsStr.slice(1, -1).split("), (").map(item =>
@@ -41,15 +67,7 @@ function RecipeModal({ isOpen, onClose, recipe, onLogRecipe }) {
     const getImageSrc = (recipeName) => {
         const imageName = `${recipeName}.jpg`;
         const imagePath = `${process.env.PUBLIC_URL}/food_pics/${imageName}`;
-        const defaultImage = `${process.env.PUBLIC_URL}/food_pics/default.jpg`;
-
-        return imagePathExists(imagePath) ? imagePath : defaultImage;
-    };
-
-    const imagePathExists = (url) => {
-        const img = new Image();
-        img.src = url;
-        return img.complete && img.naturalHeight !== 0;
+        return imagePath;
     };
 
     const handleEditIngredients = async (recipe) => {
@@ -79,8 +97,7 @@ function RecipeModal({ isOpen, onClose, recipe, onLogRecipe }) {
             if (!response.ok) {
                 throw new Error(result.error || 'Failed to update inventory');
             }
-    
-            // Optionally, show a success message
+
             toast({
                 title: "Inventory Updated",
                 description: "Ingredients have been successfully updated in the inventory.",
@@ -92,6 +109,79 @@ function RecipeModal({ isOpen, onClose, recipe, onLogRecipe }) {
             // Utilize a toast to display error messages
             toast({
                 title: "Error Updating Inventory",
+                description: error.message,
+                status: "error",
+                duration: 5000,
+                isClosable: true
+            });
+        }
+    };
+
+    const handleHeartClick = async () => {
+        try {
+            if (active) {
+                // Delete the recipe from the database
+                const response = await fetch(`${apiUrl}/delete_recipe`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        recipe_name: recipe.recipe_name
+                    }),
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || 'Failed to delete recipe');
+                }
+
+                toast({
+                    title: "Recipe Deleted",
+                    description: "Recipe has been successfully deleted from your saved recipes.",
+                    status: "success",
+                    duration: 5000,
+                    isClosable: true
+                });
+                setActive(false);
+            } else {
+                // Add the recipe to the database
+                const response = await fetch(`${apiUrl}/add_recipe`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify([{
+                        user_id: userId,
+                        recipe_name: recipe.recipe_name,
+                        ingredients: parseIngredients(recipe.ingredients).map(ingredient => [ingredient.name, ingredient.quantity]),
+                        instructions: parseInstructions(recipe.instructions),
+                        difficulty: recipe.difficulty,
+                        time_required: recipe.time_required,
+                        description: recipe.description
+                    }]),
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || 'Failed to add recipe');
+                }
+
+                toast({
+                    title: "Recipe Added",
+                    description: "Recipe has been successfully added to your saved recipes.",
+                    status: "success",
+                    duration: 5000,
+                    isClosable: true
+                });
+                setActive(true);
+            }
+        } catch (error) {
+            toast({
+                title: "Error",
                 description: error.message,
                 status: "error",
                 duration: 5000,
@@ -130,7 +220,7 @@ function RecipeModal({ isOpen, onClose, recipe, onLogRecipe }) {
                         width={25}
                         height={25}
                         active={active}
-                        onClick={() => setActive(!active)}
+                        onClick={handleHeartClick}
                         style={{ marginRight: '16px', marginTop: '12px'}}
                     />
                 </Flex>
@@ -146,6 +236,7 @@ function RecipeModal({ isOpen, onClose, recipe, onLogRecipe }) {
                             objectFit: 'cover',
                             marginBottom: '16px' 
                         }} 
+                        onError={(e) => e.target.src = `${process.env.PUBLIC_URL}/food_pics/default.jpg`}
                     />
                     <Button
                         onClick={() => setShowIngredients(!showIngredients)}
