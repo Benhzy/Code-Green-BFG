@@ -57,7 +57,6 @@ const SavedRecipes = ({ userId }) => {
         <Button onClick={handleBack} colorScheme="teal">Back</Button>
       </Flex>
       {isLoading && <Spinner />}
-      {error && <Text color="red.500">{error}</Text>}
       <div>
         {savedRecipes.map((recipe, index) => (
           <RecipeCard key={index} recipe={recipe} onRecipeSelect={handleRecipeSelect} />
