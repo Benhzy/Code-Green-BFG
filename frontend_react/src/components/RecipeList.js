@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   Box,
   Button,
@@ -14,22 +14,22 @@ import {
   Flex,
   useToast,
   FormLabel,
-  Spinner
-} from '@chakra-ui/react';
-import { AddIcon, MinusIcon } from '@chakra-ui/icons';
-import { FaRegBookmark } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
-import { apiUrl } from './IpAdr';
-import IngredientItem from './IngredientItem';
-import RecipeModal from './RecipeModal'; // Import RecipeModal
-import './RecipeList.css';
+  Spinner,
+} from "@chakra-ui/react";
+import { AddIcon, MinusIcon } from "@chakra-ui/icons";
+import { FaRegBookmark } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import { apiUrl } from "./IpAdr";
+import IngredientItem from "./IngredientItem";
+import RecipeModal from "./RecipeModal"; // Import RecipeModal
+import "./RecipeList.css";
 
 const RecipeList = ({ userId }) => {
   const [recipes, setRecipes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [servings, setServings] = useState(1);
-  const [preferences, setPreferences] = useState('');
+  const [preferences, setPreferences] = useState("");
   const [inventory, setInventory] = useState([]);
   const [showExpiring, setShowExpiring] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState(null); // State to hold the selected recipe
@@ -45,32 +45,37 @@ const RecipeList = ({ userId }) => {
     return diffDays;
   };
 
-  const fetchRecommendedRecipes = useCallback(async (url = `${apiUrl}/recommend_recipe/${userId}?cuisine=${preferences}&servings=${servings}`) => {
-    setIsLoading(true);
-    setError('');
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        const errorMessage = await response.text();
-        throw new Error(errorMessage || 'Failed to fetch recipes');
+  const fetchRecommendedRecipes = useCallback(
+    async (
+      url = `${apiUrl}/recommend_recipe/${userId}?cuisine=${preferences}&servings=${servings}`
+    ) => {
+      setIsLoading(true);
+      setError("");
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          const errorMessage = await response.text();
+          throw new Error(errorMessage || "Failed to fetch recipes");
+        }
+        const data = await response.json();
+        setRecipes(data);
+        setSelectedRecipe(data[0]); // Set the first recipe as the selected recipe
+        setIsModalOpen(true); // Open the modal
+      } catch (error) {
+        setError(`Error fetching recipes: ${error.message}`);
+      } finally {
+        setIsLoading(false);
       }
-      const data = await response.json();
-      setRecipes(data);
-      setSelectedRecipe(data[0]); // Set the first recipe as the selected recipe
-      setIsModalOpen(true); // Open the modal
-    } catch (error) {
-      setError(`Error fetching recipes: ${error.message}`);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [userId, preferences, servings]);
+    },
+    [userId, preferences, servings]
+  );
 
   const fetchInventoryItems = useCallback(async () => {
     try {
       const response = await fetch(`${apiUrl}/grocery/${userId}`);
       if (!response.ok) {
         const errorMessage = await response.text();
-        throw new Error(errorMessage || 'Failed to fetch inventory');
+        throw new Error(errorMessage || "Failed to fetch inventory");
       }
       const data = await response.json();
       setInventory(data);
@@ -80,7 +85,7 @@ const RecipeList = ({ userId }) => {
         description: error.message,
         status: "error",
         duration: 5000,
-        isClosable: true
+        isClosable: true,
       });
     }
   }, [userId, toast]);
@@ -91,7 +96,9 @@ const RecipeList = ({ userId }) => {
 
   const filteredInventory = useMemo(() => {
     return showExpiring
-      ? inventory.filter(item => calculateDaysUntilExpiry(item.expiry_date) <= 5)
+      ? inventory.filter(
+          (item) => calculateDaysUntilExpiry(item.expiry_date) <= 5
+        )
       : inventory;
   }, [inventory, showExpiring]);
 
@@ -101,29 +108,50 @@ const RecipeList = ({ userId }) => {
   };
 
   return (
-    <div className="recipe-container">
     <div className="recipe-content">
-      <Heading mb={4}>⭐  Recipe Generator</Heading>
-      <Text mb={4}>Time to create some magic in the kitchen! Select the ingredients you would like to cook with.</Text>
-        <Box bg="#19956D" p={4} borderRadius="md" boxShadow="md">
+      <Heading mb={4}>⭐ Recipe Generator</Heading>
+      <Text mb={4}>
+        Time to create some magic in the kitchen! Select the ingredients you
+        would like to cook with.
+      </Text>
+      <Box justifyContent="center" alignItems="center" display="flex">
+        <Box bg="#19956D" p={4} borderRadius="md" boxShadow="md" width="95%">
           <Flex align="center" mb={4}>
             <FormLabel mb={1}>Servings: </FormLabel>
-            <NumberInput min={1} value={servings} onChange={(valueString) => setServings(parseInt(valueString))} width="100%" position="relative" bg="white">
+            <NumberInput
+              min={1}
+              value={servings}
+              onChange={(valueString) => setServings(parseInt(valueString))}
+              width="100%"
+              position="relative"
+              bg="white"
+            >
               <NumberInputStepper position="absolute" left="0">
                 <IconButton
                   aria-label="Decrement"
                   icon={<MinusIcon />}
                   size="md"
-                  onClick={() => setServings((prevServings) => (prevServings > 1 ? prevServings - 1 : 1))}
+                  onClick={() =>
+                    setServings((prevServings) =>
+                      prevServings > 1 ? prevServings - 1 : 1
+                    )
+                  }
                 />
               </NumberInputStepper>
-              <NumberInputField pl="2rem" pr="2rem" paddingLeft="53px" textAlign="center" />
+              <NumberInputField
+                pl="2rem"
+                pr="2rem"
+                paddingLeft="53px"
+                textAlign="center"
+              />
               <NumberInputStepper position="absolute" right="4">
                 <IconButton
                   aria-label="Increment"
                   icon={<AddIcon />}
                   size="md"
-                  onClick={() => setServings((prevServings) => prevServings + 1)}
+                  onClick={() =>
+                    setServings((prevServings) => prevServings + 1)
+                  }
                 />
               </NumberInputStepper>
             </NumberInput>
@@ -140,36 +168,50 @@ const RecipeList = ({ userId }) => {
             />
           </Flex>
         </Box>
-        <Box  p={0} borderRadius="md" boxShadow="md">
-          <Flex align="center">
-            <Text paddingLeft="8px" mr={2}>Ingredients:</Text>
-            <Stack direction="row" spacing={4} mt={2}>
-              <Switch
-                isChecked={!showExpiring}
-                onChange={() => setShowExpiring(false)}
-              />
-              <Text>All</Text>
-              <Switch
-                isChecked={showExpiring}
-                onChange={() => setShowExpiring(true)}
-              />
-              <Text>Expiring</Text>
-            </Stack>
-          </Flex>
-          <Box mt={2}   
-          display="flex" 
-          flexDirection="column" 
-          alignItems="center" 
-          justifyContent="center"
-          width="100%"
-          gap="0px"
-          padding="0px 0px"
-          >
-            {isLoading ? <Spinner /> : filteredInventory.map((item, index) => (
-              <IngredientItem key={index} {...item} fetchInventoryItems={fetchInventoryItems} userId={userId} style={{ width: '100%', margin: 0, padding: 0 }}/>
-            ))}
-          </Box>
-        </Box>
+      </Box>
+      <Box justifyContent="left" display="flex" alignItems="center" paddingLeft="4px">
+      <Flex align="center">
+        <Text paddingLeft="8px" mr={2}>
+          Ingredients:
+        </Text>
+        <Stack direction="row" spacing={4} mt={2}>
+          <Switch
+            isChecked={!showExpiring}
+            onChange={() => setShowExpiring(false)}
+          />
+          <Text>All</Text>
+          <Switch
+            isChecked={showExpiring}
+            onChange={() => setShowExpiring(true)}
+          />
+          <Text>Expiring</Text>
+        </Stack>
+      </Flex>
+      </Box>
+      <Box
+        mt={2}
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        justifyContent="center"
+        width="100%"
+        gap="0px"
+        padding="0px 0px 0px 0px"
+      >
+        {isLoading ? (
+          <Spinner />
+        ) : (
+          filteredInventory.map((item, index) => (
+            <IngredientItem
+              key={index}
+              {...item}
+              fetchInventoryItems={fetchInventoryItems}
+              userId={userId}
+              style={{ width: "100%", margin: 0, padding: 0 }}
+            />
+          ))
+        )}
+      </Box>
       <Button
         onClick={() => fetchRecommendedRecipes()}
         colorScheme="teal"
@@ -194,7 +236,7 @@ const RecipeList = ({ userId }) => {
         colorScheme="teal"
         size="lg"
         isRound
-        onClick={() => navigate('/saved-recipes')}
+        onClick={() => navigate("/saved-recipes")}
       />
       {selectedRecipe && (
         <RecipeModal
@@ -202,10 +244,9 @@ const RecipeList = ({ userId }) => {
           onClose={closeModal}
           recipe={selectedRecipe}
           userId={userId}
-          onLogRecipe={(recipe) => console.log('Recipe logged:', recipe)}
+          onLogRecipe={(recipe) => console.log("Recipe logged:", recipe)}
         />
       )}
-    </div>
     </div>
   );
 };

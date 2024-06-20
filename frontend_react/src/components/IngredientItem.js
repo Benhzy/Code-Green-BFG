@@ -7,7 +7,7 @@ const categoryEmojis = {
     Vegetable: "🥦",
     Dairy: "🥛",
     Meat: "🍖",
-    Grain: "🥐",
+    Grain: "🌾",
     Seafood: "🐟",
     Condiment: "🧂",
     "Dried Good": "🍪",

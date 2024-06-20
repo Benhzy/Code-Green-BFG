@@ -6,37 +6,28 @@ import {
   Box,
   Button,
   Flex,
-  Stack,
-  FormControl,
-  FormLabel,
-  Input,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
   IconButton,
-  Select,
   useDisclosure,
   Modal,
   ModalOverlay,
   ModalContent,
-  ModalHeader,
   ModalBody,
   ModalCloseButton,
+  Text,
+  Stack,
 } from "@chakra-ui/react";
-import { MinusIcon, AddIcon } from '@chakra-ui/icons';
+import { DeleteIcon } from '@chakra-ui/icons';
 import IngredientItem from './IngredientItem';
+import EditReceiptItem from './EditReceiptItem';
 
-function ItemsList({ userId }) {
+function ItemsList({ userId, fetchInventoryItems }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [items, setItems] = useState(location.state.items);
   const [editItemIndex, setEditItemIndex] = useState(null);
-  const [item, setItem] = useState('');
-  const [quantity, setQuantity] = useState('');
-  const [category, setCategory] = useState('');
-  const [purchaseDate, setPurchaseDate] = useState('');
-  const [expiryDate, setExpiryDate] = useState('');
+  const [editItem, setEditItem] = useState(null);
+  const [editItemCategory, setEditItemCategory] = useState(null);
 
   const handleDelete = (index) => {
     setItems(items.filter((_, i) => i !== index));
@@ -47,31 +38,41 @@ function ItemsList({ userId }) {
   };
 
   const handleEdit = (index) => {
-    const itemToEdit = items[index];
     setEditItemIndex(index);
-    setItem(itemToEdit.item);
-    setQuantity(itemToEdit.quantity);
-    setCategory(itemToEdit.category);
-    setPurchaseDate(itemToEdit.purchaseDate);
-    setExpiryDate(itemToEdit.expiryDate);
+    setEditItem(items[index]);
+    setEditItemCategory(items[index].category);
     onOpen();
   };
 
   const handleConfirm = async () => {
-    await axios.post(`${apiUrl}/upload_items/${userId}`, { items });
-    navigate('/groceries');
+    try {
+      await axios.post(`${apiUrl}/upload_items/${userId}`, { items });
+      await fetchInventoryItems();
+      navigate('/groceries');
+    } catch (error) {
+      console.error("Error uploading items:", error);
+    }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const updatedItems = [...items];
-    updatedItems[editItemIndex] = { item, quantity, category, purchaseDate, expiryDate };
+  const handleSave = (updatedItem) => {
+    const updatedItems = items.map((it, idx) => idx === editItemIndex ? updatedItem : it);
     setItems(updatedItems);
     onClose();
   };
 
   return (
     <Box>
+      <Box alignItems="center" justifyContent="center" display="flex">
+        <Stack align="center" justify="center" spacing={0}>
+        <Text fontSize="6xl">✅</Text>
+        <Text fontSize="2xl" as = 'b'>Success!</Text>
+        </Stack>
+      </Box>
+      <Box alignItems="center" justifyContent="center" display="flex">
+        <Box width="95%" alignItems="center" justifyContent="center" display="flex">
+          <Text fontSize="lg" >Is this right? Tap an item to edit or press the delete button on the right!</Text>
+        </Box>
+      </Box>
       <Box 
         mt={2}   
         display="flex" 
@@ -85,87 +86,51 @@ function ItemsList({ userId }) {
         {items.map((item, index) => (
           <Box
             key={index}
-            onClick={() => handleEdit(index)}
             width="100%"
+            position="relative"  // Set the container position to relative
             cursor="pointer"
+            mb={2}  // Add margin to separate the items
           >
-            <IngredientItem 
-              {...item} 
-              userId={userId} 
-              style={{ width: '100%', margin: 0, padding: 0 }}
+            <Box onClick={() => handleEdit(index)} width="100%">
+              <IngredientItem 
+                {...item} 
+                userId={userId} 
+                style={{ width: '100%', margin: 0, padding: 0 }}
+              />
+            </Box>
+            <IconButton
+              icon={<DeleteIcon />}
+              onClick={() => handleDelete(index)}
+              aria-label="Delete item"
+              variant="ghost"
+              position="absolute"  // Position the button absolutely within the container
+              right="30px"  // Position the button to the right
+              top="50%"  // Center the button vertically
+              transform="translateY(-50%)"  // Adjust vertical position
             />
           </Box>
         ))}
         <Flex alignItems="center" justifyContent="space-between" display="flex" width="95%" mt={2}>
-          <Button onClick={handleCamera}>Scan another receipt</Button>  
-          <Button onClick={handleConfirm}>Confirm</Button>
+          <Button bg="#edf2f7" color="#888888" onClick={handleCamera}>Scan another receipt</Button>  
+          <Button bg="#19956d" color="white"  onClick={handleConfirm}>Confirm</Button>
         </Flex>
       </Box>
 
       <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Edit an item</ModalHeader>
-          <ModalCloseButton />
+        <Box>
           <ModalBody>
-            <form onSubmit={handleSubmit}>
-              <Stack spacing={4}>
-                <FormControl isRequired>
-                  <FormLabel mb={1}>Item</FormLabel>
-                  <Input type="text" value={item} onChange={(e) => setItem(e.target.value)} />
-                </FormControl>
-                <FormControl isRequired>
-                  <FormLabel mb={1}>Quantity</FormLabel>
-                  <NumberInput min={0} value={quantity} onChange={valueString => setQuantity(valueString)} position="relative">
-                    <NumberInputStepper position="absolute" left="0">
-                      <IconButton
-                        aria-label="Decrement"
-                        icon={<MinusIcon />}
-                        size="md"
-                        onClick={() => setQuantity((prevQuantity) => (parseInt(prevQuantity || "0") > 0 ? (parseInt(prevQuantity || "0") - 1).toString() : "0"))}
-                      />
-                    </NumberInputStepper>
-                    <NumberInputField pl="2rem" pr="2rem" paddingLeft="53px" /> {/* Adjust padding to ensure space for steppers */}
-                    <NumberInputStepper position="absolute" right="4">
-                      <IconButton
-                        aria-label="Increment"
-                        icon={<AddIcon />}
-                        size="md"
-                        onClick={() => setQuantity((prevQuantity) => (parseInt(prevQuantity || "0") + 1).toString())}
-                      />
-                    </NumberInputStepper>
-                  </NumberInput>
-                </FormControl>
-                <FormControl isRequired>
-                  <FormLabel mb={1}>Category</FormLabel>
-                  <Select placeholder="Select category" value={category} onChange={(e) => setCategory(e.target.value)}>
-                    <option value="Vegetable">Vegetable</option>
-                    <option value="Meat">Meat</option>
-                    <option value="Dairy">Dairy</option>
-                    <option value="Fruit">Fruit</option>
-                    <option value="Grain">Grain</option>
-                    <option value="Seafood">Seafood</option>
-                    <option value="Condiment">Condiment</option>
-                    <option value="Dried Good">Dried Good</option>
-                    <option value="Canned Food">Canned Food</option>
-                  </Select>
-                </FormControl>
-                <FormControl isRequired>
-                  <FormLabel mb={1}>Purchase Date</FormLabel>
-                  <Input type="date" value={purchaseDate} onChange={(e) => setPurchaseDate(e.target.value)} />
-                </FormControl>
-                <FormControl isRequired>
-                  <FormLabel mb={1}>Expiry Date</FormLabel>
-                  <Input type="date" value={expiryDate} onChange={(e) => setExpiryDate(e.target.value)} />
-                </FormControl>
-                <Flex mt={4} justifyContent="space-between">
-                  <Button bg="#edf2f7" color="#888888" onClick={onClose}>Cancel</Button>
-                  <Button colorScheme="orange" type="submit" bg="#19956d">Edit Item</Button>
-                </Flex>
-              </Stack>
-            </form>
+            {editItem && (
+              <EditReceiptItem
+                item={editItem}
+                index={editItemIndex}
+                items={items}
+                onSave={handleSave}
+                onClose={onClose}
+                category={editItemCategory}
+              />
+            )}
           </ModalBody>
-        </ModalContent>
+        </Box>
       </Modal>
     </Box>
   );

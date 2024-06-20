@@ -61,10 +61,7 @@ const EditItemForm = ({ id, item: initialItem, category: initialCategory, quanti
             if (response.ok) {
                 toast({
                     title: "Item Updated Successfully",
-                    description: JSON.stringify(result),
-                    status: "success",
                     duration: 5000,
-                    isClosable: true
                 });
                 fetchInventoryItems();
                 onClose();
@@ -152,3 +149,4 @@ const EditItemForm = ({ id, item: initialItem, category: initialCategory, quanti
 };
 
 export default EditItemForm;
+

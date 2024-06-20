@@ -77,7 +77,7 @@ const BottomMenuBar = ({ fetchInventoryItems, user_id }) => {
             <Stack spacing={0}>
               <Text>🛒</Text>
               <Text fontSize="xs" paddingTop="5px">
-                Grocery
+                Groceries
               </Text>
             </Stack>
           </Button>
@@ -136,9 +136,9 @@ const BottomMenuBar = ({ fetchInventoryItems, user_id }) => {
             _hover={{ bg: "#cff1e6" }}
           >
             <Stack spacing={0}>
-              <Text>📊</Text>
+              <Text>👤</Text>
               <Text fontSize="xs" paddingTop="5px">
-                Dashboard
+                Profile
               </Text>
             </Stack>
           </Button>

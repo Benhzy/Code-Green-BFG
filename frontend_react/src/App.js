@@ -39,7 +39,7 @@ const Groceries = ({ inventoryItems, onDecrement, onDelete, handleFilterChange, 
             <Stack direction="row" spacing={4} paddingLeft="5px">
                 <SortButton handleSortChange={handleSortChange} sortCriterion={sortCriterion} />
                 <Button colorScheme={selectedFilter === 'All' ? 'green' : 'gray'} variant="solid" onClick={() => handleFilterChange('All')}>All</Button>
-                <Button colorScheme={selectedFilter === 'Vegetable' ? 'green' : 'gray'} variant="solid" onClick={() => handleFilterChange('Vegetable')}>🍅 Vegetable</Button>
+                <Button colorScheme={selectedFilter === 'Vegetable' ? 'green' : 'gray'} variant="solid" onClick={() => handleFilterChange('Vegetable')}>🥦 Vegetable</Button>
                 <Button colorScheme={selectedFilter === 'Meat' ? 'green' : 'gray'} variant="solid" onClick={() => handleFilterChange('Meat')}>🍖 Meat</Button>
                 <Button colorScheme={selectedFilter === 'Dairy' ? 'green' : 'gray'} variant="solid" onClick={() => handleFilterChange('Dairy')}>🥛 Dairy</Button>
                 <Button colorScheme={selectedFilter === 'Fruit' ? 'green' : 'gray'} variant="solid" onClick={() => handleFilterChange('Fruit')}>🍎 Fruit</Button>
@@ -92,7 +92,7 @@ const AddItem = () => (
 );
 
 function App() {
-    const userId = 5; // Replace with the actual user ID
+    const userId = 6; // Replace with the actual user ID
     const [filter, setFilter] = useState('All');
     const [inventoryItems, setInventoryItems] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
@@ -294,11 +294,11 @@ function App() {
                         />
                     } />
                     <Route path="/add" element={<AddItem user_id={userId} />} />
-                    <Route path="/scanner" element={<CameraComponent userId={userId} />} />
+                    <Route path="/scanner" element={<CameraComponent userId={userId}/>} />
                     <Route path="/edit-item" element={<EditItemForm fetchInventoryItems={fetchInventoryItems} />} />
                     <Route path="/upload-receipt" element={<ImageUpload userId={userId} />} />
                     <Route path="/edit/:index" element={<EditReceiptItem />} />
-                    <Route path="/items" element={<ItemsList userId={userId} />} />
+                    <Route path="/items" element={<ItemsList userId={userId} fetchInventoryItems={fetchInventoryItems}/>} />
                     <Route path="/dashboard" element={<Dashboard userId={userId} />} />
                 </Routes>
                 </div>
