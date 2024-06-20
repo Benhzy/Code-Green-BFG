@@ -9,10 +9,7 @@ import {
   IconButton,
   useDisclosure,
   Modal,
-  ModalOverlay,
-  ModalContent,
   ModalBody,
-  ModalCloseButton,
   Text,
   Stack,
 } from "@chakra-ui/react";
@@ -89,7 +86,7 @@ function ItemsList({ userId, fetchInventoryItems }) {
             width="100%"
             position="relative"  // Set the container position to relative
             cursor="pointer"
-            mb={2}  // Add margin to separate the items
+            mb={0}  // Add margin to separate the items
           >
             <Box onClick={() => handleEdit(index)} width="100%">
               <IngredientItem 
@@ -111,7 +108,7 @@ function ItemsList({ userId, fetchInventoryItems }) {
           </Box>
         ))}
         <Flex alignItems="center" justifyContent="space-between" display="flex" width="95%" mt={2}>
-          <Button bg="#edf2f7" color="#888888" onClick={handleCamera}>Scan another receipt</Button>  
+          <Button bg="#edf2f7" color="#888888" onClick={handleCamera}>Scan again</Button>  
           <Button bg="#19956d" color="white"  onClick={handleConfirm}>Confirm</Button>
         </Flex>
       </Box>

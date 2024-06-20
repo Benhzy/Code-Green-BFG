@@ -109,11 +109,15 @@ const RecipeList = ({ userId }) => {
 
   return (
     <div className="recipe-content">
-      <Heading mb={4}>⭐ Recipe Generator</Heading>
-      <Text mb={4}>
+      <Box>
+      <Box alignItems="center" justifyContent="center" display="flex">      <Heading mb={4}>Recipe Generator</Heading>      </Box>
+      <Box alignItems="center" justifyContent="center" display="flex">
+      <Text mb={4} width="95%">
         Time to create some magic in the kitchen! Select the ingredients you
         would like to cook with.
       </Text>
+      </Box>
+
       <Box justifyContent="center" alignItems="center" display="flex">
         <Box bg="#19956D" p={4} borderRadius="md" boxShadow="md" width="95%">
           <Flex align="center" mb={4}>
@@ -217,7 +221,7 @@ const RecipeList = ({ userId }) => {
         colorScheme="teal"
         mt={4}
         position="fixed"
-        bottom="100px"
+        bottom="11%"
         left="50%"
         transform="translateX(-50%)"
         zIndex="10"
@@ -230,8 +234,8 @@ const RecipeList = ({ userId }) => {
         icon={<FaRegBookmark />}
         aria-label="Bookmark Recipes"
         position="fixed"
-        top="30px"
-        right="16px"
+        bottom="11%"
+        right="7%"
         zIndex="1000"
         colorScheme="teal"
         size="lg"
@@ -247,6 +251,7 @@ const RecipeList = ({ userId }) => {
           onLogRecipe={(recipe) => console.log("Recipe logged:", recipe)}
         />
       )}
+    </Box>
     </div>
   );
 };
