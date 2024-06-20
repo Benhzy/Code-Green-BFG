@@ -15,6 +15,7 @@ import EditReceiptItem from './components/EditReceiptItem';
 import Dashboard from './components/Dashboard.js'
 import { apiUrl } from './components/IpAdr'; 
 import axios from 'axios';
+import Leaderboard from './components/Leaderboard.js';
 
 
 const Groceries = ({ inventoryItems, onDecrement, onDelete, handleFilterChange, handleSearchChange, searchQuery, fetchInventoryItems, handleSortChange, sortCriterion, selectedFilter }) => (
@@ -300,6 +301,7 @@ function App() {
                     <Route path="/edit/:index" element={<EditReceiptItem />} />
                     <Route path="/items" element={<ItemsList userId={userId} fetchInventoryItems={fetchInventoryItems}/>} />
                     <Route path="/dashboard" element={<Dashboard userId={userId} />} />
+                    <Route path="/community" element={<Leaderboard userId={userId} />}/>
                 </Routes>
                 </div>
                 <BottomMenuBar fetchInventoryItems={fetchInventoryItems} user_id={userId} />
