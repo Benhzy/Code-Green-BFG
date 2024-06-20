@@ -68,30 +68,72 @@ a:focus {
 
 .main-container {
   position: relative;
-  margin: 20px;
+  margin: 10px;
   padding: 0px;
   padding-bottom: 150px; /* Adjust this value based on the height of your bottom menu bar */
-  /* background-color: #ffffff; */
   border-radius: 10px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  min-height: 160vh; /* Ensure it covers the full height minus the navbar if any */
-  flex-direction: column;
+  min-height: 100vh; /* Ensure it covers at least the full height of the viewport */
   display: flex;
+  flex-direction: column;
+  align-items: center; /* Center horizontally */
+  justify-content: center; /* Center vertically */
   width: 420px;
-}
-content {
-  flex: 1; /* Allows the content area to expand and fill available space */
-  overflow-y: auto; /* Allows scrolling within the content area */
+  overflow-y: auto; /* Allows scrolling within the container */
 }
 
+.main-content {
+  flex: 1; /* Allows the content area to expand and fill available space */
+  overflow-y: auto; /* Allows scrolling within the content area */
+  /* display: flex; */
+  align-items: center; /* Center content vertically */
+  justify-content: center; /* Center content horizontally */
+  width: 100%; /* Ensure content takes the full width of the container */
+}
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .main-container {
     margin-left: 5px; /* Reset margin on small screens */
     margin-right: 5px;
+    width: 100%; /* Ensure the container takes full width on small screens */
   }
 }
+
+.recipe-container {
+  position: relative;
+  margin: 10px;
+  padding: 0px;
+  padding-bottom: 150px; /* Adjust this value based on the height of your bottom menu bar */
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  min-height: 100vh; /* Ensure it covers at least the full height of the viewport */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center horizontally */
+  justify-content: center; /* Center vertically */
+  width: 420px;
+  overflow-y: auto; /* Allows scrolling within the container */
+}
+
+.recipe-content {
+  flex: 1; /* Allows the content area to expand and fill available space */
+  overflow-y: auto; /* Allows scrolling within the content area */
+  /* display: flex; */
+  align-items: center; /* Center content vertically */
+  justify-content: center; /* Center content horizontally */
+  width: 100%; /* Ensure content takes the full width of the container */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .recipe-container {
+    margin-left: 5px; /* Reset margin on small screens */
+    margin-right: 5px;
+    width: 100%; /* Ensure the container takes full width on small screens */
+  }
+}
+
 
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Inter', serif;
@@ -100,6 +142,7 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 0.5em;
   line-height: 1.2;
 }
+
 
 
 

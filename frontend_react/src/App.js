@@ -6,9 +6,16 @@ import InventoryItem from './components/InventoryItem';
 import BottomMenuBar from './components/BottomMenuBar';
 import RecipeList from './components/RecipeList';
 import CameraComponent from './components/Camera';
+import ImageUpload from './components/ImageUpload';
+import ItemsList from './components/ReceiptItemsList';
+import SavedRecipes from './components/SavedRecipes';
 import './App.css';
-import EditItemForm from './components/EditItemForm';
-import { apiUrl } from './components/IpAdr';
+import EditItemForm from './components/EditItemForm'; 
+import EditReceiptItem from './components/EditReceiptItem';
+import Dashboard from './components/Dashboard.js'
+import { apiUrl } from './components/IpAdr'; 
+import axios from 'axios';
+
 
 const Groceries = ({ inventoryItems, onDecrement, onDelete, handleFilterChange, handleSearchChange, searchQuery, fetchInventoryItems, handleSortChange, sortCriterion, selectedFilter }) => (
     <>
@@ -32,7 +39,7 @@ const Groceries = ({ inventoryItems, onDecrement, onDelete, handleFilterChange, 
             <Stack direction="row" spacing={4} paddingLeft="5px">
                 <SortButton handleSortChange={handleSortChange} sortCriterion={sortCriterion} />
                 <Button colorScheme={selectedFilter === 'All' ? 'green' : 'gray'} variant="solid" onClick={() => handleFilterChange('All')}>All</Button>
-                <Button colorScheme={selectedFilter === 'Vegetable' ? 'green' : 'gray'} variant="solid" onClick={() => handleFilterChange('Vegetable')}>🍅 Vegetable</Button>
+                <Button colorScheme={selectedFilter === 'Vegetable' ? 'green' : 'gray'} variant="solid" onClick={() => handleFilterChange('Vegetable')}>🥦 Vegetable</Button>
                 <Button colorScheme={selectedFilter === 'Meat' ? 'green' : 'gray'} variant="solid" onClick={() => handleFilterChange('Meat')}>🍖 Meat</Button>
                 <Button colorScheme={selectedFilter === 'Dairy' ? 'green' : 'gray'} variant="solid" onClick={() => handleFilterChange('Dairy')}>🥛 Dairy</Button>
                 <Button colorScheme={selectedFilter === 'Fruit' ? 'green' : 'gray'} variant="solid" onClick={() => handleFilterChange('Fruit')}>🍎 Fruit</Button>
@@ -56,6 +63,7 @@ const Groceries = ({ inventoryItems, onDecrement, onDelete, handleFilterChange, 
                     onDecrement={onDecrement}
                     onDelete={() => onDelete(item.item, item.purchase_date, item.expiry_date)}
                     fetchInventoryItems={fetchInventoryItems} // Pass fetchInventoryItems prop
+                    user_id={item.user_id} // Pass user_id prop 
                 />
             ))}
         </div>
@@ -84,11 +92,12 @@ const AddItem = () => (
 );
 
 function App() {
+    const userId = 6; // Replace with the actual user ID
     const [filter, setFilter] = useState('All');
     const [inventoryItems, setInventoryItems] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [sortCriterion, setSortCriterion] = useState('expiry_date'); // Change default sort criterion here
-    const userId = 5; // Replace with the actual user ID
+    
 
     const fetchInventoryItems = async () => {
         try {
@@ -265,29 +274,36 @@ function App() {
         <Router>
             <div className="main-background">
             <div className="main-container">
+            <div class="main-content">
                 <div className="content">
-                    <Routes>
-                        <Route path="/" element={<Navigate to="/groceries" />} />
-                        <Route path="/recipes" element={<RecipeList userId={userId} />} />
-                        <Route path="/groceries" element={
-                            <Groceries
-                                inventoryItems={filteredSortedItems}
-                                onDecrement={onDecrement}
-                                onDelete={onDelete}
-                                handleFilterChange={handleFilterChange}
-                                handleSearchChange={handleSearchChange}
-                                fetchInventoryItems={fetchInventoryItems}
-                                handleSortChange={handleSortChange}
-                                sortCriterion={sortCriterion}
-                                selectedFilter={filter}
-                            />
-                        } />
-                        <Route path="/add" element={<AddItem />} />
-                        <Route path="/scanner" element={<CameraComponent userId={userId} />} />
-                        <Route path="/edit-item" element={<EditItemForm fetchInventoryItems={fetchInventoryItems} />} />
-                    </Routes>
+                <Routes>
+                    <Route path="/" element={<Navigate to="/groceries" />} />
+                    <Route path="/recipes" element={<RecipeList userId={userId} />} />
+                    <Route path="/saved-recipes" element={<SavedRecipes userId={userId} />} />
+                    <Route path="/groceries" element={
+                        <Groceries
+                            inventoryItems={filteredSortedItems}
+                            onDecrement={onDecrement}
+                            onDelete={onDelete}
+                            handleFilterChange={handleFilterChange}
+                            handleSearchChange={handleSearchChange}
+                            fetchInventoryItems={fetchInventoryItems}
+                            handleSortChange={handleSortChange}
+                            sortCriterion={sortCriterion}
+                            selectedFilter={filter}
+                        />
+                    } />
+                    <Route path="/add" element={<AddItem user_id={userId} />} />
+                    <Route path="/scanner" element={<CameraComponent userId={userId}/>} />
+                    <Route path="/edit-item" element={<EditItemForm fetchInventoryItems={fetchInventoryItems} />} />
+                    <Route path="/upload-receipt" element={<ImageUpload userId={userId} />} />
+                    <Route path="/edit/:index" element={<EditReceiptItem />} />
+                    <Route path="/items" element={<ItemsList userId={userId} fetchInventoryItems={fetchInventoryItems}/>} />
+                    <Route path="/dashboard" element={<Dashboard userId={userId} />} />
+                </Routes>
                 </div>
-                <BottomMenuBar fetchInventoryItems={fetchInventoryItems} />
+                <BottomMenuBar fetchInventoryItems={fetchInventoryItems} user_id={userId} />
+            </div>
             </div>
             </div>
         </Router>

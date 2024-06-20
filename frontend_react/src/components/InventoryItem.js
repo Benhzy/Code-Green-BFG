@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Button, Box, Text, Stack, Flex, Divider,} from '@chakra-ui/react';
+import { Button, Box, Text, Stack, Flex, Divider, useToast } from '@chakra-ui/react';
 import EditItemForm from './EditItemForm';
+import { apiUrl } from './IpAdr';
 
 // Mapping categories to emojis
 const categoryEmojis = {
@@ -8,7 +9,7 @@ const categoryEmojis = {
     Vegetable: "🥦",
     Dairy: "🥛",
     Meat: "🍖",
-    Grain: "🥐",
+    Grain: "🌾",
     Seafood: "🐟",
     Condiment: "🧂",
     "Dried Good": "🍪",
@@ -24,7 +25,7 @@ const calculateDaysUntilExpiry = (expiryDate) => {
     return diffDays;
 };
 
-const InventoryItem = ({ id, item, category, quantity, purchase_date, expiry_date, onDecrement, onDelete, fetchInventoryItems }) => {
+const InventoryItem = ({ id, item, category, quantity, purchase_date, expiry_date, onDecrement, onDelete, fetchInventoryItems, user_id }) => {
     const [isEditing, setIsEditing] = useState(false);
 
     // Determine box color based on expiry
@@ -45,12 +46,131 @@ const InventoryItem = ({ id, item, category, quantity, purchase_date, expiry_dat
         return categoryEmojis[category] || "❓";
     };
 
-    // Decrement functions
-    const handleDecrementBy5 = () => {
-        // Implement the decrement logic or invoke a passed function
-        onDecrement(id, 5);
+    const newItem = {
+        user_id,
+        item,
+        quantity,
+        category,
+        purchase_date,
+        expiry_date,
     };
 
+    const toast = useToast();
+    const onUsed = async () => {
+        try {
+
+            const response = await fetch(`${apiUrl}/used_grocery`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify([newItem]),
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                toast({
+                    title: "Item used",
+                    isClosable: true
+                });
+                fetchInventoryItems();
+            } else {
+                toast({
+                    title: "Failed to Update Item",
+                    isClosable: true
+                });
+            }
+
+            const response2 = await fetch(`${apiUrl}/delete_grocery`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id,
+                    item: id,
+                    quantity: quantity,
+                    category: category,
+                    purchase_date: purchase_date,
+                    expiry_date: expiry_date,
+                }),
+            });
+
+            const result2 = await response2.json();
+
+            if (response2.ok) {
+                fetchInventoryItems();
+            } else {
+                toast({
+                    title: "Failed to Update Item",
+                    isClosable: true
+                });
+            }
+        } catch (error) {
+            toast({
+                title: "Error Updating Item",
+                isClosable: true
+            });
+        }
+    };
+
+    const onThrown = async () => {
+        try {
+
+            const response = await fetch(`${apiUrl}/thrown_grocery`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify([newItem]),
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                toast({
+                    title: "Item thrown away",
+                    isClosable: true
+                });
+                fetchInventoryItems();
+            } else {
+                toast({
+                    title: "Failed to Update Item",
+                    isClosable: true
+                });
+            }
+
+            const response2 = await fetch(`${apiUrl}/delete_grocery`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id,
+                    item: id,
+                    quantity: quantity,
+                    category: category,
+                    purchase_date: purchase_date,
+                    expiry_date: expiry_date,
+                }),
+            });
+
+            const result2 = await response2.json();
+
+            if (response2.ok) {
+                fetchInventoryItems();
+            } else {
+                toast({
+                    title: "Failed to Update Item",
+                    isClosable: true
+                });
+            }
+        } catch (error) {
+            toast({
+                title: "Error Updating Item",
+                isClosable: true
+            });
+        }
+    };
 
     return (
         <Box
@@ -64,16 +184,15 @@ const InventoryItem = ({ id, item, category, quantity, purchase_date, expiry_dat
                 boxShadow: "2px 2px 3px rgba(0, 0, 0, 0.25)" // Custom shadow casting to the right and bottom
             }}
             width="200px"
-
-            >
-            <Box bg={boxColor}>
+        >
+            <Box bg={boxColor} onClick={handleEdit} cursor="pointer">
                 {!isEditing ? (
                     <Flex align="center" justify="flex-start" spacing="4">
                         <Text paddingLeft="6px" fontSize="5xl">{getEmoji(category)}</Text>
                         <Flex align="center" justify="left">
                             <Text w="full">
-                                <Text fontSize="md" fontWeight="bold" ml="2" lineHeight="3" paddingTop={0.5}>{item}</Text>
-                                <Divider height="1px" borderColor="transparent"/>
+                                <Text fontSize="md" fontWeight="bold" ml="2" lineHeight="4" paddingTop={0.5}>{item}</Text>
+                                <Divider height="1px" borderColor="transparent" />
                                 <Text fontSize="xs" padding={0}>
                                     <Text as="span" fontWeight="bold" paddingLeft="1px">&nbsp;&nbsp;</Text>
                                     <Text as="span" fontWeight="bold" lineHeight="1">Amt: </Text>
@@ -83,13 +202,12 @@ const InventoryItem = ({ id, item, category, quantity, purchase_date, expiry_dat
                         </Flex>
                     </Flex>
                 ) : (
-                    <EditItemForm id={id} item={item} category={category} quantity={quantity} purchase_date={purchase_date} expiry_date={expiry_date} onClose={handleCloseEditForm} fetchInventoryItems={fetchInventoryItems}/>
+                    <EditItemForm id={id} item={item} category={category} quantity={quantity} purchase_date={purchase_date} expiry_date={expiry_date} onClose={handleCloseEditForm} fetchInventoryItems={fetchInventoryItems} user_id={user_id} />
                 )}
             </Box>
             <Box paddingLeft="0px">
                 {!isEditing ? (
                     <>
-                        {/* <Text><Text as="span" fontWeight="bold">Category: </Text><Text as="span">{category}</Text></Text> */}
                         <Text paddingLeft="12px" fontSize="sm" paddingTop="6px"><Text as="span" fontWeight="bold" >🛒: </Text><Text as="span">{purchase_date}</Text></Text>
                         <Text paddingLeft="12px" fontSize="sm" paddingTop="2px" paddingBottom="0px">
                             <Text as="span">🚮: </Text>
@@ -97,25 +215,16 @@ const InventoryItem = ({ id, item, category, quantity, purchase_date, expiry_dat
                             <Text as="span" color={wordHighlight} fontWeight="bold" fontSize="xs"> ({daysUntilExpiry}d left)</Text>
                         </Text>
                         <Box display="flex" flexDirection="column" alignItems="center" w="full">
-                        {/* <Stack direction="row" spacing={5} mt={1}>
-                            <Flex gap={1} align="center">
-                                <Button  color="black" fontSize="sm" size="xs" width="85px" height="40px" border="1px solid"  borderColor="gray.700"
-                                _hover={{ bg: "gray.600", color: 'white' }} onClick={() => onDecrement(id, 1)}>Use 1</Button>
-                                <Button color="black" fontSize="sm" size="xs" width="85px" height="40px" border="1px solid"  borderColor="gray.700"
-                                _hover={{ bg: "gray.600", color: 'white'}} onClick={handleDecrementBy5}>Use 5</Button>
-                            </Flex>
-                        </Stack> */}
                         <Stack direction="row" spacing={5} mt={2}>
                             <Flex gap={2} align="center" paddingBottom="10px">
-                                <Button bg="#EDF2F7" color="#888888" fontSize="sm" size="xs" width="85px" height="40px" _hover={{ bg: "primary.800" }} onClick={handleEdit}>Edit</Button>
-                                <Button bg="red.200" color="black" fontSize="sm" size="xs" width="85px" height="40px" _hover={{ bg: "danger.900" }} onClick={onDelete}>Delete</Button>
-                                
+                                <Button bg="#EDF2F7" color="#888888" fontSize="sm" size="xs" width="85px" height="40px"  onClick={onUsed}>Used</Button>
+                                <Button bg="red.200" color="black" fontSize="sm" size="xs" width="85px" height="40px"  onClick={onThrown}>Thrown</Button>
                             </Flex>
                         </Stack>
                         </Box>
                     </>
                 ) : (
-                    <EditItemForm id={id} item={item} category={category} quantity={quantity} purchase_date={purchase_date} expiry_date={expiry_date} onClose={handleCloseEditForm} fetchInventoryItems={fetchInventoryItems}/>
+                    <EditItemForm id={id} item={item} category={category} quantity={quantity} purchase_date={purchase_date} expiry_date={expiry_date} onClose={handleCloseEditForm} fetchInventoryItems={fetchInventoryItems} user_id={user_id} />
                 )}
             </Box>
         </Box>

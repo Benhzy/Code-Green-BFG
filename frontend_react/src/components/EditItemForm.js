@@ -12,12 +12,13 @@ import {
   Box,
   useToast,
   Stack,
-  IconButton
+  IconButton,
+  Text,
 } from '@chakra-ui/react';
 import { apiUrl } from './IpAdr';
 import { AddIcon, MinusIcon } from "@chakra-ui/icons";
 
-const EditItemForm = ({ id, item: initialItem, category: initialCategory, quantity: initialQuantity, purchase_date: initialPurchaseDate, expiry_date: initialExpiryDate, onClose, fetchInventoryItems }) => {
+const EditItemForm = ({ id, item: initialItem, category: initialCategory, quantity: initialQuantity, purchase_date: initialPurchaseDate, expiry_date: initialExpiryDate, onClose, fetchInventoryItems, user_id }) => {
     const [item, setItem] = useState(initialItem);
     const [quantity, setQuantity] = useState(initialQuantity);
     const [category, setCategory] = useState(initialCategory);
@@ -30,7 +31,7 @@ const EditItemForm = ({ id, item: initialItem, category: initialCategory, quanti
         e.preventDefault();
 
         const updatedItem = {
-            user_id: 5,
+            user_id,
             item,
             quantity,
             category,
@@ -44,7 +45,7 @@ const EditItemForm = ({ id, item: initialItem, category: initialCategory, quanti
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ user_id: '5', item: id, purchase_date: initialPurchaseDate, expiry_date: initialExpiryDate }),
+                body: JSON.stringify({ user_id, item: id, purchase_date: initialPurchaseDate, expiry_date: initialExpiryDate }),
             });
 
             const response = await fetch(`${apiUrl}/add_grocery`, {
@@ -60,10 +61,7 @@ const EditItemForm = ({ id, item: initialItem, category: initialCategory, quanti
             if (response.ok) {
                 toast({
                     title: "Item Updated Successfully",
-                    description: JSON.stringify(result),
-                    status: "success",
                     duration: 5000,
-                    isClosable: true
                 });
                 fetchInventoryItems();
                 onClose();
@@ -89,6 +87,7 @@ const EditItemForm = ({ id, item: initialItem, category: initialCategory, quanti
 
     return (
         <Box className="add-item-form-container" p={4} boxShadow="md" rounded="md" bg="white">
+            <Box display="flex" alignItems="center" justifyContent="center"><Text fontSize="2xl" as="b">Edit an item</Text></Box>  
             <form onSubmit={handleSubmit}>
                 <Stack spacing={4}>
                     <FormControl isRequired>
@@ -148,4 +147,6 @@ const EditItemForm = ({ id, item: initialItem, category: initialCategory, quanti
         </Box>
     );
 };
+
 export default EditItemForm;
+

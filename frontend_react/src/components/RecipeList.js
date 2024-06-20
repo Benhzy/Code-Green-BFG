@@ -1,150 +1,254 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
+  Box,
   Button,
-  useDisclosure
-} from '@chakra-ui/react';
-import './RecipeList.css';
-import { apiUrl } from './IpAdr';
-import RecipeCard from './RecipeCard';
-import RecipeModal from './RecipeModal';
+  Input,
+  Stack,
+  Heading,
+  Text,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  IconButton,
+  Switch,
+  Flex,
+  useToast,
+  FormLabel,
+  Spinner,
+} from "@chakra-ui/react";
+import { AddIcon, MinusIcon } from "@chakra-ui/icons";
+import { FaRegBookmark } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import { apiUrl } from "./IpAdr";
+import IngredientItem from "./IngredientItem";
+import RecipeModal from "./RecipeModal"; // Import RecipeModal
+import "./RecipeList.css";
 
-function RecipeList({ userId }) {
-    const { isOpen, onOpen, onClose } = useDisclosure();
-    const [recipes, setRecipes] = useState([]);
-    const [selectedRecipe, setSelectedRecipe] = useState(null);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState('');
+const RecipeList = ({ userId }) => {
+  const [recipes, setRecipes] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [servings, setServings] = useState(1);
+  const [preferences, setPreferences] = useState("");
+  const [inventory, setInventory] = useState([]);
+  const [showExpiring, setShowExpiring] = useState(false);
+  const [selectedRecipe, setSelectedRecipe] = useState(null); // State to hold the selected recipe
+  const [isModalOpen, setIsModalOpen] = useState(false); // State to control modal visibility
+  const toast = useToast();
+  const navigate = useNavigate(); // Use useNavigate instead of useHistory
 
-    // Abstracted fetch function
-    const fetchRecipes = async (url) => {
-        setIsLoading(true);
-        setError('');
-        try {
-            const response = await fetch(url);
-            const data = await response.json();
-            if (response.ok) {
-                setRecipes(data);
-                return data; // Return the fetched data
-            } else {
-                throw new Error('Failed to fetch recipes');
-            }
-        } catch (error) {
-            setError('Error fetching recipes: ' + error.message);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+  const calculateDaysUntilExpiry = (expiryDate) => {
+    const today = new Date();
+    const expiry = new Date(expiryDate);
+    const diffTime = expiry - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
 
-    useEffect(() => {
-        fetchRecipes(`${apiUrl}/recipe/${userId}`);
-    }, [userId]);
+  const fetchRecommendedRecipes = useCallback(
+    async (
+      url = `${apiUrl}/recommend_recipe/${userId}?cuisine=${preferences}&servings=${servings}`
+    ) => {
+      setIsLoading(true);
+      setError("");
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          const errorMessage = await response.text();
+          throw new Error(errorMessage || "Failed to fetch recipes");
+        }
+        const data = await response.json();
+        setRecipes(data);
+        setSelectedRecipe(data[0]); // Set the first recipe as the selected recipe
+        setIsModalOpen(true); // Open the modal
+      } catch (error) {
+        setError(`Error fetching recipes: ${error.message}`);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [userId, preferences, servings]
+  );
 
-    const fetchRecommendedRecipes = async (cuisine = 'Singaporean') => {
-        const recommendedRecipes = await fetchRecipes(`${apiUrl}/recommend_recipe/${userId}?cuisine=${cuisine}`);
-        if (recommendedRecipes && recommendedRecipes.length > 0) {
-            handleRecipeSelect(recommendedRecipes[0]); // Automatically select the first recipe
-        }
-    };
+  const fetchInventoryItems = useCallback(async () => {
+    try {
+      const response = await fetch(`${apiUrl}/grocery/${userId}`);
+      if (!response.ok) {
+        const errorMessage = await response.text();
+        throw new Error(errorMessage || "Failed to fetch inventory");
+      }
+      const data = await response.json();
+      setInventory(data);
+    } catch (error) {
+      toast({
+        title: "Error fetching inventory",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  }, [userId, toast]);
 
-    const handleRecipeSelect = (recipe) => {
-        setSelectedRecipe(recipe);
-        onOpen();
-    };
-    const deleteRecipeFromServer = async (recipeId) => {
-        const url = `${apiUrl}/delete_recipe/${recipeId}`;
-        const options = {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        };
-        try {
-            const response = await fetch(url, options);
-            if (!response.ok) throw new Error('Failed to delete the recipe');
-            alert('Recipe deleted successfully!');
-            // Update the recipes list by removing the deleted recipe
-            setRecipes(prevRecipes => prevRecipes.filter(recipe => recipe.id !== recipeId));
-        } catch (error) {
-            alert('Error deleting the recipe: ' + error.message);
-        }
-    };
+  useEffect(() => {
+    fetchInventoryItems();
+  }, [userId, fetchInventoryItems]);
 
-    const logRecipe = async () => {
-        const url = `${apiUrl}/add_recipe`;
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(selectedRecipe)
-        };
-        try {
-            const response = await fetch(url, options);
-            if (!response.ok) throw new Error('Failed to log the recipe');
-            alert('Recipe logged successfully!');
-        } catch (error) {
-            alert('Error logging the recipe: ' + error.message);
-        }
-    };
-    const parseIngredients = (ingredientsStr) => {
-        try {
-            // Remove the enclosing square brackets and then split the string on "), (" to get each tuple-like substring
-            const ingredientsArray = ingredientsStr.slice(1, -1).split("), (").map(item =>
-                // Remove the parentheses and any single quotes, then split each string into ingredient name and quantity
-                item.replace(/[()']/g, '').split(", ")
-            );
-    
-            // Convert each tuple-like array into an object with name and quantity properties
-            return ingredientsArray.map(item => ({
-                name: item[0],
-                quantity: item[1]
-            }));
-        } catch (error) {
-            console.error('Failed to parse ingredients:', error);
-            return [];
-        }
-    };
-    
-    
-    const parseInstructions = (instructionsStr) => {
-        try {
-            // Remove the square brackets and split the string into array entries
-            return instructionsStr.slice(2, -2).split("', '").map(instruction =>
-                instruction.trim().replace(/^'/, "").replace(/'$/, "")
-            );
-        } catch (error) {
-            console.error('Failed to parse instructions:', error);
-            return [];
-        }
-    };
-    return (
-        <div>
-            <h1>Recipes</h1>
-            <button onClick={() => fetchRecommendedRecipes()}>Get Recommended Recipes</button>
-            {isLoading && <p>Loading...</p>}
-            {error && <p>{error}</p>}
-            <div>
-                {recipes.map((recipe, index) => (
-                    <RecipeCard key={index} recipe={recipe} onRecipeSelect={handleRecipeSelect} />
-                ))}
-            </div>
-            {selectedRecipe && (
-                <RecipeModal
-                    isOpen={isOpen}
-                    onClose={onClose}
-                    recipe={selectedRecipe}
-                    onLogRecipe={logRecipe}
+  const filteredInventory = useMemo(() => {
+    return showExpiring
+      ? inventory.filter(
+          (item) => calculateDaysUntilExpiry(item.expiry_date) <= 5
+        )
+      : inventory;
+  }, [inventory, showExpiring]);
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedRecipe(null);
+  };
+
+  return (
+    <div className="recipe-content">
+      <Heading mb={4}>⭐ Recipe Generator</Heading>
+      <Text mb={4}>
+        Time to create some magic in the kitchen! Select the ingredients you
+        would like to cook with.
+      </Text>
+      <Box justifyContent="center" alignItems="center" display="flex">
+        <Box bg="#19956D" p={4} borderRadius="md" boxShadow="md" width="95%">
+          <Flex align="center" mb={4}>
+            <FormLabel mb={1}>Servings: </FormLabel>
+            <NumberInput
+              min={1}
+              value={servings}
+              onChange={(valueString) => setServings(parseInt(valueString))}
+              width="100%"
+              position="relative"
+              bg="white"
+            >
+              <NumberInputStepper position="absolute" left="0">
+                <IconButton
+                  aria-label="Decrement"
+                  icon={<MinusIcon />}
+                  size="md"
+                  onClick={() =>
+                    setServings((prevServings) =>
+                      prevServings > 1 ? prevServings - 1 : 1
+                    )
+                  }
                 />
-            )}
-        </div>
-    );
-}
+              </NumberInputStepper>
+              <NumberInputField
+                pl="2rem"
+                pr="2rem"
+                paddingLeft="53px"
+                textAlign="center"
+              />
+              <NumberInputStepper position="absolute" right="4">
+                <IconButton
+                  aria-label="Increment"
+                  icon={<AddIcon />}
+                  size="md"
+                  onClick={() =>
+                    setServings((prevServings) => prevServings + 1)
+                  }
+                />
+              </NumberInputStepper>
+            </NumberInput>
+          </Flex>
+          <Flex align="center" mb={1}>
+            <FormLabel mb={1}>Preference:</FormLabel>
+            <Input
+              value={preferences}
+              onChange={(e) => setPreferences(e.target.value)}
+              placeholder="I want something with BBQ sauce..."
+              maxLength={200}
+              width="100%"
+              bg="white"
+            />
+          </Flex>
+        </Box>
+      </Box>
+      <Box justifyContent="left" display="flex" alignItems="center" paddingLeft="4px">
+      <Flex align="center">
+        <Text paddingLeft="8px" mr={2}>
+          Ingredients:
+        </Text>
+        <Stack direction="row" spacing={4} mt={2}>
+          <Switch
+            isChecked={!showExpiring}
+            onChange={() => setShowExpiring(false)}
+          />
+          <Text>All</Text>
+          <Switch
+            isChecked={showExpiring}
+            onChange={() => setShowExpiring(true)}
+          />
+          <Text>Expiring</Text>
+        </Stack>
+      </Flex>
+      </Box>
+      <Box
+        mt={2}
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        justifyContent="center"
+        width="100%"
+        gap="0px"
+        padding="0px 0px 0px 0px"
+      >
+        {isLoading ? (
+          <Spinner />
+        ) : (
+          filteredInventory.map((item, index) => (
+            <IngredientItem
+              key={index}
+              {...item}
+              fetchInventoryItems={fetchInventoryItems}
+              userId={userId}
+              style={{ width: "100%", margin: 0, padding: 0 }}
+            />
+          ))
+        )}
+      </Box>
+      <Button
+        onClick={() => fetchRecommendedRecipes()}
+        colorScheme="teal"
+        mt={4}
+        position="fixed"
+        bottom="100px"
+        left="50%"
+        transform="translateX(-50%)"
+        zIndex="10"
+        px={8}
+        py={6}
+      >
+        Generate Recipe
+      </Button>
+      <IconButton
+        icon={<FaRegBookmark />}
+        aria-label="Bookmark Recipes"
+        position="fixed"
+        top="30px"
+        right="16px"
+        zIndex="1000"
+        colorScheme="teal"
+        size="lg"
+        isRound
+        onClick={() => navigate("/saved-recipes")}
+      />
+      {selectedRecipe && (
+        <RecipeModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          recipe={selectedRecipe}
+          userId={userId}
+          onLogRecipe={(recipe) => console.log("Recipe logged:", recipe)}
+        />
+      )}
+    </div>
+  );
+};
 
 export default RecipeList;

@@ -73,13 +73,15 @@ def generate_recipe_suggestions(ingredients, exp_ingredients, user_recipes, cuis
 
     The recipe should be for {servings} servings.
 
-    Make sure this recipe can be prepared with the ingredients here: {all_ingredients_list}.
+    Make sure the recipe follows the following preferences: {cuisine}.
+
+    I have the following ingredients available: {all_ingredients_list}.
+
+    IMPORTANT!!! YOU MUST NOT USE INGRIDIENTS THAT ARE NOT AVAILABLE!
 
     Make sure the unit of measurement for ingredients is in metric.
 
-    Make sure the recipe is an authentic {cuisine} recipe.
-
-    You do not need to use all the ingredients, if a ingredient does not being in the recipe, omit it.
+    You do not need to use all the ingredients.
 
     Give your output in the following format!
 
@@ -255,3 +257,29 @@ def store_recipe(user_id, recipe_dict):
 # near_expiry_ingredients = "Fish, Potato, Carrot, Onion, Garlic, Ginger, Soy Sauce, Oyster Sauce, Cornstarch, Sugar, Salt, Pepper, Oil"
 # user_recipes = []
 # print(recommend_recipes(123456, "Chinese"))
+
+
+## HELPER FUNCTIONS
+
+def split_quantity(quantity):
+    index = len(quantity) - 1
+    while index >= 0 and not quantity[index].isdigit():
+        index -= 1
+
+    numeric_part = quantity[:index + 1].strip()
+    unit_part = quantity[index + 1:].strip().lower()
+
+    numeric_value = float(numeric_part) if '.' in numeric_part else int(numeric_part)
+    return numeric_value, unit_part
+
+def subtract_quantity(old_quantity, new_quantity):
+    old_numeric, old_unit = split_quantity(old_quantity)
+    new_numeric, new_unit = split_quantity(new_quantity)
+
+    # if old_unit != new_unit:
+    #     raise ValueError(f"Units do not match.\n{old_unit} vs {new_unit}")
+
+    updated_numeric = old_numeric - new_numeric
+    updated_quantity = f"{updated_numeric} {old_unit}".strip()
+
+    return updated_quantity
