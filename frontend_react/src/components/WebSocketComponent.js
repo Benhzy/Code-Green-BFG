@@ -5,7 +5,7 @@ const WebSocketComponent = () => {
 
     useEffect(() => {
         // Create a new WebSocket connection
-        const socket = new WebSocket('wss://kaisukitchen.site/ws');
+        const socket = new WebSocket('wss://kiasukitchen.site/ws');
 
         // Event listener for when a connection is opened
         socket.onopen = () => {
