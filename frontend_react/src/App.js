@@ -15,7 +15,7 @@ import EditReceiptItem from './components/EditReceiptItem';
 import Dashboard from './components/Dashboard.js'
 import { apiUrl } from './components/IpAdr'; 
 import Leaderboard from './components/Leaderboard.js';
-import WebSocketComponent from './WebSocketComponent';
+import WebSocketComponent from './components/WebSocketComponent';
 
 const Groceries = ({ inventoryItems, onDecrement, onDelete, handleFilterChange, handleSearchChange, searchQuery, fetchInventoryItems, handleSortChange, sortCriterion, selectedFilter }) => (
     <>
