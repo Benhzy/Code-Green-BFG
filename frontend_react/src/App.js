@@ -15,7 +15,6 @@ import EditReceiptItem from './components/EditReceiptItem';
 import Dashboard from './components/Dashboard.js'
 import { apiUrl } from './components/IpAdr'; 
 import Leaderboard from './components/Leaderboard.js';
-import WebSocketComponent from './components/WebSocketComponent';
 
 const Groceries = ({ inventoryItems, onDecrement, onDelete, handleFilterChange, handleSearchChange, searchQuery, fetchInventoryItems, handleSortChange, sortCriterion, selectedFilter }) => (
     <>
@@ -118,6 +117,37 @@ function App() {
         fetchInventoryItems();
     }, [userId]);
 
+    useEffect(() => {
+        // Create WebSocket connection.
+        const ws = new WebSocket('wss://kiasukitchen.site/ws');
+
+        // Connection opened
+        ws.onopen = (event) => {
+            console.log('WebSocket connection opened:', event);
+        };
+
+        // Listen for messages
+        ws.onmessage = (event) => {
+            console.log('Message from server:', event.data);
+            // Handle incoming messages
+        };
+
+        // Handle errors
+        ws.onerror = (event) => {
+            console.error('WebSocket error:', event);
+        };
+
+        // Handle connection close
+        ws.onclose = (event) => {
+            console.log('WebSocket connection closed:', event);
+        };
+
+        // Cleanup on component unmount
+        return () => {
+            ws.close();
+        };
+    }, []);
+    
     const handleFilterChange = (category) => {
         setFilter(category);
     };
@@ -276,7 +306,6 @@ function App() {
             <div className="main-container">
             <div class="main-content">
                 <div className="content">
-                <WebSocketComponent />
                 <Routes>
                     <Route path="/" element={<Navigate to="/groceries" />} />
                     <Route path="/recipes" element={<RecipeList userId={userId} />} />
