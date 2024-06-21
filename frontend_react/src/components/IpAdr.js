@@ -1,6 +1,5 @@
 // // update to your own IP address
-export const apiUrl = 'https://kiasukitchen.site/api';
-
+export const apiUrl = 'https://kiasukitchen.site'
 
 
 // // // // // Ed
