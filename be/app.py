@@ -68,7 +68,7 @@ if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
 
-@app.route('/add_grocery', methods=['POST']) # POST request to add grocery items (can add multiple at the same time)
+@app.route('/api/add_grocery', methods=['POST']) # POST request to add grocery items (can add multiple at the same time)
 def add_grocery():
     data = request.get_json()  # This should be a list of dictionaries
     
@@ -97,7 +97,7 @@ def add_grocery():
     
     return jsonify({"message": "Data posted successfully", "user_id": result}), 201
 
-@app.route('/used_grocery', methods=['POST']) # POST request to add grocery items (can add multiple at the same time)
+@app.route('/api/used_grocery', methods=['POST']) # POST request to add grocery items (can add multiple at the same time)
 def used_grocery():
     data = request.get_json()  # This should be a list of dictionaries
     
@@ -126,7 +126,7 @@ def used_grocery():
     
     return jsonify({"message": "Data posted successfully", "user_id": result}), 201
 
-@app.route('/thrown_grocery', methods=['POST']) # POST request to add grocery items (can add multiple at the same time)
+@app.route('/api/thrown_grocery', methods=['POST']) # POST request to add grocery items (can add multiple at the same time)
 def thrown_grocery():
     data = request.get_json()  # This should be a list of dictionaries
     
@@ -155,15 +155,15 @@ def thrown_grocery():
     
     return jsonify({"message": "Data posted successfully", "user_id": result}), 201
 
-@app.route('/grocery/<user_id>', methods=['GET'])
+@app.route('/api/grocery/<user_id>', methods=['GET'])
 def get_grocery(user_id):
     return jsonify(get_grocery_data_by_user_id(user_id))
 
-@app.route('/recipe/<user_id>', methods=['GET'])
+@app.route('/api/recipe/<user_id>', methods=['GET'])
 def get_recipe(user_id):
     return jsonify(get_user_recipes_by_user_id(user_id))
 
-@app.route('/delete_grocery', methods=['DELETE']) # DELETE request to delete grocery items, but can only delete one at a time
+@app.route('/api/delete_grocery', methods=['DELETE']) # DELETE request to delete grocery items, but can only delete one at a time
 def delete_grocery():
     data = request.get_json()
     user_id = data.get('user_id')
@@ -181,7 +181,7 @@ def delete_grocery():
     
     return jsonify({"message": "Item deleted successfully"}), 200
 
-@app.route('/delete_recipe', methods=['DELETE'])
+@app.route('/api/delete_recipe', methods=['DELETE'])
 def delete_recipe():
     data = request.get_json()
     user_id = data.get('user_id')
@@ -197,7 +197,7 @@ def delete_recipe():
     
     return jsonify({"message": "Recipe deleted successfully"}), 200
 
-@app.route('/recommend_recipe/<user_id>', methods=['GET'])
+@app.route('/api/recommend_recipe/<user_id>', methods=['GET'])
 @cross_origin(origins="*", allow_headers=["Content-Type", "Authorization", "X-Requested-With"], supports_credentials=True)
 def recommend_recipe(user_id):
     cuisine = request.args.get('cuisine', 'Singaporean')
@@ -212,7 +212,7 @@ def recommend_recipe(user_id):
         return jsonify({"error": str(e)}), 500
 
 
-@app.route('/add_recipe', methods=['POST'])
+@app.route('/api/add_recipe', methods=['POST'])
 def store_recipe():
     data = request.get_json()
     
@@ -249,7 +249,7 @@ def store_recipe():
     return jsonify([{"message": "Data posted successfully", "response": resp} for resp, stat in responses]), 201
 
 
-@app.route('/update_inventory', methods=['POST'])
+@app.route('/api/update_inventory', methods=['POST'])
 def update_inventory_item():
     data = request.get_json()
     
@@ -294,7 +294,7 @@ def update_inventory_item():
 
     return jsonify({"message": "Inventory updated successfully."}), 201
 
-@app.route('/upload_receipt/<user_id>', methods=['POST'])
+@app.route('/api/upload_receipt/<user_id>', methods=['POST'])
 def upload_receipt(user_id):
     data = request.get_json()
     image_data = data['image']
@@ -313,7 +313,7 @@ def upload_receipt(user_id):
     return jsonify({'extracted_text': extracted_items, 'user_id': user_id})
 
 
-@app.route('/upload_items/<user_id>', methods=['POST'])
+@app.route('/api/upload_items/<user_id>', methods=['POST'])
 def save_receipt_items(user_id):
     extracted_items = request.json['items']
     print(extracted_items)
@@ -321,7 +321,7 @@ def save_receipt_items(user_id):
     return jsonify({'extracted_text': extracted_items, 'user_id': user_id})
 
 
-@app.route('/upload_receipt_two/<user_id>', methods=['POST'])
+@app.route('/api/upload_receipt_two/<user_id>', methods=['POST'])
 def upload_file(user_id):
     if 'file' not in request.files:
         return jsonify({'error': 'No file part'}), 400
@@ -336,19 +336,19 @@ def upload_file(user_id):
         post_data(user_id, extracted_items)
         return jsonify({'extracted_text': extracted_items, 'user_id': user_id})
 
-@app.route('/get_most_wasted/<user_id>', methods=['GET'])
+@app.route('/api/get_most_wasted/<user_id>', methods=['GET'])
 def get_most_wasted_items(user_id):
     return jsonify(get_most_wasted(user_id))
 
-@app.route('/get_most_used/<user_id>', methods=['GET'])
+@app.route('/api/get_most_used/<user_id>', methods=['GET'])
 def get_most_used_items(user_id):
     return jsonify(get_most_used(user_id))
 
-@app.route('/get_used_info/<user_id>', methods=['GET']) 
+@app.route('/api/get_used_info/<user_id>', methods=['GET']) 
 def get_used_info_items(user_id):
     return jsonify(get_used_info(user_id))
 
-@app.route('/get_thrown_info/<user_id>', methods=['GET']) 
+@app.route('/api/get_thrown_info/<user_id>', methods=['GET']) 
 def get_thrown_info_items(user_id):
     return jsonify(get_thrown_info(user_id))
 
