@@ -128,8 +128,8 @@ const AddItemForm = ({ onClose, fetchInventoryItems, user_id }) => {
                         <Input type="date" value={expiryDate} onChange={(e) => setExpiryDate(e.target.value)} />
                     </FormControl>
                     <Flex mt={4} justifyContent="space-between">
-                        <Button bg="#edf2f7" onClick={onClose} disabled={loading} color="#888888">Cancel</Button>
-                        <Button bg="#19956d" type="submit" disabled={loading} color="white">Add Item</Button>
+                        <Button bg="#edf2f7" color="#888888" onClick={onClose} disabled={loading} >Cancel</Button>
+                        <Button bg="#19956d" color="white" type="submit" disabled={loading} >Add Item</Button>
                     </Flex>
                 </Stack>
             </form>

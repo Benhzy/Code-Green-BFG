@@ -78,7 +78,7 @@ a:focus {
   flex-direction: column;
   align-items: center; /* Center horizontally */
   justify-content: center; /* Center vertically */
-  width: 420px;
+  width: 1vw;
   overflow-y: auto; /* Allows scrolling within the container */
 }
 

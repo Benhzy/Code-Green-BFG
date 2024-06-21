@@ -9,6 +9,8 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import { apiUrl } from "./IpAdr.js";
+import dpImage from './dp.jpg'; // Import the image
+import './FullPageImage.css'; // Import the CSS file
 
 const categoryEmojis = {
   Fruit: "🍎",
@@ -106,19 +108,21 @@ const Dashboard = ({ userId }) => {
   }, [userId]);
 
   return (
-    <Box p={2}>
-      <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        mt="-30px"
-      >
-        <Image
-          boxSize="30%"
-          src="https://assets-global.website-files.com/5e51c674258ffe10d286d30a/5e5353e82b568af2d916cbbd_peep-26.svg"
+    <Box>
+    <Box className="full-width-image-container" w="100%">
+        <Image 
+          src={dpImage}
+          className="full-width-image"
         />
+    </Box>
+    <Box p={2}>
+      <Box paddingLeft="8px" paddingTop="20px" >
+        <Stack gap="0px">
+        <Text fontSize="xl" as="b">Isabelle Toh</Text>
+        <Text>@isabelle_toh</Text>
+        </Stack>
       </Box>
-      <Box paddingBot="8px" paddingLeft="7px">
+      <Box paddingBot="8px" paddingLeft="7px" paddingTop="12px">
         <Text fontSize="xl" as="b">
           Overview
         </Text>
@@ -384,6 +388,7 @@ const Dashboard = ({ userId }) => {
           ))}
         </Flex>
       </Box>
+    </Box>
     </Box>
   );
 };
