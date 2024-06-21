@@ -54,8 +54,8 @@ try:
 except Exception as e:
     print("An error occurred:", e)
 
-
 app = Flask(__name__)
+
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # cors = CORS(app, resources={r"/api/*": {"origins": frontend_url}})
