@@ -35,7 +35,7 @@ import os
 import warnings
 import logging
 import json
-from flask_socketio import SocketIO
+# from flask_socketio import SocketIO
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -56,7 +56,7 @@ except Exception as e:
     print("An error occurred:", e)
 
 app = Flask(__name__)
-socketio = SocketIO(app)
+# socketio = SocketIO(app)
 
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -357,13 +357,13 @@ def get_thrown_info_items(user_id):
 
 
 
-if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=8000)
-
-
-######################### DONT CHANGE THIS, FOR EDWARD TO USE
 # if __name__ == '__main__':
-#     app.run(host="172.20.10.5", debug=True)
+#     socketio.run(app, host='0.0.0.0', port=8000)
+
+
+######################## DONT CHANGE THIS, FOR EDWARD TO USE
+if __name__ == '__main__':
+    app.run(host="172.20.10.5", debug=True)
 
 # # DONT DELETE THIS, FOR ANYBODY TO USE
 # if __name__ == '__main__':
