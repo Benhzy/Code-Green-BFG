@@ -1,5 +1,5 @@
 // // update to your own IP address
-export const apiUrl = 'https://kaisukitchen.site/api/grocery';
+export const apiUrl = 'https://kaisukitchen.site/api';
 
 
 

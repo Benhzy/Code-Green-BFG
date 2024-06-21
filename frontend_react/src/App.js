@@ -14,9 +14,8 @@ import EditItemForm from './components/EditItemForm';
 import EditReceiptItem from './components/EditReceiptItem';
 import Dashboard from './components/Dashboard.js'
 import { apiUrl } from './components/IpAdr'; 
-import axios from 'axios';
 import Leaderboard from './components/Leaderboard.js';
-
+import WebSocketComponent from './WebSocketComponent';
 
 const Groceries = ({ inventoryItems, onDecrement, onDelete, handleFilterChange, handleSearchChange, searchQuery, fetchInventoryItems, handleSortChange, sortCriterion, selectedFilter }) => (
     <>
@@ -277,6 +276,7 @@ function App() {
             <div className="main-container">
             <div class="main-content">
                 <div className="content">
+                <WebSocketComponent />
                 <Routes>
                     <Route path="/" element={<Navigate to="/groceries" />} />
                     <Route path="/recipes" element={<RecipeList userId={userId} />} />

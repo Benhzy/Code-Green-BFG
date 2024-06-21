@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Heading, Text, Spinner, Button, Flex } from '@chakra-ui/react';
+import { Box, Heading, Spinner, Button, Flex } from '@chakra-ui/react';
 import { apiUrl } from './IpAdr';
 import RecipeCard from './RecipeCard';
 import RecipeModal from './RecipeModal';
