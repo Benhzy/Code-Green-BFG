@@ -207,12 +207,15 @@ function RecipeModal({ isOpen, onClose, recipe, userId }) {
                         height="60px"
                         textAlign="center"
                         paddingTop="6px"
-                        fontSize="xl"
+                        fontSize={recipe.recipe_name.length > 20 ? 'md' : 'xl'} // Adjust font size based on text length
                         fontWeight="bold"
-                        margin="0px 16px" 
+                        margin="0px 16px"
                         marginBottom="-10"
                         bg="#FFFFFF"
                         borderRadius="8px 8px 0 0"
+                        whiteSpace="nowrap"
+                        overflow="hidden"
+                        textOverflow="ellipsis"
                     >
                         {recipe.recipe_name}
                     </Box>
