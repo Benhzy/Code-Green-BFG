@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import { Menu, MenuButton, MenuList, MenuItem, Button, Stack, Input, InputGroup, InputRightElement, IconButton } from '@chakra-ui/react';
+import { Menu, MenuButton, MenuList, MenuItem, Button, Stack, Input, InputGroup, InputRightElement, IconButton, Alert, AlertIcon, AlertTitle, AlertDescription, CloseButton } from '@chakra-ui/react';
 import { SearchIcon, ChevronDownIcon } from '@chakra-ui/icons';
 import InventoryItem from './components/InventoryItem';
 import BottomMenuBar from './components/BottomMenuBar';
@@ -96,7 +96,7 @@ function App() {
     const [inventoryItems, setInventoryItems] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [sortCriterion, setSortCriterion] = useState('expiry_date'); // Change default sort criterion here
-    
+    const [showAlert, setShowAlert] = useState(true); // State to show/hide alert
 
     const fetchInventoryItems = async () => {
         try {
@@ -116,6 +116,13 @@ function App() {
     useEffect(() => {
         fetchInventoryItems();
     }, [userId]);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setShowAlert(true);
+        }, 600000); // 10 minutes in milliseconds
+        return () => clearInterval(interval);
+    }, []);
 
     const handleFilterChange = (category) => {
         setFilter(category);
@@ -274,6 +281,14 @@ function App() {
             <div className="main-background">
             <div className="main-container">
             <div class="main-content">
+                {showAlert && (
+                    <Alert status="warning">
+                        <AlertIcon />
+                        <AlertTitle>Items Expiring Soon!</AlertTitle>
+                        <AlertDescription>You have 3 items expiring soon.</AlertDescription>
+                        <CloseButton position="absolute" right="8px" top="8px" onClick={() => setShowAlert(false)} />
+                    </Alert>
+                )}
                 <div className="content">
                 <Routes>
                     <Route path="/" element={<Navigate to="/groceries" />} />
